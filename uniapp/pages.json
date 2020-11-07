@@ -1,0 +1,343 @@
+{
+  "easycom": {
+    "^u-(.*)": "@/uview-ui/components/u-$1/u-$1.vue"
+  },
+  "pages": [{
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "北京盛世国际拍卖"
+      }
+    },
+    {
+      "path": "pages/category/category",
+      "style": {
+        "navigationBarTitleText": "拍品分类"
+      }
+    }, {
+      "path": "pages/notice/notice",
+      "style": {
+        "navigationBarTitleText": "消息"
+      }
+    }, {
+      "path": "pages/notice/detail",
+      "style": {
+        "navigationBarTitleText": "消息详情"
+      }
+    }, {
+      "path": "pages/news/news",
+      "style": {
+        "navigationBarTitleText": "公司动态"
+      }
+    }, {
+      "path": "pages/news/detail",
+      "style": {
+        "navigationBarTitleText": "文章详情"
+      }
+    }, {
+      "path": "pages/my/my",
+      "style": {
+        "navigationBarTitleText": "我的"
+      }
+    }, {
+      "path": "pages/my/verify",
+      "style": {
+        "navigationBarTitleText": "实名认证"
+      }
+    }
+    , {
+      "path": "pages/my/edit",
+      "style": {
+        "navigationBarTitleText": "资料修改"
+      }
+    }
+    , {
+      "path": "pages/my/phone",
+      "style": {
+        "navigationBarTitleText": "绑定手机号"
+      }
+    }
+    ,{
+        "path" : "pages/search/search",
+      "style": {
+        "navigationBarTitleText": "搜索"
+      }
+    }
+    ,{
+        "path" : "pages/my/address/address",
+      "style": {
+        "navigationBarTitleText": "地址管理"
+      }
+    }
+    ,{
+      "path" : "pages/my/address/add",
+      "style": {
+        "navigationBarTitleText": "地址修改"
+      }
+    }
+    , {
+      "path": "pages/my/bid",
+      "style": {
+        "navigationBarTitleText": "我的出价"
+      }
+    }
+    , {
+      "path": "pages/my/favorite",
+      "style": {
+        "navigationBarTitleText": "我的收藏"
+      }
+    }
+    ,{
+      "path" : "pages/system/about/about",
+      "style": {
+        "navigationBarTitleText": "关于我们"
+      }
+    }
+    ,{
+      "path" : "pages/system/about/office",
+      "style": {
+        "navigationBarTitleText": "全国联络处"
+      }
+    }
+    ,{
+      "path" : "pages/system/about/partner",
+      "style": {
+        "navigationBarTitleText": "合作单位"
+      }
+    }
+    ,{
+      "path" : "pages/system/about/contact",
+      "style": {
+        "navigationBarTitleText": "联系我们"
+      }
+    }
+    ,{
+      "path" : "pages/system/collect/collect",
+      "style": {
+        "navigationBarTitleText": "藏品征集"
+      }
+    }
+    ,{
+      "path" : "pages/system/consign/consign",
+      "style": {
+        "navigationBarTitleText": "我要寄售"
+      }
+    }
+    ,{
+      "path" : "pages/system/association/association",
+      "style": {
+        "navigationBarTitleText": "盛世雅聚艺术社"
+      }
+    }
+    ,{
+      "path" : "pages/system/web-view",
+      "style": {
+        "navigationBarTitleText": "北京盛世国际拍卖"
+      }
+    }
+    ,{
+      "path" : "pages/lecture/lecture",
+      "style": {
+        "navigationBarTitleText": "专家讲座"
+      }
+    }
+    ,{
+      "path" : "pages/lecture/detail",
+      "style": {
+        "navigationBarTitleText": "讲座",
+        "usingComponents": {
+          "subscribe": "plugin-private://wx2b03c6e691cd7370/components/subscribe/subscribe"
+        }
+      }
+    }
+    ,{
+      "path" : "pages/auction/seckill",
+      "style": {
+        "navigationBarTitleText": "限时拍"
+      }
+    }
+    ,{
+      "path" : "pages/auction/sync",
+      "style": {
+        "navigationBarTitleText": "直播拍卖"
+      }
+    }
+    ,{
+      "path" : "pages/auction/list",
+      "style": {
+        "navigationBarTitleText": "拍品列表"
+      }
+    }
+    ,{
+      "path" : "pages/auction/detail",
+      "style": {
+        "navigationBarTitleText": "拍品详情"
+        /* "usingComponents": {
+          "subscribe": "plugin-private://wx2b03c6e691cd7370/components/subscribe/subscribe"
+        }, */
+        //"enablePullDownRefresh": true
+      }
+    }
+    ,{
+      "path" : "pages/auction/special",
+      "style": {
+        "navigationBarTitleText": "专场"
+      }
+    }
+    ,{
+      "path" : "pages/auction/asset",
+      "style": {
+        "navigationBarTitleText": "资产列表"
+      }
+    }
+    ,{
+      "path" : "pages/order/order",
+      "style": {
+        "navigationBarTitleText": "订单列表"
+      }
+    }
+    ,{
+      "path" : "pages/order/detail",
+      "style": {
+        "navigationBarTitleText": "订单详情"
+      }
+    }
+    ,{
+      "path" : "pages/order/confirm",
+      "style": {
+        "navigationBarTitleText": "确认订单"
+      }
+    }
+    ,{
+      "path" : "pages/order/pay_result",
+      "style": {
+        "navigationBarTitleText": "支付结果"
+      }
+    }
+    ,{
+      "path" : "pages/order/express",
+      "style": {
+        "navigationBarTitleText": "物流信息"
+      }
+    }
+    ,{
+      "path" : "pages/system/help/help",
+      "style": {
+        "navigationBarTitleText": "新手指南"
+      }
+    }
+    ,{
+      "path" : "pages/expert/expert",
+      "style": {
+        "navigationBarTitleText": "专家简介"
+      }
+    }
+    ,{
+        "path" : "pages/system/deposit/deposit",
+      "style": {
+        "navigationBarTitleText": "我的保证金"
+      }
+    }
+    ,{
+        "path" : "pages/system/deposit/offline",
+      "style": {
+        "navigationBarTitleText": "线下银行卡转账"
+      }
+    }
+    ,{
+        "path" : "pages/system/deposit/list",
+      "style": {
+        "navigationBarTitleText": "保证金明细"
+      }
+    },
+    {
+    	"path": "uview-ui/components/u-avatar-cropper/u-avatar-cropper",
+    	"style": {
+    		"navigationBarTitleText": "上传头像",
+    		"navigationBarBackgroundColor": "#000000"
+    	}
+    }
+    ,{
+      "path" : "pages/goods/list",
+      "style": {
+        "navigationBarTitleText": "藏品列表"
+      }
+    }
+    ,{
+      "path" : "pages/goods/category",
+      "style": {
+        "navigationBarTitleText": "藏品分类"
+      }
+    }
+    ,{
+      "path" : "pages/goods/detail",
+      "style": {
+        "navigationBarTitleText": "藏品详情"
+      }
+    }
+    ,{
+      "path" : "pages/goods/search",
+      "style": {
+        "navigationBarTitleText": "藏品搜索"
+      }
+    }
+    ,{
+      "path" : "pages/cart/cart",
+      "style": {
+        "navigationBarTitleText": "购物车"
+      }
+    }
+  ],
+  "globalStyle": {
+    "pageOrientation": "portrait",
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "北京盛世国际拍卖",
+    "navigationBarBackgroundColor": "#ffffff",
+    "backgroundColor": "#F8F8F8",
+    "backgroundColorTop": "#F4F5F6",
+    "backgroundColorBottom": "#F4F5F6"
+  },
+  "tabBar": {
+    // "custom": true,
+    "color": "#282828",
+    "selectedColor": "#f45300",
+    "borderStyle": "white",
+    "backgroundColor": "#ffffff",
+    "list": [{
+        "pagePath": "pages/index/index",
+				"iconPath": "static/home.png",
+				"selectedIconPath": "static/home-current.png",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/category/category",
+				"iconPath": "static/cate.png",
+				"selectedIconPath": "static/cate-current.png",
+        "text": "拍品分类"
+      },
+      {
+        "pagePath": "pages/cart/cart",
+				"iconPath": "static/cart.png",
+				"selectedIconPath": "static/cart-current.png",
+        "text": "购物车"
+      },
+      {
+        "pagePath": "pages/notice/notice",
+				"iconPath": "static/msg.png",
+				"selectedIconPath": "static/msg-current.png",
+        "text": "消息"
+      },
+      {
+        "pagePath": "pages/my/my",
+				"iconPath": "static/my.png",
+				"selectedIconPath": "static/my-current.png",
+        "text": "我的"
+      }
+    ]
+  },
+
+  // "component": true,
+  "condition": { //模式配置，仅开发期间生效
+    "current": 0, //当前激活的模式(list 的索引项)
+    "list": []
+  }
+}
