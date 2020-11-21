@@ -1,33 +1,32 @@
 <?php
-/**
- * Desc:
- * User: SenSen Wechat:1050575278
- * Date: 2020/8/6
- * Time: 11:12
- */
 
 namespace sensen\services\upload\storage;
 
-
-use sensen\basic\BaseUpload;
-use sensen\exceptions\UploadException;
+use crmeb\basic\BaseUpload;
+use crmeb\exceptions\UploadException;
 use think\exception\ValidateException;
 use think\facade\Config;
 use think\facade\Filesystem;
 use think\File;
-use think\Image;
 
+/**
+ * 本地上传
+ * Class Local
+ * @package sensen\services\upload\storage
+ */
 class Local extends BaseUpload
 {
-    //默认存放位置
+
+    /**
+     * 默认存放路径
+     * @var string
+     */
     protected $defaultPath;
 
     public function initialize(array $config)
     {
         parent::initialize($config);
-
-        $disk = Config::get('filesystem.default');
-        $this->defaultPath = Config::get("filesystem.disks.{$disk}.url");
+        $this->defaultPath = Config::get('filesystem.disks.' . Config::get('filesystem.default') . '.url');
     }
 
     protected function app()
@@ -35,22 +34,26 @@ class Local extends BaseUpload
         // TODO: Implement app() method.
     }
 
-    /**
-     * 生成上传文件目录位置
-     * @param $path
-     * @param null $root
-     * @return mixed
-     */
-    protected function uploadDir($path, $root=null)
+    public function getTempKeys()
     {
-        if($root==null){
-            $root = app()->getRootPath().'public'.DIRECTORY_SEPARATOR;
-        }
-        return str_replace('\\', '/', $root.'uploads'.DIRECTORY_SEPARATOR.$path);
+        // TODO: Implement getTempKeys() method.
+        return $this->setError('请检查您的上传配置，视频默认oss上传');
     }
 
     /**
-     * 检测上传目录是否存在 不存在则生成
+     * 生成上传文件目录
+     * @param $path
+     * @param null $root
+     * @return string
+     */
+    protected function uploadDir($path, $root = null)
+    {
+        if ($root === null) $root = app()->getRootPath() . 'public/';
+        return str_replace('\\', '/', $root . 'uploads/' . $path);
+    }
+
+    /**
+     * 检查上传目录不存在则生成
      * @param $dir
      * @return bool
      */
@@ -60,12 +63,11 @@ class Local extends BaseUpload
     }
 
     /**
-     * 上传操作
+     * 文件上传
      * @param string $file
-     * @param string $thumb 格式为 axb
-     * @return array|bool|mixed
+     * @return array|bool|mixed|\StdClass
      */
-    public function move(string $file = 'file', string $thumb='')
+    public function move(string $file = 'file')
     {
         $fileHandle = app()->request->file($file);
         if (!$fileHandle) {
@@ -73,36 +75,23 @@ class Local extends BaseUpload
         }
         if ($this->validate) {
             try {
-                validate([$file => $this->validate])->check([$file => $fileHandle]);
+                $error = [
+                    $file . '.filesize' => 'Upload filesize error',
+                    $file . '.fileExt' => 'Upload fileExt error',
+                    $file . '.fileMime' => 'Upload fileMine error'
+                ];
+                validate([$file => $this->validate],$error)->check([$file => $fileHandle]);
             } catch (ValidateException $e) {
                 return $this->setError($e->getMessage());
             }
         }
         $fileName = Filesystem::putFile($this->path, $fileHandle);
-
-        if (!$fileName){
+        if (!$fileName)
             return $this->setError('Upload failure');
-        }
         $filePath = Filesystem::path($fileName);
         $this->fileInfo->uploadInfo = new File($filePath);
-        $this->fileInfo->hash = $fileHandle->hash();
-        $this->fileInfo->mime = $fileHandle->getMime();
-        $this->fileInfo->ext = $fileHandle->extension();
-        $this->fileInfo->size = $fileHandle->getSize();
         $this->fileInfo->fileName = $this->fileInfo->uploadInfo->getFilename();
-        $this->fileInfo->fileNameOrigin = '';
         $this->fileInfo->filePath = $this->defaultPath . '/' . str_replace('\\', '/', $fileName);
-
-        //是否需要压缩图片
-        $this->fileInfo->filePathZip = '';
-        if($thumb){
-            $thumbSize = explode('x', $thumb);
-            $image = Image::open('.'.$this->fileInfo->filePath);
-            $thumbPath = str_replace('.'.$this->fileInfo->extension, '', $this->fileInfo->filePath) . '_'.$thumb.'.'.$this->fileInfo->extension;
-            $image->thumb($thumbSize[0], $thumbSize[1])->save('.'.$thumbPath);
-            $this->fileInfo->filePathZip = $thumbPath;
-        }
-
         return $this->fileInfo;
     }
 
@@ -125,7 +114,7 @@ class Local extends BaseUpload
         file_put_contents($fileName, $fileContent);
         $this->fileInfo->uploadInfo = new File($fileName);
         $this->fileInfo->fileName = $key;
-        $this->fileInfo->filePath = '/uploads/' . $this->path . '/' . $key;
+        $this->fileInfo->filePath = $this->defaultPath . '/' . $this->path . '/' . $key;
         return $this->fileInfo;
     }
 
@@ -146,5 +135,4 @@ class Local extends BaseUpload
         }
         return false;
     }
-
 }

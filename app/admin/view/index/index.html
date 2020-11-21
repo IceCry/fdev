@@ -1,0 +1,380 @@
+{extend name="public/container"}
+
+{block name="head"}
+<style>
+    .layui-side-menu .layui-nav .layui-nav-item .fa{
+        position: absolute;
+        top: 50%;
+        left: 20px;
+        margin-top: -19px;
+        line-height: 38px;
+        color: #666666;
+    }
+</style>
+{/block}
+
+{block name="content"}
+<body class="layui-layout-body" layadmin-themealias="white">
+
+    <div id="LAY_app">
+        <div class="layui-layout layui-layout-admin">
+            <div class="layui-header">
+                <!-- 头部区域 -->
+                <ul class="layui-nav layui-layout-left">
+                    <li class="layui-nav-item layadmin-flexible" lay-unselect>
+                        <a href="javascript:;" layadmin-event="flexible" title="侧边伸缩">
+                            <i class="layui-icon layui-icon-shrink-right" id="LAY_app_flexible"></i>
+                        </a>
+                    </li>
+                    <li class="layui-nav-item layui-hide-xs" lay-unselect>
+                        <a href="/" target="_blank" title="首页">
+                            <i class="layui-icon layui-icon-website"></i>
+                        </a>
+                    </li>
+                    <li class="layui-nav-item" lay-unselect>
+                        <a href="javascript:;" layadmin-event="refresh" title="刷新">
+                            <i class="layui-icon layui-icon-refresh-3"></i>
+                        </a>
+                    </li>
+                    <!--<li class="layui-nav-item layui-hide-xs" lay-unselect>
+                        <input type="text" placeholder="搜索..." autocomplete="off" class="layui-input layui-input-search" layadmin-event="serach" lay-action="template/search.html?keywords=">
+                    </li>-->
+                </ul>
+                <ul class="layui-nav layui-layout-right" lay-filter="layadmin-layout-right">
+
+                    <!--<li class="layui-nav-item" lay-unselect>
+                        <a lay-href="app/message/index.html" layadmin-event="message" lay-text="消息中心">
+                            <i class="layui-icon layui-icon-notice"></i>
+                            <span class="layui-badge-dot"></span>
+                        </a>
+                    </li>-->
+                    <!--<li class="layui-nav-item layui-hide-xs" lay-unselect>
+                        <a href="javascript:;" layadmin-event="theme">
+                            <i class="layui-icon layui-icon-theme"></i>
+                        </a>
+                    </li>
+                    <li class="layui-nav-item layui-hide-xs" lay-unselect>
+                        <a href="javascript:;" layadmin-event="note">
+                            <i class="layui-icon layui-icon-note"></i>
+                        </a>
+                    </li>-->
+                    <li class="layui-nav-item layui-hide-xs" lay-unselect>
+                        <a href="javascript:;" layadmin-event="fullscreen">
+                            <i class="layui-icon layui-icon-screen-full"></i>
+                        </a>
+                    </li>
+                    <!--<li class="layui-nav-item" lay-unselect>
+                        <a href="javascript:;">
+                            <cite>{$userInfo.name}</cite>
+                        </a>
+                        <dl class="layui-nav-child">
+                            <dd><a lay-href="{:url('index/index')}">修改密码</a></dd>
+                            <hr>
+                            <dd style="text-align: center;"><a href="{:url('login/logout')}">退出</a></dd>
+                        </dl>
+                    </li>-->
+
+                    <li class="layui-nav-item layui-hide-xs">
+                        <a href="javascript:;"></a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 侧边菜单 -->
+            <div class="layui-side layui-side-menu">
+                <div class="layui-side-scroll">
+                    <div class="layui-logo">
+                        <span>北京盛世国际拍卖</span>
+                    </div>
+
+                    <ul class="layui-nav layui-nav-tree" lay-shrink="all" id="LAY-system-side-menu" lay-filter="layadmin-system-side-menu">
+
+                        {foreach $menu as $m}
+                        {empty name="m['_data']"}
+                        <li data-name="m_{$m.id}" class="layui-nav-item">
+                            <a href="javascript:;" lay-href="{:url($m['name'])}" lay-tips="{$m['title']}" lay-direction="2">
+                                <i class="fa fa-{$m.ico}"></i>
+                                <cite>{$m.title}</cite>
+                            </a>
+                        </li>
+                        {else/}
+                        <li data-name="m_{$m.id}" class="layui-nav-item">
+                            <a href="javascript:;" lay-tips="{$m.title}" lay-direction="2">
+                                <i class="fa fa-{$m.ico}"></i>
+                                <cite>{$m.title}</cite>
+                            </a>
+                            <dl class="layui-nav-child">
+                                {foreach $m['_data'] as $n}
+                                <dd><a lay-href="{:url($n.name)}">{$n.title}</a></dd>
+                                {/foreach}
+                            </dl>
+                        </li>
+                        {/empty}
+                        {/foreach}
+
+                        <!--<li data-name="home" class="layui-nav-item">
+                            <a href="javascript:;" lay-href="{:url('index/home')}" lay-tips="主页" lay-direction="2">
+                                <i class="layui-icon layui-icon-home"></i>
+                                <cite>主页</cite>
+                            </a>
+                        </li>
+                        <li data-name="home" class="layui-nav-item">
+                            <a href="javascript:;" lay-href="{:url('auction.special/live')}" lay-tips="直播" lay-direction="2">
+                                <i class="layui-icon layui-icon-wifi"></i>
+                                <cite>直播拍卖</cite>
+                            </a>
+                        </li>
+                        <li data-name="component" class="layui-nav-item">
+                            <a href="javascript:;" lay-tips="订单" lay-direction="2">
+                                <i class="layui-icon layui-icon-form"></i>
+                                <cite>订单管理</cite>
+                            </a>
+                            <dl class="layui-nav-child">
+                                <dd data-name="button">
+                                    <a lay-href="{:url('order.order/index')}">订单管理</a>
+                                </dd>
+                            </dl>
+                        </li>
+                        <li data-name="component" class="layui-nav-item">
+                            <a href="javascript:;" lay-tips="财务" lay-direction="2">
+                                <i class="layui-icon layui-icon-rmb"></i>
+                                <cite>财务管理</cite>
+                            </a>
+                            <dl class="layui-nav-child">
+                                &lt;!&ndash;<dd data-name="button">
+                                    <a lay-href="{:url('finance.finance/index')}">数据概览</a>
+                                </dd>&ndash;&gt;
+                                <dd data-name="button">
+                                    <a href="javascript:;">保证金</a>
+                                    <dl class="layui-nav-child">
+                                        <dd data-name="button">
+                                            <a lay-href="{:url('finance.deposit/freeze')}">冻结记录</a>
+                                        </dd>
+                                        <dd data-name="button">
+                                            <a lay-href="{:url('finance.deposit/recharge')}">充值/提现记录</a>
+                                        </dd>
+                                    </dl>
+                                </dd>
+                            </dl>
+                        </li>
+                        <li data-name="component" class="layui-nav-item">
+                            <a href="javascript:;" lay-tips="拍卖" lay-direction="2">
+                                <i class="layui-icon layui-icon-diamond"></i>
+                                <cite>拍卖管理</cite>
+                            </a>
+                            <dl class="layui-nav-child">
+                                <dd data-name="grid">
+                                    <a lay-href="{:url('collection.collection/index')}">拍品列表</a>
+                                </dd>
+                                <dd data-name="grid">
+                                    <a lay-href="{:url('collection.assets/index')}">资产列表</a>
+                                </dd>
+                                <dd data-name="grid">
+                                    <a lay-href="{:url('auction.special/index')}">专场管理</a>
+                                </dd>
+                                <dd data-name="button">
+                                    <a lay-href="{:url('collection.collectionCate/index')}">拍品分类</a>
+                                </dd>
+                            </dl>
+                        </li>
+                        <li data-name="component" class="layui-nav-item">
+                            <a href="javascript:;" lay-tips="藏品" lay-direction="2">
+                                <i class="layui-icon layui-icon-star"></i>
+                                <cite>藏品在线</cite>
+                            </a>
+                            <dl class="layui-nav-child">
+                                <dd data-name="grid">
+                                    <a lay-href="{:url('goods.goods/index')}">藏品列表</a>
+                                </dd>
+                                <dd data-name="grid">
+                                    <a lay-href="{:url('goods.goodsCate/index')}">藏品分类</a>
+                                </dd>
+                                <dd data-name="button">
+                                    <a lay-href="{:url('collection.collect/index')}">藏品征集</a>
+                                </dd>
+                                <dd data-name="button">
+                                    <a lay-href="{:url('collection.consign/index')}">藏品委托寄售</a>
+                                </dd>
+                            </dl>
+                        </li>
+                        <li data-name="component" class="layui-nav-item">
+                            <a href="javascript:;" lay-tips="专家" lay-direction="2">
+                                <i class="layui-icon layui-icon-auz"></i>
+                                <cite>专家讲座</cite>
+                            </a>
+                            <dl class="layui-nav-child">
+                                <dd data-name="grid">
+                                    <a lay-href="{:url('expert.lecture/index')}">讲座列表</a>
+                                </dd>
+                                <dd data-name="grid">
+                                    <a lay-href="{:url('expert.expert/index')}">专家列表</a>
+                                </dd>
+                            </dl>
+                        </li>
+                        <li data-name="user" class="layui-nav-item">
+                            <a href="javascript:;" lay-tips="会员" lay-direction="2">
+                                <i class="layui-icon layui-icon-user"></i>
+                                <cite>会员管理</cite>
+                            </a>
+                            <dl class="layui-nav-child">
+                                <dd data-name="grid">
+                                    <a lay-href="{:url('user.user/index')}">会员列表</a>
+                                </dd>
+                                <dd data-name="grid">
+                                    <a lay-href="{:url('user.user/verify')}">等待认证</a>
+                                </dd>
+                                <dd data-name="grid">
+                                    <a lay-href="{:url('user.vip/index')}">艺术社会员</a>
+                                </dd>
+                            </dl>
+                        </li>
+                        <li data-name="template" class="layui-nav-item">
+                            <a href="javascript:;" lay-tips="新闻" lay-direction="2">
+                                <i class="layui-icon layui-icon-read"></i>
+                                <cite>新闻动态</cite>
+                            </a>
+                            <dl class="layui-nav-child">
+                                <dd><a lay-href="{:url('article.article/index')}">新闻动态</a></dd>
+                                <dd><a lay-href="{:url('article.articleCate/index')}">新闻分类</a>
+                                <dd><a lay-href="{:url('article.notice/index')}">消息通知</a></dd>
+                            </dl>
+                        </li>
+                        <li data-name="component" class="layui-nav-item">
+                            <a href="javascript:;" lay-tips="权限" lay-direction="2">
+                                <i class="layui-icon layui-icon-key"></i>
+                                <cite>权限管理</cite>
+                            </a>
+                            <dl class="layui-nav-child">
+                                <dd data-name="grid">
+                                    <a lay-href="{:url('system.admin/index')}">管理员管理</a>
+                                </dd>
+                                <dd data-name="grid">
+                                    <a lay-href="{:url('system.role/index')}">用户角色</a>
+                                </dd>
+                                <dd data-name="button">
+                                    <a lay-href="{:url('system.rule/index')}">权限列表</a>
+                                </dd>
+                            </dl>
+                        </li>
+                        <li data-name="app" class="layui-nav-item">
+                            <a href="javascript:;" lay-tips="系统" lay-direction="2">
+                                <i class="layui-icon layui-icon-set-sm"></i>
+                                <cite>系统管理</cite>
+                            </a>
+
+                            <dl class="layui-nav-child">
+                                <dd data-name="xitong">
+                                    <a lay-href="{:url('system.config/index')}">系统配置</a>
+                                </dd>
+                                <dd data-name="kaifa">
+                                    <a href="javascript:;">开发配置</a>
+                                    <dl class="layui-nav-child">
+                                        <dd data-name="list"><a lay-href="{:url('system.configTab/index')}">配置分类</a></dd>
+                                        <dd data-name="tags"><a lay-href="{:url('system.dataGroup/index')}">组合数据</a></dd>
+                                        <dd data-name="list"><a lay-href="{:url('system.express/index')}">物流公司</a></dd>
+                                    </dl>
+                                </dd>
+                                <dd data-name="hangye">
+                                    <a href="javascript:;">行业配置</a>
+                                    <dl class="layui-nav-child">
+                                        <dd data-name="list"><a lay-href="{:url('system.partner/index')}">合作单位</a></dd>
+                                        <dd data-name="list"><a lay-href="{:url('system.office/index')}">联络处管理</a></dd>
+                                    </dl>
+                                </dd>
+                                <dd data-name="log">
+                                    <a lay-href="{:url('system.log/index')}">系统日志</a>
+                                </dd>
+                                <dd data-name="cache">
+                                    <a lay-href="{:url('system.config/clear')}">清空缓存</a>
+                                </dd>
+                            </dl>
+                        </li>
+                        <li data-name="template" class="layui-nav-item">
+                            <a href="javascript:;" lay-tips="我的" lay-direction="2">
+                                <i class="layui-icon layui-icon-face-smile"></i>
+                                <cite>我的</cite>
+                            </a>
+                            <dl class="layui-nav-child">
+                                <dd><a lay-href="{:url('system.admin/password')}">修改密码</a></dd>
+                                <dd><a href="{:url('login/logout')}">退出</a></dd>
+                            </dl>
+                        </li>-->
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 页面标签 -->
+            <div class="layadmin-pagetabs" id="LAY_app_tabs">
+                <div class="layui-icon layadmin-tabs-control layui-icon-prev" layadmin-event="leftPage"></div>
+                <div class="layui-icon layadmin-tabs-control layui-icon-next" layadmin-event="rightPage"></div>
+                <div class="layui-icon layadmin-tabs-control layui-icon-down">
+                    <ul class="layui-nav layadmin-tabs-select" lay-filter="layadmin-pagetabs-nav">
+                        <li class="layui-nav-item" lay-unselect>
+                            <a href="javascript:;"></a>
+                            <dl class="layui-nav-child layui-anim-fadein">
+                                <dd layadmin-event="closeThisTabs"><a href="javascript:;">关闭当前标签页</a></dd>
+                                <dd layadmin-event="closeOtherTabs"><a href="javascript:;">关闭其它标签页</a></dd>
+                                <dd layadmin-event="closeAllTabs"><a href="javascript:;">关闭全部标签页</a></dd>
+                            </dl>
+                        </li>
+                    </ul>
+                </div>
+                <div class="layui-tab" lay-unauto lay-allowClose="true" lay-filter="layadmin-layout-tabs">
+                    <ul class="layui-tab-title" id="LAY_app_tabsheader">
+                        <li lay-id="home/console.html" lay-attr="home/console.html" class="layui-this"><i class="layui-icon layui-icon-home"></i></li>
+                    </ul>
+                </div>
+            </div>
+
+
+            <!-- 主体内容 -->
+            <div class="layui-body" id="LAY_app_body">
+                <div class="layadmin-tabsbody-item layui-show">
+                    <iframe src="{:url('index/home')}" frameborder="0" class="layadmin-iframe"></iframe>
+                </div>
+            </div>
+
+            <!--<div class="footer" style="width: 100%; height: 40px;position: fixed; bottom: 0; background: #fff; z-index: 999;border-top: 1px solid #ccc;">
+                222
+            </div>-->
+
+            <!-- 辅助元素，一般用于移动设备下遮罩 -->
+            <div class="layadmin-body-shade" layadmin-event="shade"></div>
+        </div>
+    </div>
+</body>
+{/block}
+
+{block name="script"}
+<script src='http://cdn.bootcss.com/socket.io/1.3.7/socket.io.js'></script>
+<script>
+    layui.config({
+        base: '{__LAYUI_PATH}' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use('index', function () {
+        var $ = layui.$;
+
+        /*// 连接服务端
+        var socket = io('http://127.0.0.1:2120');
+        // uid可以是自己网站的用户id，以便针对uid推送以及统计在线人数
+        uid = "{$userInfo.id}" || 0;
+
+        // socket连接后以uid登录
+        socket.on('connect', function () {
+            socket.emit('login', uid);
+        });
+        // 后端推送来消息时
+        socket.on('new_msg', function (msg) {
+            layer.alert("收到消息：" + msg, {offset: 'rb', title: false, btn:false, time: 10000, anim: 1, shade :0});
+        });
+        // 后端推送来在线数据时
+        socket.on('update_online_count', function (online_stat) {
+            console.log(online_stat);
+        });*/
+    });
+</script>
+{/block}
+
+
+

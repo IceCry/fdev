@@ -2,8 +2,12 @@
 
 namespace app\api;
 
+use sensen\exceptions\ApiException;
+use sensen\exceptions\AuthException;
 use think\exception\DbException;
 use think\exception\Handle;
+use think\exception\ValidateException;
+use think\facade\Env;
 use think\Response;
 use Throwable;
 
@@ -39,15 +43,17 @@ class ApiExceptionHandle extends Handle
                 'message' => $e->getMessage(),
                 'line' => $e->getLine(),
             ]);
+        } else if ($e instanceof AuthException || $e instanceof ApiException || $e instanceof ValidateException) {
+            return app('json')->fail($e->getMessage());
         } else {
-            return app('json')->fail('系统出现异常', [
+            return app('json')->fail('系统出现异常', Env::get('app_debug', false) ?[
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'code' => $e->getCode(),
                 'line' => $e->getLine(),
                 'trace' => $e->getTrace(),
                 'previous' => $e->getPrevious(),
-            ]);
+            ]: []);
         }
     }
 

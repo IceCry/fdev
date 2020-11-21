@@ -1,0 +1,136 @@
+{extend name="public/container"}
+
+{block name="content"}
+<body>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">数据组管理</div>
+                <div class="layui-card-body layui-form">
+                    <div class="event-btns" style="margin-bottom: 10px;">
+                        <button class="layui-btn layui-btn-danger" data-type="add"><i class="fa fa-plus-circle"></i> 添加数据组</button>
+                    </div>
+
+                    <table class="layui-hide" id="table-toolbar" lay-filter="table-toolbar"></table>
+
+                    <script type="text/html" id="table-toolbar-barDemo">
+                        <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="values">数据列表</a>
+                        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+{/block}
+
+{block name="script"}
+<script>
+    layui.config({
+        base: '{__LAYUI_PATH}'
+    }).extend({
+        index: 'lib/index'
+    }).use(['index', 'table', 'form'], function(){
+        var $ = layui.$
+            ,table = layui.table
+            ,form = layui.form;
+
+        table.render({
+            elem: '#table-toolbar'
+            ,url: "{:url('system.dataGroup/getData')}"
+            ,toolbar: '#table-toolbar-toolbarDemo'
+            ,title: '数据表'
+            ,cols: [[
+                {field:'id', title:'ID', width:80, unresize: true, sort: true}
+                ,{field:'config_name', title:'KEY', width:150}
+                ,{field:'name', title:'数据组名称', width:300}
+                ,{field:'info', title:'简介'}
+                ,{field:'status', title:'是否展示', width:100, templet:function (d) {
+                    if(d.status==1){
+                        return '<input type="checkbox" name="status" data-id="'+d.id+'" value="1" lay-filter="isCheck" lay-skin="switch" lay-text="ON|OFF" checked>';
+                    }else{
+                        return '<input type="checkbox" name="status" data-id="'+d.id+'" value="0" lay-filter="isCheck" lay-skin="switch" lay-text="ON|OFF" >';
+                    }
+                }}
+                ,{title:'操作', toolbar: '#table-toolbar-barDemo', width:200}
+            ]]
+            ,autoSort: false
+            ,page: true
+            ,limit: 20
+        });
+
+        var active = {
+            add: function(){
+                layer.open({
+                    type: 2
+                    ,title: '新增数据组'
+                    ,content: "{:url('system.dataGroup/create')}"
+                    ,area: ['1000px', '90%']
+                });
+            }
+        };
+
+        $('.event-btns .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //监听行工具事件
+        table.on('tool(table-toolbar)', function(obj){
+            var data = obj.data;
+            console.log(data)
+            if(obj.event === 'del'){
+                layer.confirm('删除可能导致系统错误，确定要删除吗？', function(index){
+                    //obj.del();
+                    $.ajax({
+                        url: "{:url('system.dataGroup/delete')}",
+                        data:{"id": data.id},
+                        method: "POST",
+                        dataType: "Json",
+                        success:function (res) {
+                            console.log(res)
+                            layer.msg(res.msg);
+                            table.reload('table-toolbar');
+                        }
+                    });
+                    layer.close(index);
+                });
+            } else if(obj.event === 'edit'){
+                layer.open({
+                    type: 2
+                    ,title: '修改数据组'
+                    ,content: "{:url('system.dataGroup/create',[], false)}/id/"+data.id
+                    ,area: ['90%', '90%']
+                });
+            } else if(obj.event === 'values'){
+                layer.open({
+                    type: 2
+                    ,title: '数据管理'
+                    ,content: "{:url('system.dataGroupValue/index',[], false)}/gid/"+data.id
+                    ,area: ['90%', '90%']
+                });
+            }
+        });
+
+        //更改是否验证
+        form.on('switch(isCheck)', function(data){
+            var is_check = data.elem.checked;
+            is_check = is_check?1:0;
+            var id = data.elem.attributes['data-id'].nodeValue;
+            $.ajax({
+                url: "{:url('base/updateStatus')}",
+                data:{'table':'data_group','status':is_check, 'id':id},
+                method: "POST",
+                dataType: "Json",
+                success:function (res) {
+                    layer.msg(res.msg);
+                    table.reload('table-toolbar');
+                }
+            });
+        });
+    });
+</script>
+{/block}

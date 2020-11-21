@@ -1,0 +1,134 @@
+{extend name="public/container"}
+
+{block name="content"}
+<body>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">物流公司管理</div>
+                <div class="layui-card-body layui-form">
+                    <div class="event-btns" style="margin-bottom: 10px;">
+                        <!--<button class="layui-btn layui-btn-danger" data-type="add"><i class="fa fa-plus-circle"></i> 添加物流公司</button>-->
+                        <div class="layui-inline">
+                            <input class="layui-input" name="keyword" id="keyword" autocomplete="off" v-model="where.keyword" placeholder="按关键词搜索">
+                        </div>
+                        <button class="layui-btn" data-type="search">搜索</button>
+                        <a class="layui-btn layui-btn-primary" href="{:url('system.express/index')}">重置</a>
+                    </div>
+
+                    <table class="layui-hide" id="table-toolbar" lay-filter="table-toolbar"></table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+{/block}
+
+{block name="script"}
+<script>
+    layui.config({
+        base: '{__LAYUI_PATH}' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'table', 'form'], function(){
+        var $ = layui.$
+            ,table = layui.table
+            ,form = layui.form;
+
+        table.render({
+            elem: '#table-toolbar'
+            ,url: "{:url('system.express/getData')}"
+            ,toolbar: '#table-toolbar-toolbarDemo'
+            ,title: '数据表'
+            ,cols: [[
+                {field:'id', title:'ID', width:80}
+                ,{field:'name', title:'物流公司', width:150}
+                ,{field:'code', title:'代码'}
+                ,{field:'sort_num', title:'排序值', edit: "sort_num", width: 80}
+                ,{field:'status', title:'状态', width:100, templet:function (d) {
+                    if(d.status==1){
+                        return '<input type="checkbox" name="status" data-id="'+d.id+'" value="1" lay-filter="isCheck" lay-skin="switch" lay-text="ON|OFF" checked>';
+                    }else{
+                        return '<input type="checkbox" name="status" data-id="'+d.id+'" value="0" lay-filter="isCheck" lay-skin="switch" lay-text="ON|OFF">';
+                    }
+                }}
+            ]]
+            ,page: true
+            ,limit: 20
+        });
+
+        var active = {
+            add: function(){
+                layer.open({
+                    type: 2
+                    ,title: '新增物流公司'
+                    ,content: "{:url('system.express/create')}"
+                    ,area: ['90%', '90%']
+                });
+            },
+            search: function(){
+                var keyword = $('input[name=keyword]').val();
+                table.reload('table-toolbar', {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    ,where: {
+                        keyword: keyword
+                    }
+                });
+            }
+        };
+
+        //快速编辑
+        table.on('edit(table-toolbar)', function(obj){
+            var value = obj.value //得到修改后的值
+                ,data = obj.data //得到所在行所有键值
+                ,field = obj.field; //得到字段
+            $.ajax({
+                url: "{:url('base/updateStatus')}",
+                data:{'table':'express','status':value, 'id':data.id, 'field':field},
+                method: "POST",
+                dataType: 'json',
+                success:function (res) {
+                    layer.msg(res.msg);
+                    table.reload('table-toolbar');
+                }
+            });
+        });
+
+        $('.event-btns .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //监听行工具事件
+        table.on('tool(table-toolbar)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'del'){
+
+            }
+        });
+
+        //更改是否验证
+        form.on('switch(isCheck)', function(data){
+            var is_check = data.elem.checked;
+            is_check = is_check?1:0;
+            var id = data.elem.attributes['data-id'].nodeValue;
+            $.ajax({
+                url: "{:url('base/updateStatus')}",
+                data:{'table':'express','status':is_check, 'id':id},
+                method: "POST",
+                dataType: 'json',
+                success:function (res) {
+                    layer.msg(res.msg);
+                    table.reload('table-toolbar');
+                }
+            });
+        });
+
+    });
+</script>
+{/block}

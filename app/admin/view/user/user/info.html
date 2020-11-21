@@ -1,0 +1,158 @@
+{extend name="public/container"}
+
+{block name="content"}
+<body>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-col-md6">
+                <div class="layui-card">
+                    <div class="layui-card-header">基础数据</div>
+                    <div class="layui-card-body">
+
+                        <div class=" layadmin-carousel layadmin-backlog">
+                            <div carousel-item>
+                                <ul class="layui-row layui-col-space10">
+                                    <li class="layui-col-xs6">
+                                        <a lay-href="javascript:;" class="layadmin-backlog-body">
+                                            <h3>订单数</h3>
+                                            <p><cite>{$info.order_num}</cite></p>
+                                        </a>
+                                    </li>
+                                    <li class="layui-col-xs6">
+                                        <a lay-href="javascript:;" class="layadmin-backlog-body">
+                                            <h3>交易金额</h3>
+                                            <p><cite>{$info.order_price}</cite></p>
+                                        </a>
+                                    </li>
+                                    <li class="layui-col-xs6">
+                                        <a lay-href="javascript:;" class="layadmin-backlog-body">
+                                            <h3>可用保证金</h3>
+                                            <p><cite>{$info.deposit_price}</cite></p>
+                                        </a>
+                                    </li>
+                                    <li class="layui-col-xs6">
+                                        <a href="javascript:;" class="layadmin-backlog-body">
+                                            <h3>保证金充值金额</h3>
+                                            <p><cite>{$info.deposit.recharge}</cite></p>
+                                        </a>
+                                    </li>
+                                    <li class="layui-col-xs6">
+                                        <a href="javascript:;" class="layadmin-backlog-body">
+                                            <h3>保证金抵扣金额</h3>
+                                            <p><cite>{$info.deposit.deduct}</cite></p>
+                                        </a>
+                                    </li>
+                                    <li class="layui-col-xs6">
+                                        <a href="javascript:;" class="layadmin-backlog-body">
+                                            <h3>保证金提现金额</h3>
+                                            <p><cite>{$info.deposit.withdraw}</cite></p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-md6">
+                <div class="layui-card">
+                    <div class="layui-card-header">基础信息</div>
+                    <div class="layui-card-body layui-text">
+                        <table class="layui-table">
+                            <colgroup>
+                                <col width="120">
+                                <col>
+                            </colgroup>
+                            <tbody>
+                            <tr>
+                                <td>昵称</td>
+                                <td>{$info.nickname}</td>
+                            </tr>
+                            <tr>
+                                <td>姓名</td>
+                                <td>{$info.real_name} {if condition="$info.gender eq 1"}先生{elseif condition="$info.gender eq 2"/}女士{else/}未知{/if}</td>
+                            </tr>
+                            <tr>
+                                <td>身份证号</td>
+                                <td>
+                                    {$info.card_id}（{if condition="$info.is_verify eq 1"}已认证{else/}未认证{/if}）
+                                    {if condition="$info.cert_pic"}
+                                    {foreach $info.cert_pic as $item}
+                                        <img src="{$item}" style="width: 150px;">
+                                    {/foreach}
+                                    {/if}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>手机号</td>
+                                <td>{$info.phone}</td>
+                            </tr>
+                            <tr>
+                                <td>小程序openid</td>
+                                <td>{$info.routine_openid}</td>
+                            </tr>
+                            <tr>
+                                <td>unionid</td>
+                                <td>{$info.unionid}</td>
+                            </tr>
+                            <tr>
+                                <td>uuid</td>
+                                <td>{$info.uuid}</td>
+                            </tr>
+                            <tr>
+                                <td>备注</td>
+                                <td>{$info.remark}</td>
+                            </tr>
+                            <tr>
+                                <td>上次登录时间</td>
+                                <td>{if condition="$info.login_time gt 0"}{$info.login_time|date='Y/m/d H:i:s'}{/if}</td>
+                            </tr>
+                            <tr>
+                                <td>上次登录IP</td>
+                                <td>{$info.login_ip}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">收货地址</div>
+                <div class="layui-card-body layui-text">
+                    <table class="layui-table">
+                        <thead>
+                        <tr>
+                            <th>收货人</th>
+                            <th>电话</th>
+                            <th>收货地址</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {foreach $info.address as $item}
+                        <tr>
+                            <td>{$item.name}</td>
+                            <td>{$item.phone}</td>
+                            <td>{if condition="$item.is_default eq 1"}<span class="layui-badge">默认</span>{/if} {$item.province}{$item.city}{$item.district}{$item.detail}</td>
+                        </tr>
+                        {/foreach}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+{/block}
+
+{block name="script"}
+<script>
+
+</script>
+{/block}

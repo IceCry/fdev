@@ -1,0 +1,49 @@
+{extend name="public/container"}
+
+{block name="content"}
+<body>
+<form class="layui-form" style="padding: 15px;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">类型</label>
+        <div class="layui-input-block">
+            <input type="radio" name="type" value="1" checked title="充值">
+            <input type="radio" name="type" value="-3" title="扣除">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">金额</label>
+        <div class="layui-input-block">
+            <input type="number" name="price" lay-verify="required" placeholder="请填写保证金金额" autocomplete="off" class="layui-input" maxlength="45" min="0">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">备注</label>
+        <div class="layui-input-block">
+            <textarea name="remark" placeholder="请填写保证金操作说明" lay-verify="required" class="layui-textarea" maxlength="200"></textarea>
+        </div>
+    </div>
+
+    <div class="layui-form-item layui-hide">
+        <input type="hidden" name="user_id" value="{$Request.param.user_id}">
+        <input type="button" lay-submit lay-filter="layer-submit" id="layer-submit" value="确认">
+    </div>
+    <div class="h20"></div>
+</form>
+</body>
+{/block}
+
+{block name="script"}
+<script>
+    var id = "{$Request.param.id}" || 0;
+    var pid = "{$Request.param.pid}" || 0;
+
+    layui.config({
+        base: '{__LAYUI_PATH}' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'form'], function(){
+        var $ = layui.$
+            ,form = layui.form;
+    });
+</script>
+{/block}

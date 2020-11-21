@@ -1,0 +1,100 @@
+{extend name="public/container"}
+
+{block name="content"}
+<body>
+<div class="layui-form" lay-filter="layuiadmin-form-useradmin" id="layuiadmin-form-useradmin" style="padding: 15px;">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <form class="layui-form" action="" lay-filter="component-form-element">
+                <p style="text-align: center;line-height: 30px;">如提示格式不支持，可将文件打包为rar、zip文件进行上传。</p>
+
+                <div class="layui-row layui-col-space10 layui-form-item">
+                    <div class="layui-col-lg6">
+                        <label class="layui-form-label">附件名称</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="name_origin" lay-verify="required" placeholder="请填写附件名称，方便识别" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">上传文件</label>
+                    <div class="layui-upload-drag" id="upload-btn">
+                        <i class="layui-icon"></i>
+                        <p>点击选择要上传的文件</p>
+                    </div>
+                    <div class="layui-upload-drag ss-hide" id="upload-drag">
+                        <i class="layui-icon"></i>
+                        <p>点击选择要上传的文件</p>
+                    </div>
+                    <div class="layui-input-block" id="src-box" style="display: none;">
+                        <input type="text" readonly id="src" name="src" value="" class="layui-input">
+                    </div>
+                </div>
+                {if condition="!$Request.param.simple"}
+                <div class="layui-form-item">
+                    <label class="layui-form-label">备注信息</label>
+                    <div class="layui-input-block">
+                        <textarea name="remark" placeholder="" class="layui-textarea"></textarea>
+                    </div>
+                </div>
+                {/if}
+                <div class="layui-form-item layui-hide">
+                    <input type="hidden" id="aid" name="aid" value="0">
+                    <input type="button" lay-submit lay-filter="layer-submit" id="layer-submit" value="确认">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+{/block}
+
+{block name="script"}
+<script>
+    var mtable = "{$Request.param.mtable}" || '';
+    var mid = "{$Request.param.mid}" || 0;
+    layui.config({
+        base: '{__LAYUI_PATH}' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'upload', 'form'], function(){
+        var $ = layui.jquery
+            ,upload = layui.upload
+            ,form = layui.form;
+
+        form.render();
+
+        //判断是否填写标题
+        $('#upload-btn').click(function () {
+            var title = $('input[name=name_origin]').val();
+            if(!title){
+                return layer.msg("请先填写附件名称");
+            }
+            $('#upload-drag').click();
+        });
+
+        //拖拽上传
+        upload.render({
+            elem: '#upload-drag'
+            ,url: "{:url('authController/baseUpload')}"
+            ,accept: "file"
+            ,before: function(input){
+                var data = {};
+                data.mtable = mtable;
+                data.mid = mid;
+                data.name_origin = $('input[name=name_origin]').val();
+                this.data=data;
+            }
+            ,done: function(res){
+                layer.msg(res.msg);
+                if(res.code==200){
+                    $('#src').val(res.data.src);
+                    $('#aid').val(res.data.aid);
+                    $('#src-box').show();
+                    $('#upload-btn').hide();
+                }
+            }
+        });
+    });
+</script>
+{/block}

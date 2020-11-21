@@ -1,0 +1,64 @@
+{extend name="public/container"}
+
+{block name="content"}
+<body>
+<div class="layui-form" lay-filter="layuiadmin-form-useradmin" id="layuiadmin-form-useradmin" style="padding: 15px;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">权限名</label>
+        <div class="layui-input-inline">
+            <input type="text" name="title" lay-verify="required" placeholder="请输入权限名称" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">权限</label>
+        <div class="layui-input-inline">
+            <input type="text" name="name" lay-verify="required" placeholder="如：home/index/index" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">图标</label>
+        <div class="layui-input-inline">
+            <input type="text" name="ico" placeholder="（选填）仅输入fa-xxx中的xxx即可" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">排序</label>
+        <div class="layui-input-inline">
+            <input type="number" name="sort_num" placeholder="数据越大越靠前" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">是否验证</label>
+        <div class="layui-input-inline">
+            <input type="radio" name="is_check" checked value="1" title="需要验证"><div class="layui-unselect layui-form-radio"><div>需要验证</div></div>
+            <input type="radio" name="is_check" value="0" title="无需验证"><div class="layui-unselect layui-form-radio"><div>无需验证</div></div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">是否菜单</label>
+        <div class="layui-input-inline">
+            <input type="radio" name="is_menu" checked value="0" title="非菜单"><div class="layui-unselect layui-form-radio"><div>非菜单</div></div>
+            <input type="radio" name="is_menu" value="1" title="菜单"><div class="layui-unselect layui-form-radio"><div>菜单</div></div>
+        </div>
+    </div>
+    <div class="layui-form-item layui-hide">
+        <input type="hidden" name="id" value="0">
+        <input type="hidden" name="pid" value="{$Request.param.pid|default=0}">
+        <input type="button" lay-submit lay-filter="layer-submit" id="layer-submit" value="确认">
+    </div>
+</div>
+</body>
+{/block}
+
+{block name="script"}
+<script>
+    layui.config({
+        base: '{__LAYUI_PATH}' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'form'], function(){
+        var $ = layui.$
+            ,form = layui.form;
+    })
+</script>
+{/block}

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <link rel="stylesheet" href="{__LAYUI_PATH}layui/css/layui.css" media="all">
+    <script src="{__STATIC_PATH}common/js/jquery-3.5.1.min.js"></script>
+    <script src="{__LAYUI_PATH}layui/layui.all.js"></script>
+    <script src="{__PLUG_PATH}vue/vue.min.js"></script>
+    <script src="{__LAYUI_PATH}modules/layuiList.js"></script>
+</head>
+<style>
+    body{-moz-user-select:none;-webkit-user-select:none;-ms-user-select:none;user-select:none;}
+    .layui-fluid{margin:0;padding: 0;}
+    .layadmin-homepage-shadow{box-shadow: 0 1px 1px rgba(0,0,0,.05);background-color: #fff;border-radius: 0;border: 1px solid #e7ecf3;}
+    .layui-tree-txt{cursor: pointer;}
+    .clearfix:after{content:"";display:block;visibility:hidden;clear:both;height:0;}
+    .image-box{padding-top: 10px}
+    .image-box .image .layui-img-box{margin: 5px;border: 2px solid #ffffff;height: 100px;line-height: 100px;text-align: center;}
+    .image-box .image .layui-img-box.on{border: 2px solid #5FB878;}
+    .image-box .image .layui-img-box img{width: 90%;max-height:90%;vertical-align:middle;}
+    .page .image_page{text-align: right;}
+    .page .layui-box{text-align: left;}
+    .layui-tree-txt.on{color:#1E9FFF}
+    .line1{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width: 90%;}
+    .layadmin-homepage-panel.left ::-webkit-scrollbar{width: 3px;height: auto;background-color: #ddd;}
+    .layadmin-homepage-panel.left ::-webkit-scrollbar-thumb {border-radius: 1px;-webkit-box-shadow: inset 0 0 6px rgba(255,255,255,.3);background-color: #333;}
+    .layadmin-homepage-panel.left ::-webkit-scrollbar-track {-webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);border-radius: 1px;background: #e5e5e5;}
+    #app .layui-tree-btnGroup{color: #ffffff;padding: 3px 7px;position: absolute;top: -28px;left: 30px;background-color: #1E9FFF;}
+    #app .layui-tree-btnGroup .layui-layer-TipsT{border-right-color: #1E9FFF;color: #ffffff}
+    #app .layui-tree-iconClick{margin:0 0 0 9px;}
+    @media screen and (min-width:1000px){
+        .image-box .image .layui-img-box{
+            height: 200px;
+            line-height: 200px;
+        }
+    }
+</style>
+<body style="background-color: #f2f2f2">
+
+<div class="layui-fluid" id="app">
+    <div class="layui-row">
+        <div class="layui-col-md2 layui-col-xs2 layui-col-sm2">
+            <div class="layadmin-homepage-panel layadmin-homepage-shadow left">
+                <div class="layui-card text-center">
+                    <div class="layui-card-header">
+                        <div class="layui-unselect layui-form-select layui-form-selected">
+                            <div class="layui-select-title">
+                                <input type="text" name="title" v-model="searchTitle" placeholder="搜索分类" style="height: 24px;line-height:24px;padding-left:7px;font-size: 12px;display: inline;padding-right: 0;width: 100%;" autocomplete="off" class="layui-input layui-input-search" @keydown="search">
+                                <i class="layui-icon layui-icon-search" @click="search"  style="cursor: pointer;margin:0 3px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-card-body" style="padding: 0;height: 455px;overflow:auto;">
+                        <div ref="tree" class="demo-tree demo-tree-box">
+                            <div class="layui-tree layui-tree-line">
+                                <div class="layui-tree-set layui-tree-setHide">
+                                    <div class="layui-tree-entry">
+                                        <div class="layui-tree-main" @click="OpenTree({child:[],id:0})">
+                                            <span class="layui-tree-iconClick">
+                                                <i class="layui-icon">&nbsp;&nbsp;&nbsp;</i>
+                                            </span>
+                                            <span class="layui-tree-txt" :class="cate_id == 0 ? 'on' : '' ">全部图片</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="layui-tree-set layui-tree-setHide" :class=" value.isOpen ? 'layui-tree-spread' : '' " v-for="(value,k) in categoryList">
+                                    <div class="layui-tree-entry">
+                                        <div class="layui-tree-main">
+                                            <span class="layui-tree-iconClick">
+                                                <i class="layui-icon">&nbsp;&nbsp;&nbsp;</i>
+                                            </span>
+                                            <span @click="OpenTree({child:[],id:value.id})" class="layui-tree-txt" :class="cate_id == value.id ? 'on' : '' ">{{value.name}}</span>
+                                            <i class="layui-icon layui-icon-edit" @click="updateCategory({child:[],id:value.id, name:value.name})"></i>
+                                            <i class="layui-icon layui-icon-delete" @click="delCategory({child:[],id:value.id, name:value.name})"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-md10 layui-col-xs10 layui-col-sm10">
+            <div class="layadmin-homepage-panel layadmin-homepage-shadow">
+                <div class="layui-card text-center">
+                    <div class="layui-card-header">
+                        <div class="layadmin-homepage-pad-ver" style="text-align: left">
+                            <div class="layui-btn-group">
+                                <button type="button" class="layui-btn layui-btn-normal layui-btn-sm"  @click="addCategory">添加分类</button>
+                                <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" ref="upload">上传图片</button>
+                                <button type="button" class="layui-btn layui-btn-warm layui-btn-sm" :class="selectImages.length ? '':'layui-btn-disabled' " @click="moveCate">移动分类</button>
+                                <button type="button" class="layui-btn layui-btn-danger layui-btn-sm" :class="selectImages.length ? '':'layui-btn-disabled' " @click="delImage">删除图片</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-card-body clearfix image-box" style="padding: 10px;height: 360px;z-index:10;">
+                        <div class="layui-col-md2 layui-col-xs2 layui-col-sm2 image" v-for="(item,index) in imageList">
+                            <span class="layui-badge layui-bg-cyan" style="position: absolute;" v-if="item.sort">{{ item.sort }}</span>
+                            <div class="layui-img-box"  :class="item.isSelect ? 'on': '' ">
+                                <img :src="item.path" v-if="small == 1" @click="changImage(item)">
+                                <img :src="item.path" v-else @click="changImage(item)">
+                            </div>
+                        </div>
+                        <div class="empty-image" style="width: 100%;height: 100%;text-align: center;" v-if="!imageList.length && loading == false">
+                            <div class="layui-img-box">
+                                <img src="{__STATIC_PATH}common/images/empty.jpg" style="height: 400px;" alt="" >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-card-body clearfix page">
+                        <div class="layui-col-md4 layui-col-xs4 layui-col-sm4">
+                            <div class="layui-box" style="margin: 10px 0;">
+                                <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" :class="selectImages.length ? '':'layui-btn-disabled' " @click="useImages">使用选中的图片</button>
+                            </div>
+                        </div>
+                        <div class="layui-col-md8 layui-col-xs8 layui-col-sm8 image_page" ref="image_page"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var cate_id = "{$cate_id}", small="{$Request.param.small ? : 0}", parentInputName = '{$Request.param.fodder}';//当前图片分类ID
+
+    new Vue({
+        el: "#app",
+        data: {
+            categoryList:[],
+            searchTitle:'',
+            cate_id:cate_id,
+            imageList:[],
+            page:1,
+            limit:18,
+            loading:false,
+            small:small,
+            selectImages:[],
+            selectImagesIds:[],
+            uploadInst:null,
+        },
+        watch:{
+            page:function () {
+                this.getImageList();
+            }
+        },
+        methods:{
+            //删除图片
+            delImage:function(){
+                var that=this;
+                if(!this.selectImages.length) return;
+                layList.layer.confirm('是否要删除选中图片？', {
+                    btn: ['是的我要删除','取消'] //按钮
+                }, function(){
+                    layList.basePost(that.U({a:'delete'}),{imageId:that.selectImagesIds},function (res) {
+                        layList.msg(res.msg);
+                        that.selectImagesIds = [];
+                        that.selectImages = [];
+                        that.getImageList();
+                    },function (res) {
+                        layList.msg(res.msg);
+                    })
+                })
+            },
+            //移动图片分类
+            moveCate:function(){
+                if(!this.selectImages.length) return;
+                return this.getOpenWindow('移动图片',this.U({a:'moveImg'})+'?images='+this.selectImagesIds);
+            },
+            //使用选中图片
+            useImages:function(){
+                console.log(parentInputName)
+                if(!this.selectImages.length) return;
+                //判断表单限制图片个数
+                if(typeof parent.$f != 'undefined'){
+                    //已有图片个数
+                    var nowpics = parent.$f.getValue(parentInputName).length,
+                        props = parent.$f.model()[parentInputName].props || {},
+                        maxlength = props.maxLength || 0;
+                    //已选图片个数
+                    var selectlength = this.selectImages.length;
+                    //还可以选择多少张
+                    var surplus = maxlength-nowpics;
+                    if(nowpics+selectlength > maxlength){
+                        return layList.msg('最多只能选择 '+ surplus +' 张');
+                    }
+                }
+                //编辑器中
+                if(parentInputName == 'editor'){
+                    var list =  [];console.log(this.selectImages);
+                    for(var i = 0;i < this.selectImages.length;i++){
+                        list.push({
+                            _src: this.selectImages[i],
+                            src:this.selectImages[i]
+                        });
+                    }
+                    parent.insertEditor(list);
+                    var index = parent.layer.getFrameIndex(window.name);
+                    parent.layer.close(index);
+                }else{
+                    //form表单中
+                    if(parent.$f){
+                        var value = parent.$f.getValue(parentInputName);//父级input 值
+                        var list = value || [];
+                        for(var i = 0;i < this.selectImages.length;i++){
+                            if(value.indexOf(this.selectImages[i]) == -1) list.push(this.selectImages[i]);
+                        }
+                        parent.$f.changeField(parentInputName,list);
+
+                        console.log(nowpics);
+                        console.log(maxlength);
+                        console.log(selectlength);
+                        parent.$f.closeModal(parentInputName);
+                    }else{
+                        //独立图片选择页面
+                        if(parentInputName == 'image' && this.selectImages.length > 1) {
+                            return layList.msg('最多只能选择1张');
+                        }
+                        if(parent.$vm){
+                            var rule = parent.$vm.getRule(parentInputName)
+                            if(rule.maxLength !== undefined){
+                                if(this.selectImages.length > rule.maxLength){
+                                    return layList.msg('最多只能选择'+rule.maxLength+'张');
+                                }
+                                parent.changeIMG(parentInputName,this.selectImages);
+                                var index = parent.layer.getFrameIndex(window.name);
+                                parent.layer.close(index);
+                                return;
+                            }
+
+                        }
+                        parent.changeIMG(parentInputName, this.selectImages[0]);
+                        var index = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(index);
+                    }
+                }
+
+            },
+            //图片选中和取消
+            changImage:function(item,index){
+                this.$set(item,'isSelect',item.isSelect == undefined ? true : !item.isSelect);
+                var val = small == 1 ? item['path_zip'] : item['path'];
+                if(item.isSelect === true) {
+                    this.selectImages[this.selectImages.length] = val;
+                    this.selectImagesIds[this.selectImages.length] = item['id'];
+                    item.sort = this.selectImages.length;
+                }else{
+                    this.selectImages.splice(this.selectImages.indexOf(val),1);
+                    this.selectImagesIds.splice(this.selectImages.indexOf(item['id']),1);
+                    for (var i=0;i<this.imageList.length;i++){
+                        if(this.imageList[i].sort > item.sort) {
+                            this.imageList[i].sort = (this.imageList[i].sort-1)>=0? this.imageList[i].sort-1 : 0;
+                        }
+                    }
+                    item.sort = 0;
+                }
+                //console.log(this.selectImagesIds)
+                this.$set(this,'selectImages',this.selectImages);
+                this.$set(this,'selectImagesIds',this.selectImagesIds);
+            },
+            //获取图片列表
+            getImageList:function(){
+                var that = this;
+                if(that.loading) return;
+                that.loading = true;
+                var index = layList.layer.load(1, {shade: [0.1,'#fff']});
+                layList.baseGet(this.U({a:'getImageData',q:{cate_id:this.cate_id,page:this.page,limit:this.limit}}),function (res) {
+                    that.loading = false;
+                    that.$set(that,'imageList',res.data.list);
+                    layList.layer.close(index);
+                    if(that.page == 1){
+                        layList.laypage.render({
+                            elem: that.$refs.image_page
+                            ,count: res.data.count
+                            ,limit:that.limit
+                            ,theme: '#1E9FFF',
+                            jump:function (obj) {
+                                that.page=obj.curr;
+                            }
+                        });
+                    }
+                },function () {
+                    that.loading = false;
+                    layList.layer.close(index);
+                });
+            },
+            //查询分类
+            search:function(){
+//                if(!this.searchTitle) return layList.msg('请输入搜索内容！');
+                this.getCategoryList();
+            },
+            //打开和关闭树形
+            OpenTree:function(item,index){
+                this.cate_id = item.id;
+                if(item.child.length){
+                    /*item.isOpen == undefined ? false : item.isOpen;
+                    this.$set(this.categoryList[index],'isOpen',!item.isOpen);*/
+                }else{
+                    this.page = 1;
+                    this.$set(this,'selectImages',[]);
+                    this.$set(this,'selectImagesIds',[]);
+                    this.getImageList();
+                }
+                /*this.uploadInst.reload({
+                    url:this.U({a:'upload'})+'?cate_id='+this.cate_id
+                });*/
+            },
+            //组装URL
+            U:function(opt){
+                opt = typeof opt == 'object' ? opt : {};
+                return layList.U({m:'admin',c:"widget.attach",a:opt.a || '',q:opt.q || {},p:opt.q || {}});
+            },
+            //获取分类
+            getCategoryList:function(){
+                var that=this;
+                layList.baseGet(that.U({a:'getCateData',q:{name:this.searchTitle}}),function (res) {
+                    that.$set(that,'categoryList',res.data);
+                });
+            },
+            //添加分类
+            addCategory:function (item, cate_id) {
+                layer.prompt({
+                    formType: 3,
+                    value: '',
+                    title: '新增分类',
+                }, function(value, index, elem){
+                    $.ajax({
+                        url: "{:url('widget.attach/saveCate')}",
+                        data:{'name':value, "id":0},
+                        method: "POST",
+                        dataType: 'json',
+                        success:function (res) {
+                            layer.msg(res.msg);
+                            location.reload();
+                        }
+                    });
+                    layer.close(index);
+                });
+            },
+            //修改分类
+            updateCategory:function(item,cate_id){
+                layer.prompt({
+                    formType: 3,
+                    value: item.name,
+                    title: '修改分类',
+                }, function(value, index, elem){
+                    $.ajax({
+                        url: "{:url('widget.attach/saveCate')}",
+                        data:{'name':value, "id":item.id},
+                        method: "POST",
+                        dataType: 'json',
+                        success:function (res) {
+                            layer.msg(res.msg);
+                            location.reload();
+                        }
+                    });
+                    layer.close(index);
+                });
+            },
+            //删除分类
+            delCategory:function (item,cate_id) {
+                var that=this;
+                if(item.child.length) return layList.msg('请先删除子分类再尝试删除此分类！');
+                layList.layer.confirm('是否要删除['+item.name+']分类？', {
+                    btn: ['是的我要删除','我想想把'] //按钮
+                }, function(){
+                    layList.baseGet(that.U({a:'deleteCate',q:{cate_id:item.id}}),function (res) {
+                        layList.msg(res.msg,function () {
+                            that.getCategoryList();
+                            location.reload();
+                        });
+                    });
+                });
+            },
+            //打开一个窗口
+            getOpenWindow:function(title,url,opt){
+                opt = opt == undefined ? {w:400,h:350} : opt;
+                return layList.layer.open({
+                    type: 2,
+                    title: title,
+                    shade: [0],
+                    area: [opt.w+"px" , opt.h+'px'],
+                    anim: 2,
+                    content: [url, 'no'],
+                });
+            },
+            //回调
+            SuccessCateg:function () {
+                this.getCategoryList();
+            },
+            upload:function () {
+                var that=this;
+                this.uploadInst=layList.upload.render({
+                    elem: this.$refs.upload
+                    ,url: this.U({a:'upload'})+'?cate_id='+this.cate_id
+                    ,multiple: true
+                    ,auto:true
+                    ,size: 2097152 //限制文件大小，单位 KB
+                    ,done: function(res){
+                        layList.layer.msg(res.msg,{time:3000});
+                        that.getImageList();
+                    }
+                });
+            }
+        },
+        mounted:function () {
+            this.getCategoryList();
+            this.getImageList();
+            window.SuccessCateg = this.SuccessCateg;
+            this.upload();
+        }
+    })
+</script>
+
+</body>
+</html>

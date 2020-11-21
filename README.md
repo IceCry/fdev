@@ -22,9 +22,14 @@ a fast development framework based on thinkphp6
 - godruoyi/php-snowflake
 
 
+todo
+- workerman/channel
+- overtrue/socialite
+- xaboy/form-builder
+
 
 ### 基础
-- php 7.2+
+- php 7.4+
 - thinkphp 6.x
 - layuiadmin 1.4.0
 - 

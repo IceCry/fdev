@@ -1,0 +1,121 @@
+{extend name="public/container"}
+
+{block name="content"}
+<body>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    <button type="button" id="add" class="layui-btn layui-btn-sm">添加数据</button>
+                </div>
+                <div class="layui-card-body layui-form">
+                    <table class="layui-table">
+                        <thead>
+                        <tr>
+                            <th class="text-center">编号</th>
+                            {volist name="fields" id="vo"}
+                            <th class="text-center">{$vo.name}</th>
+                            {/volist}
+                            <!--<th class="text-center">状态</th>-->
+                            <th class="text-center">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody class="">
+                        {volist name="list" id="vo" key="key"}
+                        <tr>
+                            <td>
+                                {$vo.id}
+                            </td>
+                            {volist name="fields" id="item"}
+                            <td>
+                                {if condition="isset($vo['value'][$key][$item['var']]['value']) && $vo['value'][$key][$item['var']]['value'] !== ''"}
+
+                                    {if condition="$item['var'] == 'status'"}
+                                        {if condition="$vo['value'][$key][$item['var']]['value'] eq 1"}
+                                        <i class="fa fa-check text-navy"></i>
+                                        {else/}
+                                        <i class="fa fa-close text-danger"></i>
+                                        {/if}
+                                    {else/}
+                                        {$vo['value'][$key][$item['var']]['value']}
+                                    {/if}
+                                {/if}
+                            </td>
+                            {/volist}
+
+                            <!--<td>
+                                {php}dump($vo['value'][$key]);{/php}
+                                {if condition="$vo.status eq 1"}
+                                <i class="fa fa-check text-navy"></i>
+                                {elseif condition="$vo.status eq 0"/}
+                                <i class="fa fa-close text-danger"></i>
+                                {/if}
+                            </td>-->
+                            <td>
+                                <button class="layui-btn layui-btn-info layui-btn-xs edit-btn" type="button"  data-gid="{$gid}" data-id="{$vo.id}"><i class="fa fa-edit"></i> 编辑</button>
+                                <button class="layui-btn layui-btn-danger layui-btn-xs del-btn" data-id="{$vo.id}" type="button"><i class="fa fa-times"></i> 删除</button>
+                            </td>
+                        </tr>
+                        {/volist}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+{/block}
+
+{block name="script"}
+<script>
+    var gid = "{$Request.param.gid}" || 0;
+    layui.config({
+        base: '{__LAYUI_PATH}'
+    }).extend({
+        index: 'lib/index'
+    }).use(['index'], function(){
+        var $ = layui.$;
+
+        $('#add').click(function () {
+            layer.open({
+                type: 2
+                ,title: '新增数据'
+                ,content: "{:url('system.dataGroupValue/create', [], false)}/gid/"+gid
+                ,area: ['600px', '90%']
+            });
+        });
+
+        $('.edit-btn').click(function () {
+            var gid = $(this).attr('data-gid');
+            var id = $(this).attr('data-id');
+            layer.open({
+                type: 2
+                ,title: '新增数据'
+                ,content: "{:url('system.dataGroupValue/create', [], false)}/gid/"+gid+"/id/"+id
+                ,area: ['600px', '90%']
+            });
+        });
+
+        $('.del-btn').click(function () {
+            var id = $(this).attr('data-id');
+            layer.confirm('删除可能导致系统错误，确定要删除吗？', function(index){
+                $.ajax({
+                    url: "{:url('system.dataGroupValue/delete')}",
+                    data:{"id": id},
+                    method: "POST",
+                    dataType: "json",
+                    success:function (res) {
+                        console.log(res)
+                        layer.msg(res.msg,{},function () {
+                            location.reload();
+                        });
+                    }
+                });
+            });
+        });
+
+    });
+</script>
+{/block}

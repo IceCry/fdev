@@ -1,0 +1,94 @@
+{extend name="public/container"}
+
+{block name="content"}
+<body>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <!--<div class="layui-card-header">权限分配</div>-->
+                <div class="layui-card-body layui-form">
+                    <table class="layui-hide" id="table-toolbar" lay-filter="table-toolbar"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+{/block}
+
+{block name="script"}
+<script>
+    layui.config({
+        base: '{__LAYUI_PATH}' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+        ,treetable: 'treetable-lay/treetable'
+    }).use(['index', 'table', 'form', 'treetable'], function(){
+        var $ = layui.$
+            ,form = layui.form
+            ,treetable = layui.treetable;
+
+        var group_id = "{$Request.param.id}";
+
+        // 渲染表格
+        var renderTable = function () {
+            layer.load(2);
+            treetable.render({
+                treeColIndex: 2
+                ,treeSpid: 0
+                ,treeIdName: 'id'
+                ,treePidName: 'pid'
+                ,treeDefaultClose: false
+                ,treeLinkage: true
+                ,elem: '#table-toolbar'
+                ,url: "{:url('system.role/getRuleData',[], false)}/id/"+group_id
+                ,toolbar: '#table-toolbar-toolbarDemo'
+                ,title: '权限数据表'
+                ,cols: [[
+                    {type:'numbers', title:'序号', width:100, unresize: true}
+                    ,{field:'is_menu', title:'菜单', width:80, templet:function (d) {
+                        if(d.is_menu==1){
+                            return "<i class='fa fa-"+d.ico+"'>";
+                        }else{
+                            return '';
+                        }
+                    }}
+                    ,{field:'title', title:'权限名', width:300}
+                    ,{field:'checked', title:'状态', templet:function (d) {
+                        if(d.checked==1 || d.is_check==0){
+                            return '<input type="checkbox" name="yyy" data-id="'+d.id+'" value="1" lay-filter="isCheck" lay-skin="switch" lay-text="授权|禁用" checked>';
+                        }else{
+                            return '<input type="checkbox" name="yyy" data-id="'+d.id+'" value="0" lay-filter="isCheck" lay-skin="switch" lay-text="授权|禁用">';
+                        }
+                    }}
+                ]],
+                done: function () {
+                    layer.closeAll('loading');
+                }
+                // ,page: true
+            });
+        };
+
+        renderTable();
+
+        //更改是否验证
+        form.on('switch(isCheck)', function(data){
+            var checked = data.elem.checked;
+            checked = checked?1:0;
+            var rule_id = data.elem.attributes['data-id'].nodeValue;
+            $.ajax({
+                url: "{:url('system.role/updateRule')}",
+                data:{'checked':checked, 'id':group_id, 'rule_id':rule_id},
+                method: "POST",
+                dataType: "json",
+                success:function (res) {
+                    layer.msg(res.msg);
+                    //table.reload('table-toolbar');
+                    renderTable();
+                }
+            });
+        });
+    });
+</script>
+{/block}

@@ -1,0 +1,494 @@
+{extend name="public/container"}
+
+{block name="content"}
+<body>
+<form class="layui-form" style="padding: 15px;" id="app" v-cloak="">
+    <blockquote class="layui-col-sm12 layui-elem-quote" style="margin-top: 10px;">
+        当前尚未设置便捷的人员信息及上下级步骤ID选择，需按格式手动填写，不同id用逗号间隔。
+    </blockquote>
+    <div class="layui-form-item">
+        <label class="layui-form-label">步骤名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="name" lay-verify="required" autocomplete="off" class="layui-input" v-model="formData.name" maxlength="45">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">简介</label>
+        <div class="layui-input-block">
+            <input type="text" name="intro" autocomplete="off" class="layui-input" v-model="formData.intro" maxlength="200">
+        </div>
+    </div>
+    <!--<div class="layui-form-item">
+        <label class="layui-form-label">适用人员</label>
+        <div class="layui-input-inline">
+            <select name="for_user_type" lay-verify="required" id="for_user_type" lay-filter="for_user_type" v-model="formData.for_user_type">
+                <option value="all">全体人员</option>
+                {foreach $checker as $item}
+                <option value="{$item.en_name}">{$item.name}</option>
+                {/foreach}
+            </select>
+        </div>
+        <div class="layui-input-inline" v-show="formData.for_user_type=='dept' || formData.for_user_type=='role' || formData.for_user_type=='user'">
+            <div id="for_user"></div>
+            <input type="hidden" name="for_user_name" autocomplete="off" class="layui-input" v-model="formData.for_user_name" maxlength="200">
+            <input type="hidden" name="for_user_id" autocomplete="off" class="layui-input" v-model="formData.for_user_id" placeholder="请按格式填写对应结果ID" maxlength="45">
+        </div>
+    </div>-->
+    <div class="layui-form-item">
+        <label class="layui-form-label">办理人员</label>
+        <div class="layui-input-inline">
+            <select name="checker_type" lay-verify="required" id="checker_type" lay-filter="checker_type" v-model="formData.checker_type">
+                <option value="">请选择办理人员</option>
+                {foreach $checker as $item}
+                <option value="{$item.en_name}">{$item.name}</option>
+                {/foreach}
+            </select>
+        </div>
+        <div class="layui-input-inline" v-show="formData.checker_type=='dept' || formData.checker_type=='role' || formData.checker_type=='user'">
+            <div id="check_type"></div>
+            <input type="hidden" name="checker_name" autocomplete="off" class="layui-input" v-model="formData.checker_name" maxlength="200">
+            <input type="hidden" name="checker_id" autocomplete="off" class="layui-input" v-model="formData.checker_id" placeholder="请按格式填写对应结果ID" maxlength="45">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">转办类型</label>
+        <div class="layui-input-block">
+            <input type="radio" v-model="formData.can_transfer" name="can_transfer" value="1" title="可转他人办理" checked="formData.can_transfer == 1" lay-filter="can_transfer">
+            <input type="radio" v-model="formData.can_transfer" name="can_transfer" value="0" title="不可转办" checked="formData.can_transfer == 0" lay-filter="can_transfer">
+        </div>
+    </div>
+    <div class="layui-form-item" v-show="formData.can_transfer == 1">
+        <label class="layui-form-label">转办范围</label>
+        <div class="layui-input-inline">
+            <select name="transfer_type" lay-verify="required" id="transfer_type" lay-filter="transfer_type" v-model="formData.transfer_type">
+                <option value="all">全体人员</option>
+                {foreach $checker as $item}
+                <option value="{$item.en_name}">{$item.name}</option>
+                {/foreach}
+            </select>
+        </div>
+        <div class="layui-input-inline" v-show="formData.transfer_type=='dept' || formData.transfer_type=='role' || formData.transfer_type=='user'">
+            <div id="trans_type"></div>
+            <input type="hidden" name="transfer_name" autocomplete="off" class="layui-input" v-model="formData.transfer_name" maxlength="200">
+            <input type="hidden" name="transfer_id" autocomplete="off" class="layui-input" v-model="formData.transfer_id" placeholder="请按格式填写对应结果ID" maxlength="45">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">能否退回</label>
+        <div class="layui-input-block">
+            <input type="radio" v-model="formData.can_back" name="can_back" value="1" title="允许退回" checked="formData.can_back == 1" lay-filter="can_back">
+            <input type="radio" v-model="formData.can_back" name="can_back" value="0" title="不可退回" checked="formData.can_back == 0" lay-filter="can_back">
+        </div>
+    </div>
+    <div class="layui-form-item" v-if="formData.id>0">
+        <label class="layui-form-label">步骤模式</label>
+        <div class="layui-input-block">
+            <!--下一步仅存在一个步骤时-->
+            <input type="radio" v-model="formData.mode" name="mode" value="0" title="单线模式" checked="formData.mode == 0" lay-filter="mode" v-if="formData.is_single==1">
+            <!--多个步骤-->
+            <input type="radio" v-model="formData.mode" name="mode" value="1" title="条件转出（符合执行）" checked="formData.mode == 1" lay-filter="mode" v-if="formData.is_single==0">
+            <!--<input type="radio" v-model="formData.mode" name="mode" value="2" title="同步模式（均需办理）" checked="formData.mode == 2" lay-filter="mode" v-if="formData.is_single==0">-->
+        </div>
+    </div>
+    <div class="layui-form-item" v-show="formData.mode==1" v-for="(item, index) in formData.next_step">
+        <label class="layui-form-label">{{item.name}}</label>
+        <div class="layui-input-block">
+            <input type="text" class="layui-input" v-model="formData.out_condition[item.id]['title']" placeholder="请输入条件介绍，如：重大法律事务案件需经所主任审核">
+            <textarea name="out_condition" autocomplete="off" class="layui-textarea" v-model="formData.out_condition[item.id]['condition']" placeholder="请输入正确的数据库查询语句，留空则代表其他情况均经此处理"></textarea>
+            <small class="ss-red">建议使用系统内置条件，如内置条件无法满足请联系我们</small>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">办理结果</label>
+        <div class="layui-input-block">
+            <input type="text" name="actions" lay-verify="required" autocomplete="off" class="layui-input" v-model="formData.actions" maxlength="150">
+            <small>格式为：动作1|动作1值,动作2|动作2值，如：同意|1,拒绝|2</small>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">提醒方式</label>
+        <div class="layui-input-block">
+            <input type="checkbox" lay-skin="primary" v-model="formData.is_sms" :checked="formData.is_sms === 1" name="is_sms" lay-filter="is_sms" value="1" title="短信通知">
+            <input type="checkbox" lay-skin="primary" v-model="formData.is_wechat" :checked="formData.is_wechat === 1" name="is_wechat" lay-filter="is_wechat" value="1" title="微信通知">
+        </div>
+    </div>
+    <!--<div class="layui-form-item">
+        <label class="layui-form-label">上级步骤ID</label>
+        <div class="layui-input-block">
+            <input type="text" name="pre_step_id" lay-verify="required" autocomplete="off" class="layui-input" v-model="formData.pre_step_id" maxlength="45" placeholder="可创建完所有步骤后再填写，逗号间隔">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">下级步骤ID</label>
+        <div class="layui-input-block">
+            <input type="text" name="next_step_id" lay-verify="required" autocomplete="off" class="layui-input" v-model="formData.next_step_id" maxlength="45" placeholder="可创建完所有步骤后再填写，逗号间隔">
+        </div>
+    </div>-->
+    <div class="layui-form-item" style="float: right;margin-right: 10px;">
+        <input type="button" lay-submit lay-filter="layer-submit" id="layer-submit" class="layui-btn layui-btn-info" value="确认发布">
+    </div>
+    <div class="h20"></div>
+</form>
+</body>
+{/block}
+
+{block name="script"}
+<script>
+    var id = "{$Request.param.id}" || 0;
+    var flow_id = "{$Request.param.flow_id}" || 0;
+    var app = new Vue({
+        el: '#app',
+        data: {
+            formData:{
+                id: id,
+                flow_id: flow_id,
+                name: '',
+                intro: '',
+                for_user_type: '',
+                for_user_name: '',
+                for_user_id: '',
+                checker_type: '',
+                checker_name: '',
+                checker_id: '',
+                can_transfer: 1,
+                transfer_type: 'all',
+                transfer_name: '',
+                transfer_id: '',
+                can_back: 1,
+                is_wechat: 1,
+                is_sms: 1,
+                mode: 0,
+                out_condition: [],
+                actions: '',
+                pre_step_id: '',
+                next_step_id: '',
+            },
+            rule: {
+
+            },
+            nowType: '', //当前弹窗类型
+            nowSelect: '', //当前选项
+        },
+        watch:{
+
+        },
+        methods: {
+            U: function (opt) {
+                var m = opt.m || 'index', c = opt.c || window.controlle || '', a = opt.a || 'index', q = opt.q || '', p = opt.p || {};
+                var params = Object.keys(p).map(function (key) {
+                    return key + '/' + p[key];
+                }).join('/');
+                var gets = Object.keys(q).map(function (key) {
+                    return key+'='+ q[key];
+                }).join('&');
+
+                return '/' + m + '/' + c + '/' + a + (params == '' ? '' : '/' + params) + (gets == '' ? '' : '?' + gets);
+            },
+            //提示
+            showMsg: function (msg, success) {
+                layui.use(['layer'], function () {
+                    layui.layer.msg(msg, success);
+                });
+            },
+            createFrame: function (title, src, opt) {
+                opt === undefined && (opt = {});
+                var h = 0;
+                if (window.innerHeight < 800 && window.innerHeight >= 700) {
+                    h = window.innerHeight - 50;
+                } else if (window.innerHeight < 900 && window.innerHeight >= 800) {
+                    h = window.innerHeight - 100;
+                } else if (window.innerHeight < 1000 && window.innerHeight >= 900) {
+                    h = window.innerHeight - 150;
+                } else if (window.innerHeight >= 1000) {
+                    h = window.innerHeight - 200;
+                } else {
+                    h = window.innerHeight;
+                }
+                var area = [(opt.w || window.innerWidth / 2) + 'px', (!opt.h || opt.h > h ? h : opt.h) + 'px'];
+                layui.use('layer',function () {
+                    return layer.open({
+                        type: 2,
+                        title: title,
+                        area: area,
+                        fixed: false, //不固定
+                        maxmin: true,
+                        moveOut: false,//true  可以拖出窗外  false 只能在窗内拖
+                        anim: 5,//出场动画 isOutAnim bool 关闭动画
+                        offset: 'auto',//['100px','100px'],//'auto',//初始位置  ['100px','100px'] t[ 上 左]
+                        shade: 0,//遮罩
+                        resize: true,//是否允许拉伸
+                        content: src,//内容
+                        move: '.layui-layer-title'
+                    });
+                });
+            }
+        },
+        mounted: function () {
+            var that = this;
+            window.$vm = that;
+            //如果id>0则获取数据
+            if(id>0){
+                axios.post("{:url('system.flow/stepInfo')}", {id:id}).then(function (res) {
+                    app.formData = res.data.data;
+                    console.log(app.formData)
+                    layui.use(['form'], function () {
+                        var form = layui.form;
+                        setTimeout(function () {
+                            form.render();
+                        }, 500);
+                    });
+                }).catch(function (err) {
+                    alert(err)
+                });
+            }
+        }
+    });
+
+    layui.config({
+        base: '{__LAYUI_PATH}' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+        ,ueditor: 'ueditor'
+    }).use(['index', 'form', 'xmSelect'], function(){
+        var $ = layui.$
+            ,xmSelect = layui.xmSelect
+            ,form = layui.form;
+
+        //适用人员
+        form.on('select(for_user_type)', function(data){
+            var val = data.value;
+            app.formData.for_user_type = val;
+        });
+
+
+        //本地数据动态赋值
+        //办理人员
+        var checkerType = xmSelect.render({
+            el: '#check_type',
+            language: 'zn',
+            data: [],
+            tips: '请选择办理人员',
+            empty: "未检索到数据，请检查",
+            filterable: true,
+            searchTips: '请选择办理人员',
+            radio: true,
+            clickClose: true,
+            on: function(data){
+                var arr = data.arr[0];
+                if(arr != undefined){
+                    app.formData.checker_id = arr['value'];
+                    app.formData.checker_name = arr['name'];
+                }else{
+                    app.formData.checker_id = '';
+                    app.formData.checker_name = '';
+                }
+            }
+        });
+        form.on('select(checker_type)', function(data){
+            var val = data.value;
+            app.formData.checker_type = val;
+            //办理人员
+            if(val=='dept' || val=='role' || val=='user'){
+                axios({
+                    method: 'get',
+                    url: "{:url('system.flow/searchUserTypeData', [], false)}",
+                    params: {
+                        keyword: '',
+                        type: val
+                    }
+                }).then(response => {
+                    var res = response.data;
+                    checkerType.update({data: res.data});
+                }).catch(err => {
+                    console.log(err);
+                });
+            }
+        });
+        //转办范围
+        var transType = xmSelect.render({
+            el: '#trans_type',
+            language: 'zn',
+            data: [],
+            tips: '请选择转办范围',
+            empty: "未检索到数据，请检查",
+            filterable: true,
+            searchTips: '请选择转办范围',
+            on: function(data){
+                var arr = data.arr;
+                var ids = [];
+                var names = [];
+                if(arr != undefined){
+                    arr.forEach(function (val, index) {
+                        //创建表单
+                        names.push(val.name);
+                        ids.push(val.value);
+                    });
+                    app.formData.transfer_name = names.join(',');
+                    app.formData.transfer_id = ids.join(',');
+                }else{
+                    app.formData.transfer_id = '';
+                    app.formData.transfer_name = '';
+                }
+            }
+        });
+        form.on('select(transfer_type)', function(data){
+            var val = data.value;
+            app.formData.transfer_type = val;
+            console.log(val)
+            //办理人员
+            if(val=='dept' || val=='role' || val=='user'){
+                axios({
+                    method: 'get',
+                    url: "{:url('system.flow/searchUserTypeData', [], false)}",
+                    params: {
+                        keyword: '',
+                        type: val
+                    }
+                }).then(response => {
+                    var res = response.data;
+                    transType.update({data: res.data});
+                }).catch(err => {
+                    console.log(err);
+                });
+            }
+        });
+        //编辑时xmselect默认选中
+        if(id>0){
+            setTimeout(function () {
+                //办理人员
+                axios({
+                    method: 'get',
+                    url: "{:url('system.flow/searchUserTypeData', [], false)}",
+                    params: {
+                        keyword: '',
+                        type: app.formData.checker_type
+                    }
+                }).then(response => {
+                    var res = response.data.data;
+                    var checkedArr = app.formData.checker_id.split(',');
+                    //遍历默认选中项
+                    if(app.formData.checker_type=='user'){
+                        res.forEach(function (val, index) {
+                            val.children.forEach(function (val2, index2) {
+                                console.log(val2)
+                                var nowVal = val2.value+'';
+                                if(checkedArr.indexOf(nowVal) !== -1){
+                                    res[index]['children'][index2]['selected'] = true;
+                                }
+                            })
+                        });
+                    }else{
+                        res.forEach(function (val, index) {
+                            var nowVal = val.value+'';
+                            if(checkedArr.indexOf(nowVal) !== -1){
+                                res[index]['selected'] = true;
+                            }
+                        });
+                    }
+                    checkerType.update({data: res});
+                }).catch(err => {
+                    console.log(err);
+                });
+
+                //转办范围
+                axios({
+                    method: 'get',
+                    url: "{:url('system.flow/searchUserTypeData', [], false)}",
+                    params: {
+                        keyword: '',
+                        type: app.formData.transfer_type
+                    }
+                }).then(response => {
+                    var res = response.data.data;
+                    var checkedArr = app.formData.transfer_id.split(',');
+                    //遍历默认选中项
+                    //todo 如果为用户，则需处理分组
+                    if(app.formData.transfer_type=='user'){
+                        res.forEach(function (val, index) {
+                            val.children.forEach(function (val2, index2) {
+                                console.log(val2)
+                                var nowVal = val2.value+'';
+                                if(checkedArr.indexOf(nowVal) !== -1){
+                                    res[index]['children'][index2]['selected'] = true;
+                                }
+                            })
+                        });
+                    }else{
+                        res.forEach(function (val, index) {
+                            var nowVal = val.value+'';
+                            if(checkedArr.indexOf(nowVal) !== -1){
+                                res[index]['selected'] = true;
+                            }
+                        });
+                    }
+
+                    transType.update({data: res});
+                }).catch(err => {
+                    console.log(err);
+                });
+            }, 500);
+        }
+
+        //转办类型
+        form.on('radio(can_transfer)', function(data){
+            var val = data.value;
+            app.formData.can_transfer = val;
+        });
+        //能否退回
+        form.on('radio(can_back)', function(data){
+            var val = data.value;
+            app.formData.can_back = val;
+        });
+        //步骤模式
+        form.on('radio(mode)', function(data){
+            var val = data.value;
+            app.formData.mode = val;
+        });
+        //是否短信微信通知
+        form.on('checkbox(is_sms)', function(data){
+            var checked = data.elem.checked;
+            var val = checked?1:0;
+            app.formData.is_sms = val;
+        });
+        form.on('checkbox(is_wechat)', function(data){
+            var checked = data.elem.checked;
+            var val = checked?1:0;
+            app.formData.is_wechat = val;
+        });
+
+        //数据提交
+        form.on('submit(layer-submit)', function(){
+            //检测数据是否完整
+            if((app.formData.for_user_type=='dept' || app.formData.for_user_type=='role' || app.formData.for_user_type=='user') && !app.formData.for_user_id){
+                return layer.msg('请填写对应适用人员');
+            }
+            if((app.formData.checker_type=='dept' || app.formData.checker_type=='role' || app.formData.checker_type=='user') && !app.formData.checker_id){
+                return layer.msg('请填写对应办理人员');
+            }
+            if((app.formData.transfer_type=='dept' || app.formData.transfer_type=='role' || app.formData.transfer_type=='user') && !app.formData.transfer_id){
+                return layer.msg('请填写对应可转办人员');
+            }
+
+            $.ajax({
+                url: "{:url('system.flow/stepSave')}",
+                data: app.formData,
+                method: "POST",
+                dataType: 'json',
+                success:function (res) {
+                    if(res.code==200){
+                        layer.msg(res.msg, {time: 2000}, function () {
+                            parent.layer.closeAll();
+                            parent.location.reload();
+                        });
+                    }else{
+                        layer.msg(res.msg);
+                    }
+                }
+            });
+            return false;
+        });
+
+    });
+
+</script>
+{/block}

@@ -1,0 +1,157 @@
+{extend name="public/container"}
+
+{block name="content"}
+<body>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">用户认证审核</div>
+                <div class="layui-card-body layui-form">
+                    <div class="event-btns" style="margin-bottom: 10px;">
+                    </div>
+
+                    <table class="layui-hide" id="table-toolbar" lay-filter="table-toolbar"></table>
+
+                    <script type="text/html" id="avatar">
+                        <img style="cursor: pointer" src="{{d.avatar}}">
+                    </script>
+                    <script type="text/html" id="cert">
+                        {{# for(var i=0; i<d.cert_pic.length; i++){ }}
+                        <img style="cursor: pointer" lay-event="open_image" src="{{d.cert_pic[i]}}">
+                        {{# } }}
+                    </script>
+
+                    <script type="text/html" id="table-toolbar-barDemo">
+                        <a class="layui-btn layui-btn-xs" lay-event="action">立即审核</a>
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+{/block}
+
+{block name="script"}
+<script>
+    layui.config({
+        base: '{__LAYUI_PATH}'
+    }).extend({
+        index: 'lib/index'
+    }).use(['index', 'table', 'form'], function(){
+        var $ = layui.$
+            ,table = layui.table
+            ,form = layui.form;
+
+        table.render({
+            elem: '#table-toolbar'
+            ,url: "{:url('user.user/getVerifyData')}"
+            ,where:{
+                is_verify: 0
+            }
+            ,toolbar: '#table-toolbar-toolbarDemo'
+            ,title: '数据表'
+            ,cols: [[
+                {field:'id', title:'ID', width:80, unresize: true, sort: true}
+                ,{field:'avatar', title:'头像', width:100,templet:"#avatar"}
+                ,{field:'user_id', title:'用户',width:200, templet:function (d) {
+                    return d.nickname+ '[ID:'+d.user_id+']';
+                }}
+                ,{field:'contact', title:'联系人',width:100}
+                ,{field:'phone', title:'联系电话', width:150}
+                ,{field:'cert_type', title:'地域',width:80}
+                ,{field:'cert_id', title:'证件号', width:200}
+                ,{field:'cert_pic', title:'审核资料', minWidth:200,templet:"#cert"}
+                ,{field:'create_time', title:'申请时间', width:170}
+                ,{title:'操作', width:150, toolbar: '#table-toolbar-barDemo'}
+            ]]
+            ,autoSort: false
+            ,page: true
+            ,limit: 20
+        });
+
+        var active = {
+            search: function(){
+                var keyword = $('input[name=keyword]').val();
+                table.reload('table-toolbar', {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    ,where: {
+                        keyword: keyword
+                    }
+                });
+            }
+        };
+
+        $('.event-btns .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //监听行工具事件
+        table.on('tool(table-toolbar)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'action'){
+
+                layer.confirm('是否通过审核？', {
+                    btn: ['通过', '拒绝'] //按钮
+                }, function(){
+                    //通过审核
+                    $.ajax({
+                        url: "{:url('user.user/doVerify')}",
+                        data:{"id": data.id, 'status':1, 'remark':''},
+                        method: "POST",
+                        success:function (res) {
+                            layer.msg(res.msg);
+                            table.reload('table-toolbar');
+                        }
+                    });
+                    layer.close(index);
+                }, function(){
+                    //无效投诉 更改状态等
+                    layer.prompt({title: '请填写理由 15字内', formType: 3}, function(text, index){
+                        layer.close(index);
+                        $.ajax({
+                            url: "{:url('user.user/doVerify')}",
+                            data:{"id": data.id, 'status':-1, 'remark': text},
+                            method: "POST",
+                            success:function (res) {
+                                layer.msg(res.msg);
+                                table.reload('table-toolbar');
+                            }
+                        });
+                    });
+                });
+
+            }else if(obj.event === 'open_image'){
+                var src = this.src;
+                layer.open({
+                    type: 1,
+                    title: false,
+                    closeBtn: 0,
+                    shadeClose: true,
+                    content: '<img src="'+src+'" style="display: block;max-width: 100%;max-height:100%;" />'
+                });
+            }
+        });
+
+        //更改是否验证
+        form.on('switch(isCheck)', function(data){
+            var is_check = data.elem.checked;
+            is_check = is_check?1:0;
+            var id = data.elem.attributes['data-id'].nodeValue;
+            $.ajax({
+                url: "{:url('base/updateStatus')}",
+                data:{'table':'lawyer','status':is_check, 'id':id},
+                method: "POST",
+                success:function (res) {
+                    layer.msg(res.msg);
+                    table.reload('table-toolbar');
+                }
+            });
+        });
+    });
+</script>
+{/block}

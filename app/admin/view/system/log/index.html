@@ -1,0 +1,148 @@
+{extend name="public/container"}
+
+{block name="head"}
+<style>
+    .layui-nav-child2{
+        display: none;
+        padding: 10px;
+        background: #ffffff;
+    }
+</style>
+{/block}
+
+{block name="content"}
+<body>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">日志管理</div>
+                <div class="layui-card-body layui-form">
+                    <div class="event-btns" style="margin-bottom: 10px;">
+                        <div class="layui-inline">
+                            <select name="is_admin" id="is_admin" lay-search>
+                                <option value="">日志类型</option>
+                                <option value="1">后台日志</option>
+                                <option value="0">用户日志</option>
+                            </select>
+                        </div>
+                        <div class="layui-inline">
+                            <input class="layui-input" name="keyword" id="keyword" autocomplete="off" placeholder="按内容关键词搜索">
+                        </div>
+                        <button class="layui-btn" data-type="search">搜索</button>
+                        <a class="layui-btn layui-btn-primary" href="{:url('system.log/index')}">重置</a>
+                    </div>
+
+                    <table class="layui-hide" id="table-toolbar" lay-filter="table-toolbar"></table>
+
+                    <script type="text/html" id="table-toolbar-barDemo">
+                        <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="info">日志详情</a>
+
+                        <button type="button" class="layui-btn layui-btn-xs" onclick="dropDown(this)">操作 <i class="fa fa-caret-down"></i></button>
+                        <ul class="layui-nav-child2">
+                            {{# if(d.order_status > 1){ }}
+                            <li><a href="javascript:void(0);" lay-event='express'><i class="fa fa-send-o"></i> 发货/修改单号</a></li>
+                            {{# } }}
+
+                            {{# if(d.order_status == 1){ }}
+                            <li><a href="javascript:void(0);" lay-event='cancel'><i class="fa fa-history"></i>  取消日志</a></li>
+                            {{# } }}
+                            <!--<li><a href="javascript:void(0);" lay-event='edit_status'><i class="fa fa-edit"></i> 修改日志状态</a></li>-->
+                            <!--<li><a href="javascript:void(0);" lay-event='delete'><i class="fa fa-history"></i>删除日志</a></li>-->
+                            <li><a href="javascript:void(0);" lay-event='remark'><i class="fa fa-edit"></i> 日志备注</a></li>
+                        </ul>
+                        <!--<a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>-->
+                        <!--<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>-->
+                    </script>
+
+                    <script type="text/html" id="thumb">
+                        <img style="cursor: pointer" lay-event="open_image" src="{{d.thumb}}">
+                    </script>
+                    <!--用户信息-->
+                    <script type="text/html" id="user_info">
+                        {{d.user_name==null ? '暂无信息':d.user_name}}/{{d.user_id}}
+                    </script>
+                    <!--商品信息-->
+                    <script type="text/html" id="info">
+                        {{#  layui.each(d.snap.products, function(index, item){ }}
+                        <div class="product">
+                            <span><img style="width: 30px;height: 30px;margin:0;cursor: pointer;" src="{{item.thumb}}"></span>
+                            <span>{{item.title}}</span><span> | ￥{{item.max_price}}×{{item.number}}</span>
+                        </div>
+                        {{#  }); }}
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+{/block}
+
+{block name="script"}
+<script>
+    layui.config({
+        base: '{__LAYUI_PATH}' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'table', 'form', 'laydate'], function(){
+        var $ = layui.$
+            ,table = layui.table
+            ,laydate = layui.laydate
+            ,form = layui.form;
+
+        laydate.render({
+            elem: '#range_time'
+            ,type: 'datetime'
+            ,range: true
+            ,done:function(val){
+                //app.formData.range_time = val;
+            }
+        });
+
+        table.render({
+            elem: '#table-toolbar'
+            ,url: "{:url('system.log/getData')}"
+            ,toolbar: '#table-toolbar-toolbarDemo'
+            ,title: '数据表'
+            ,cols: [[
+                {field:'id', title:'ID', width:80}
+                ,{field:'is_admin', title:'',width: 80, templet: function (d) {
+                    return d.is_admin?'<span class="layui-badge">后台</span>':'<span class="layui-badge layui-bg-blue">用户</span>';
+                }}
+                ,{field: 'level_str', title: '级别', width: 80}
+                ,{field:'mvc', title:'MVC', width:200}
+                ,{field: 'link_id', title: '关联ID', width: 200}
+                ,{field: 'message', title: '内容', minWidth: 200, align: 'center'}
+                ,{field: 'create_time', title: '时间', width: 170, align: 'center'}
+                ,{field: 'create_ip', title: 'IP', width: 150, align: 'center'}
+                ,{field:'user_info', title:'操作人',width: 150, templet: '#user_info', align: 'center'}
+            ]]
+            ,page: true
+            ,limit: 20
+        });
+
+        var active = {
+            search: function(){
+                var is_admin = $('select[name=is_admin]').val();
+                var keyword = $('input[name=keyword]').val();
+                table.reload('table-toolbar', {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    ,where: {
+                        keyword: keyword,
+                        is_admin: is_admin
+                    }
+                });
+            }
+        };
+
+        $('.event-btns .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+    });
+</script>
+{/block}

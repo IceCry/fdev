@@ -1,0 +1,152 @@
+{extend name="public/container"}
+
+{block name="content"}
+<body>
+<form class="layui-form" style="padding: 20px;" id="app" v-cloak="">
+    <div class="layui-form-item">
+        <label class="layui-form-label">数据组名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="name" lay-verify="required" placeholder="" autocomplete="off" class="layui-input" v-model="formData.name" maxlength="200">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">数据字段</label>
+        <div class="layui-input-block">
+            <input type="text" name="config_name" lay-verify="required" placeholder="如：home_slider" autocomplete="off" class="layui-input" v-model="formData.config_name" maxlength="200">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">简介</label>
+        <div class="layui-input-block">
+            <textarea name="info" placeholder="" class="layui-textarea" v-model="formData.info"></textarea>
+        </div>
+    </div>
+
+    <!--字段添加-->
+    <div class="fields">
+        <div class="layui-row layui-col-space10 layui-form-item" v-for="(item, index) in formData.fields">
+            <div class="layui-col-sm6">
+                <div class="layui-input-block">
+                    <input type="text" name="name" lay-verify="required" placeholder="字段名称：姓名" autocomplete="off" class="layui-input" v-model="item.name">
+                </div>
+                <div class="layui-input-block">
+                    <input type="text" name="var" lay-verify="required" placeholder="字段配置名：name" autocomplete="off" class="layui-input" v-model="item.var">
+                </div>
+                <div class="layui-input-block">
+                    <select name="type" class="layui-select" style="width: 100%;" lay-ignore placeholder="字段类型" lay-verify="required" v-model="item.type">
+                        <option value="text">文本框</option>
+                        <option value="textarea">多行文本框</option>
+                        <option value="radio">单选</option>
+                        <option value="checkbox">多选</option>
+                        <option value="select">下拉</option>
+                        <option value="image">图片</option>
+                        <option value="date">日期</option>
+                        <option value="area">地域</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-col-sm6">
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <textarea name="param" placeholder="参数方式例如:1=白色|2=红色|3=黑色" v-model="item.param" class="layui-textarea"></textarea>
+                        <button type="button" class="layui-btn layui-btn-danger layui-btn-xs" @click="removeField(index)">删除字段</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label"></label>
+        <div class="layui-input-block">
+            <button type="button" @click="addField" class="layui-btn layui-btn-warm layui-btn-sm">添加字段</button>
+        </div>
+    </div>
+    <!--字段添加-->
+
+
+    <div class="layui-form-item" style="float: right;">
+        <input type="button" lay-submit lay-filter="layer-submit" id="layer-submit" class="layui-btn layui-btn-info" value="确认提交">
+    </div>
+</form>
+</body>
+{/block}
+
+{block name="script"}
+<script>
+    var id = "{$Request.param.id}" || 0;
+    var app = new Vue({
+        el: '#app',
+        data: {
+            formData:{
+                id: id,
+                name: '',
+                info: '',
+                config_name: '',
+                fields: []
+            }
+        },
+        watch:{
+
+        },
+        methods: {
+            addField: function(){
+                this.formData.fields.push({
+                    name: '',
+                    var: '',
+                    type: 'text',
+                    param: ''
+                });
+            },
+            removeField: function(index){
+                this.formData.fields.splice(index,1);
+            },
+        },
+        mounted: function () {
+            var that = this;
+            //如果id>0则获取数据
+            if(id>0){
+                axios.post("{:url('system.dataGroup/info')}", {id:id}, {headers:{'Content-Type':'application/json;charset=utf8'}}).then(function (res) {
+                    if (res.status == 200 && res.data.code == 200) {
+                        app.formData = res.data.data;
+                    }
+                }).catch(function (err) {
+                    alert(err)
+                });
+            }
+        }
+    });
+
+
+    layui.config({
+        base: '{__LAYUI_PATH}' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'form'], function(){
+        var $ = layui.$
+            ,form = layui.form;
+
+        form.on('submit(layer-submit)', function(data){
+            $.ajax({
+                url: "{:url('system.dataGroup/save')}",
+                data: app.formData,
+                method: "POST",
+                dataType: 'json',
+                success:function (res) {
+                    if(res.code==200){
+                        layer.msg(res.msg, {time: 2000}, function () {
+                            parent.layer.closeAll();
+                            parent.location.reload();
+                        });
+                    }else{
+                        layer.msg(res.msg);
+                    }
+                }
+            });
+            return false;
+        });
+
+    });
+
+</script>
+{/block}

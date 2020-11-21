@@ -1,0 +1,250 @@
+{extend name="public/container"}
+
+{block name="content"}
+<body>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">权限管理</div>
+                <div class="layui-card-body layui-form">
+                    <div class="event-btns" style="margin-bottom: 10px;">
+                        <button class="layui-btn layui-btn-danger" data-type="add"><i class="fa fa-plus-circle"></i> 添加权限</button>
+                    </div>
+
+                    <table class="layui-hide" id="table-toolbar" lay-filter="table-toolbar"></table>
+
+                    <script type="text/html" id="table-toolbar-barDemo">
+                        <a class="layui-btn layui-btn-xs layui-btn-primary" lay-event="son">添加子权限</a>
+                        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+{/block}
+
+{block name="script"}
+<script>
+    layui.config({
+        base: '{__LAYUI_PATH}'
+    }).extend({
+        index: 'lib/index'
+        ,treetable: 'treetable-lay/treetable'
+    }).use(['index', 'table', 'form', 'treetable'], function(){
+        var $ = layui.$
+            ,table = layui.table
+            ,form = layui.form
+            ,treetable = layui.treetable;
+
+        // 渲染表格
+        var renderTable = function () {
+            layer.load(2);
+            treetable.render({
+                treeColIndex: 2
+                ,treeSpid: 0
+                ,treeIdName: 'id'
+                ,treePidName: 'pid'
+                ,treeDefaultClose: false
+                ,treeLinkage: true
+                ,elem: '#table-toolbar'
+                ,url: "{:url('system.rule/getData')}"
+                ,toolbar: '#table-toolbar-toolbarDemo'
+                ,title: '权限数据表'
+                ,cols: [[
+                    {type:'numbers', title:'序号', width:100, unresize: true}
+                    ,{field:'is_menu', title:'菜单', width:80, templet:function (d) {
+                            if(d.is_menu==1){
+                                return "<i class='fa fa-"+d.ico+"'>";
+                            }else{
+                                return '';
+                            }
+                        }}
+                    ,{field:'title', title:'权限名', width:300}
+                    ,{field:'name', title:'权限', width:200}
+                    ,{field:'is_check', title:'验证', templet:function (d) {
+                            if(d.is_check==1){
+                                return '<input type="checkbox" name="yyy" data-id="'+d.id+'" value="1" lay-filter="isCheck" lay-skin="switch" lay-text="ON|OFF" checked>';
+                            }else{
+                                return '<input type="checkbox" name="yyy" data-id="'+d.id+'" value="0" lay-filter="isCheck" lay-skin="switch" lay-text="ON|OFF">';
+                            }
+                        }}
+                    ,{field:'status', title:'是否开启', templet:function (d) {
+                            if(d.status==1){
+                                return '<input type="checkbox" name="status" data-id="'+d.id+'" value="1" lay-filter="isStatus" lay-skin="switch" lay-text="ON|OFF" checked>';
+                            }else{
+                                return '<input type="checkbox" name="status" data-id="'+d.id+'" value="0" lay-filter="isStatus" lay-skin="switch" lay-text="ON|OFF">';
+                            }
+                        }}
+                    ,{title:'操作', toolbar: '#table-toolbar-barDemo', width:250}
+                ]],
+                done: function () {
+                    layer.closeAll('loading');
+                }
+                // ,page: true
+            });
+        };
+
+        renderTable();
+
+        var active = {
+            add: function(){
+                layer.open({
+                    type: 2
+                    ,title: '新增权限'
+                    ,content: "{:url('system.rule/add')}"
+                    ,area: ['500px', '500px']
+                    ,btn: ['确定', '取消']
+                    ,yes: function(index, layero){
+                        var iframeWindow = window['layui-layer-iframe'+ index]
+                            ,submitID = 'layer-submit'
+                            ,submit = layero.find('iframe').contents().find('#'+ submitID);
+                        //监听提交
+                        iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
+                            var field = data.field;
+                            $.ajax({
+                                url: "{:url('system.rule/save')}",
+                                data:field,
+                                method: "POST",
+                                dataType: 'json',
+                                success:function (res) {
+                                    layer.msg(res.msg);
+                                    //table.reload('table-toolbar');
+                                    renderTable();
+                                }
+                            });
+                            layer.close(index);
+                        });
+
+                        submit.trigger('click');
+                    }
+                });
+            }
+        };
+
+        $('.event-btns .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //监听行工具事件
+        table.on('tool(table-toolbar)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'del'){
+                layer.confirm('删除可能导致系统错误，确定要删除吗？', function(index){
+                    //obj.del();
+                    $.ajax({
+                        url: "{:url('system.rule/delete')}",
+                        data:{"id": data.id},
+                        method: "POST",
+                        dataType: 'json',
+                        success:function (res) {
+                            layer.msg(res.msg);
+                            //table.reload('table-toolbar');
+                            renderTable();
+                        }
+                    });
+                    layer.close(index);
+                });
+            } else if(obj.event === 'edit'){
+                layer.open({
+                    type: 2
+                    ,title: '修改权限'
+                    ,content: "{:url('system.rule/edit',[],false)}/id/"+data.id
+                    ,area: ['500px', '400px']
+                    ,btn: ['确定', '取消']
+                    ,yes: function(index, layero){
+                        var iframeWindow = window['layui-layer-iframe'+ index]
+                            ,submitID = 'layer-submit'
+                            ,submit = layero.find('iframe').contents().find('#'+ submitID);
+                        //监听提交
+                        iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
+                            var field = data.field;
+                            $.ajax({
+                                url: "{:url('system.rule/save')}",
+                                data:field,
+                                method: "POST",
+                                dataType: 'json',
+                                success:function (res) {
+                                    layer.msg(res.msg);
+                                    //table.reload('table-toolbar');
+                                    renderTable();
+                                }
+                            });
+                            layer.close(index);
+                        });
+
+                        submit.trigger('click');
+                    }
+                });
+            }else if(obj.event === 'son'){
+                layer.open({
+                    type: 2
+                    ,title: '新增权限'
+                    ,content: "{:url('system.rule/add', [], false)}/pid/"+data.id
+                    ,area: ['500px', '400px']
+                    ,btn: ['确定', '取消']
+                    ,yes: function(index, layero){
+                        var iframeWindow = window['layui-layer-iframe'+ index]
+                            ,submitID = 'layer-submit'
+                            ,submit = layero.find('iframe').contents().find('#'+ submitID);
+                        //监听提交
+                        iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
+                            var field = data.field;
+                            $.ajax({
+                                url: "{:url('system.rule/save')}",
+                                data:field,
+                                method: "POST",
+                                dataType: 'json',
+                                success:function (res) {
+                                    layer.msg(res.msg);
+                                    //table.reload('table-toolbar');
+                                    renderTable();
+                                }
+                            });
+                            layer.close(index);
+                        });
+
+                        submit.trigger('click');
+                    }
+                });
+            }
+        });
+
+        //更改是否验证
+        form.on('switch(isCheck)', function(data){
+            var is_check = data.elem.checked;
+            is_check = is_check?1:0;
+            var id = data.elem.attributes['data-id'].nodeValue;
+            $.ajax({
+                url: "{:url('base/updateStatus')}",
+                data:{'table':'auth_rule','status':is_check, 'id':id, 'field':'is_check'},
+                method: "POST",
+                dataType: 'json',
+                success:function (res) {
+                    layer.msg(res.msg);
+                    renderTable();
+                }
+            });
+        });
+        form.on('switch(isStatus)', function(data){
+            var is_check = data.elem.checked;
+            is_check = is_check?1:0;
+            var id = data.elem.attributes['data-id'].nodeValue;
+            $.ajax({
+                url: "{:url('base/updateStatus')}",
+                data:{'table':'auth_rule','status':is_check, 'id':id},
+                method: "POST",
+                dataType: 'json',
+                success:function (res) {
+                    layer.msg(res.msg);
+                    renderTable();
+                }
+            });
+        });
+    });
+</script>
+{/block}

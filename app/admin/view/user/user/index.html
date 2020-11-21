@@ -1,0 +1,236 @@
+{extend name="public/container"}
+
+{block name="content"}
+<body>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">用户管理</div>
+                <div class="layui-card-body layui-form">
+                    <div class="event-btns" style="margin-bottom: 10px;">
+                        <div class="layui-inline">
+                            <select name="province" id="province" lay-search class="layui-select" lay-filter="province">
+                                <option value="">所有省份</option>
+                                {foreach $province as $item}
+                                <option value="{$item.city_id}">{$item.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                        <div class="layui-inline" style="display: none;" id="city-box">
+                            <select name="city" id="city" lay-search class="layui-select" lay-filter="city">
+                                <option value="">所有城市</option>
+                            </select>
+                        </div>
+                        <div class="layui-inline" style="display: none;" id="district-box">
+                            <select name="district" id="district" lay-search class="layui-select">
+                                <option value="">选择县区</option>
+                            </select>
+                        </div>
+                        <div class="layui-inline">
+                            <input class="layui-input" name="keyword" id="keyword" autocomplete="off" placeholder="按昵称、手机号搜索">
+                        </div>
+                        <button class="layui-btn" data-type="search">搜索</button>
+                        <a class="layui-btn layui-btn-primary" href="{:url('user.user/index')}">重置</a>
+                    </div>
+
+                    <table class="layui-hide" id="table-toolbar" lay-filter="table-toolbar"></table>
+
+                    <script type="text/html" id="avatar">
+                        <img style="cursor: pointer" lay-event="open_image" src="{{d.avatar}}">
+                    </script>
+
+                    <script type="text/html" id="table-toolbar-barDemo">
+                        <a class="layui-btn layui-btn-xs" lay-event="bid">出价记录</a>
+                        <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="deposit">保证金明细</a>
+                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="order">订单列表</a>
+                        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="info">个人信息</a>
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+{/block}
+
+{block name="script"}
+<script>
+    layui.config({
+        base: '{__LAYUI_PATH}'
+    }).extend({
+        index: 'lib/index'
+    }).use(['index', 'table', 'form'], function(){
+        var $ = layui.$
+            ,table = layui.table
+            ,form = layui.form;
+
+        table.render({
+            elem: '#table-toolbar'
+            ,url: "{:url('user.user/getData')}"
+            ,toolbar: '#table-toolbar-toolbarDemo'
+            ,title: '数据表'
+            ,cols: [[
+                {field:'id', title:'ID', width:80, unresize: true, sort: true}
+                ,{field:'avatar', title:'头像',width:90,templet:"#avatar"}
+                ,{field:'nickname', title:'昵称',width:150}
+                ,{field:'gender', title:'性别',width:80}
+                ,{field:'is_verify', title:'是否认证',width:100, templet:function (d) {
+                    return (d.is_verify==1)?'<span class="layui-badge">已认证</span>':'';
+                }}
+                ,{field:'phone', title:'手机号',width:120}
+                ,{field:'order_num', title:'成交数',width:100, sort: true}
+                ,{field:'order_price', title:'交易额',width:150, sort: true}
+                ,{field:'address', title:'地域', minWidth:150, templet:function (d) {
+                    return d.province+'/'+d.city;
+                }}
+                ,{field:'deposit_price', title:'可用保证金',width:130, sort: true}
+                ,{field:'status', title:'状态', width:100, templet:function (d) {
+                    if(d.status==1){
+                        return '<input type="checkbox" name="status" data-id="'+d.id+'" value="1" lay-filter="isCheck" lay-skin="switch" lay-text="ON|OFF" checked>';
+                    }else{
+                        return '<input type="checkbox" name="status" data-id="'+d.id+'" value="0" lay-filter="isCheck" lay-skin="switch" lay-text="ON|OFF" >';
+                    }
+                }}
+                ,{title:'操作', toolbar: '#table-toolbar-barDemo', width:320}
+            ]]
+            ,autoSort: false
+            ,page: true
+            ,limit: 20
+        });
+
+        var active = {
+            search: function(){
+                //检索条件
+                var province = $('select[name=province]').val();
+                var city = $('select[name=city]').val();
+                var district = $('select[name=district]').val();
+                var keyword = $('input[name=keyword]').val();
+                var whereObj = {
+                    keyword: keyword,
+                    province: province,
+                    city: city,
+                    district: district
+                };
+                table.reload('table-toolbar', {
+                    page: {
+                        curr: 1 //重新从第1页开始
+                    }
+                    ,where: whereObj
+                });
+            }
+        };
+
+        $('.event-btns .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //监听排序
+        table.on('sort(table-toolbar)', function(obj){
+            table.reload('table-toolbar', {
+                initSort: obj
+                ,where: {
+                    field: obj.field
+                    ,order: obj.type
+                }
+            });
+        });
+
+        //监听行工具事件
+        table.on('tool(table-toolbar)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'bid'){
+                layer.open({
+                    type: 2
+                    ,title: '出价记录'
+                    ,content: "{:url('user.user/bidHistory',[], false)}/user_id/"+data.id
+                    ,area: ['90%', '90%']
+                });
+            } else if(obj.event === 'deposit'){
+                layer.open({
+                    type: 2
+                    ,title: '保证金明细'
+                    ,content: "{:url('user.user/deposit',[], false)}/user_id/"+data.id
+                    ,area: ['90%', '90%']
+                });
+            } else if(obj.event === 'order'){
+                layer.open({
+                    type: 2
+                    ,title: '订单列表'
+                    ,content: "{:url('user.user/order',[], false)}/user_id/"+data.id
+                    ,area: ['90%', '90%']
+                });
+            }else if(obj.event === 'info'){
+                layer.open({
+                    type: 2
+                    ,title: false
+                    ,content: "{:url('user.user/info',[], false)}/user_id/"+data.id
+                    ,area: ['90%', '90%']
+                });
+            }
+        });
+
+        //获取对应城市 县区
+        form.on('select(province)', function(data){
+            var val = data.value || '';
+            $('select[name=city]').html('');
+            $('select[name=district]').html('');
+            if(!val) {
+                form.render('select');
+                $('#city-box').hide();
+                $('#district-box').hide();
+                return;
+            }
+            $('#city-box').show();
+            $.ajax({
+                url: "{:url('base/getCityByPid')}",
+                data: {"city_id": val},
+                dataType: 'html',
+                method: "POST",
+                success:function (res) {
+                    $('select[name=city]').append(res);
+                    form.render('select');
+                }
+            });
+        });
+        form.on('select(city)', function(data){
+            var val = data.value || '';
+            $('select[name=district]').html('');
+            if(!val) {
+                form.render('select');
+                $('#district-box').hide();
+                return;
+            }
+            $('#district-box').show();
+            $.ajax({
+                url: "{:url('base/getCityByPid')}",
+                data: {"city_id": val},
+                dataType: 'html',
+                method: "POST",
+                success:function (res) {
+                    $('select[name=district]').append(res);
+                    form.render('select');
+                }
+            });
+        });
+
+        //更改是否验证
+        form.on('switch(isCheck)', function(data){
+            var is_check = data.elem.checked;
+            is_check = is_check?1:0;
+            var id = data.elem.attributes['data-id'].nodeValue;
+            $.ajax({
+                url: "{:url('base/updateStatus')}",
+                data:{'table':'user','status':is_check, 'id':id},
+                method: "POST",
+                dataType: "json",
+                success:function (res) {
+                    layer.msg(res.msg);
+                    table.reload('table-toolbar');
+                }
+            });
+        });
+    });
+</script>
+{/block}

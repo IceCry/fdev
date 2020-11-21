@@ -1,11 +1,4 @@
 <?php
-/**
- * Desc:
- * User: SenSen Wechat:1050575278
- * Date: 2020/11/7
- * Time: 17:18
- */
-
 namespace sensen\basic;
 
 use sensen\interfaces\JobInterface;

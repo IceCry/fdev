@@ -1,0 +1,204 @@
+{extend name="public/container"}
+
+{block name="content"}
+<body>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">流程管理</div>
+                <div class="layui-card-body layui-form">
+                    <div class="event-btns" style="margin-bottom: 10px;">
+                        <button class="layui-btn layui-btn-danger" data-type="add">添加流程</button>
+                    </div>
+
+                    <table class="layui-hide" id="table-toolbar" lay-filter="table-toolbar"></table>
+
+                    <script type="text/html" id="table-toolbar-barDemo">
+                        <a class="layui-btn layui-btn-xs layui-btn-warm" lay-event="step">审核步骤设置</a>
+                        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+{/block}
+
+{block name="script"}
+<script>
+    layui.config({
+        base: '{__LAYUI_PATH}' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'table', 'form'], function(){
+        var $ = layui.$
+            ,table = layui.table
+            ,form = layui.form;
+
+        table.render({
+            elem: '#table-toolbar'
+            ,url: "{:url('system.flow/getData')}"
+            ,toolbar: '#table-toolbar-toolbarDemo'
+            ,title: '数据表'
+            ,cols: [[
+                {field:'id', title:'ID', width:80, unresize: true, sort: true}
+                ,{field:'type', title:'类型', width:100}
+                ,{field:'name', title:'流程名称', width:200}
+                ,{field:'prefix_num', title:'编号前缀', width:150}
+                ,{field:'intro', title:'简介'}
+                ,{field:'status', title:'是否可用', width:120, templet:function (d) {
+                    if(d.status==1){
+                        return '<input type="checkbox" name="status" data-id="'+d.id+'" value="1" lay-filter="isCheck" lay-skin="switch" lay-text="ON|OFF" checked>';
+                    }else{
+                        return '<input type="checkbox" name="status" data-id="'+d.id+'" value="0" lay-filter="isCheck" lay-skin="switch" lay-text="ON|OFF" >';
+                    }
+                }}
+                ,{title:'操作', toolbar: '#table-toolbar-barDemo', width:250}
+            ]]
+            // ,page: true
+        });
+
+        var active = {
+            add: function(){
+                layer.open({
+                    type: 2
+                    ,title: '新增流程'
+                    ,content: "{:url('system.flow/create')}"
+                    ,area: ['450px', '450px']
+                    ,btn: ['确定', '取消']
+                    ,yes: function(index, layero){
+                        var iframeWindow = window['layui-layer-iframe'+ index]
+                            ,submitID = 'layer-submit'
+                            ,submit = layero.find('iframe').contents().find('#'+ submitID);
+                        //监听提交
+                        iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
+                            var field = data.field;
+                            $.ajax({
+                                url: "{:url('system.flow/save')}",
+                                data:field,
+                                method: "POST",
+                                dataType: "json",
+                                success:function (res) {
+                                    layer.msg(res.msg);
+                                    table.reload('table-toolbar');
+                                }
+                            });
+                            layer.close(index);
+                        });
+
+                        submit.trigger('click');
+                    }
+                });
+            }
+        };
+
+        $('.event-btns .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //监听行工具事件
+        table.on('tool(table-toolbar)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'del'){
+                layer.confirm('删除可能导致系统错误，确定要删除吗？', function(index){
+                    //obj.del();
+                    $.ajax({
+                        url: "{:url('system.flow/delete')}",
+                        data:{"id": data.id},
+                        method: "POST",
+                        dataType: 'json',
+                        success:function (res) {
+                            layer.msg(res.msg);
+                            table.reload('table-toolbar');
+                        }
+                    });
+                    layer.close(index);
+                });
+            } else if(obj.event === 'edit'){
+                layer.open({
+                    type: 2
+                    ,title: '修改流程'
+                    ,content: "{:url('system.flow/create', [], false)}/id/"+data.id
+                    ,area: ['450px', '450px']
+                    ,btn: ['确定', '取消']
+                    ,yes: function(index, layero){
+                        var iframeWindow = window['layui-layer-iframe'+ index]
+                            ,submitID = 'layer-submit'
+                            ,submit = layero.find('iframe').contents().find('#'+ submitID);
+                        //监听提交
+                        iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
+                            var field = data.field;
+                            $.ajax({
+                                url: "{:url('system.flow/save')}",
+                                data:field,
+                                method: "POST",
+                                dataType: "json",
+                                success:function (res) {
+                                    layer.msg(res.msg);
+                                    table.reload('table-toolbar');
+                                }
+                            });
+                            layer.close(index);
+                        });
+
+                        submit.trigger('click');
+                    }
+                });
+            }else if(obj.event==='step'){
+                layer.open({
+                    type: 2
+                    ,title: '步骤管理'
+                    ,content: "{:url('system.flow/step',[], false)}/flow_id/"+data.id
+                    ,area: ['90%', '90%']
+                    // ,btn: ['确定', '取消']
+                    ,yes: function(index, layero){
+                        var iframeWindow = window['layui-layer-iframe'+ index]
+                            ,submitID = 'layer-submit'
+                            ,submit = layero.find('iframe').contents().find('#'+ submitID);
+                        //监听提交
+                        iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
+                            var field = data.field;
+                            $.ajax({
+                                url: "{:url('system.flow/stepSave')}",
+                                data:field,
+                                method: "POST",
+                                dataType: 'json',
+                                success:function (res) {
+                                    layer.msg(res.msg);
+                                    table.reload('table-toolbar');
+                                }
+                            });
+                            layer.close(index);
+                        });
+
+                        submit.trigger('click');
+                    }
+                });
+            }
+        });
+
+
+        //更改是否验证
+        form.on('switch(isCheck)', function(data){
+            var is_check = data.elem.checked;
+            is_check = is_check?1:0;
+            var id = data.elem.attributes['data-id'].nodeValue;
+            $.ajax({
+                url: "{:url('base/updateStatus')}",
+                data:{'table':'flow','status':is_check, 'id':id},
+                method: "POST",
+                dataType: 'json',
+                success:function (res) {
+                    layer.msg(res.msg);
+                    table.reload('table-toolbar');
+                }
+            });
+        });
+
+    });
+</script>
+{/block}

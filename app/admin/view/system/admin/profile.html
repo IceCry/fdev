@@ -1,0 +1,240 @@
+{extend name="public/container"}
+
+{block name="head"}
+<style>
+    .layui-form-item .layui-input-inline{
+        width: 360px;
+    }
+</style>
+{/block}
+
+{block name="content"}
+<body>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">个人资料修改</div>
+                <div class="layui-card-body" pad15>
+
+                    <div class="layui-form" lay-filter="">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">姓名</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="name" class="layui-input" placeholder="请输入您的真实姓名" value="{$info.name}">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">性别</label>
+                            <div class="layui-input-block">
+                                <input type="radio" name="sex" value="1" title="男" {if condition="$info.sex eq 1"}checked{/if}>
+                                <input type="radio" name="sex" value="2" title="女" {if condition="$info.sex eq 2"}checked{/if}>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">头像</label>
+                            <div class="layui-input-inline">
+                                <input name="avatar" lay-verify="required" id="avatar" placeholder="请点击右侧按钮上传" class="layui-input" value="{$info.avatar}">
+                            </div>
+                            <div class="layui-input-inline layui-btn-container" style="width: auto;">
+                                <button type="button" class="layui-btn layui-btn-primary" id="avatar-btn">
+                                    <i class="layui-icon">&#xe67c;</i>上传图片
+                                </button>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">手写签名</label>
+                            <div class="layui-input-inline">
+                                <input name="signature" id="signature" placeholder="（选填）手写签名尺寸建议为200x80像素，格式为PNG" class="layui-input" value="{$info.signature}">
+                            </div>
+                            <div class="layui-input-inline layui-btn-container" style="width: auto;">
+                                <button type="button" class="layui-btn layui-btn-primary" id="signature-btn">
+                                    <i class="layui-icon">&#xe67c;</i>上传图片
+                                </button>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">手机号</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="phone" lay-verify="required|phone" maxlength="11" class="layui-input" placeholder="" value="{$info.phone}">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">座机号</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="tel" maxlength="45" autocomplete="off" class="layui-input" placeholder="（选填）填写您的座机号" value="{$info.tel}">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">邮箱</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="email" lay-verify="email" autocomplete="off" class="layui-input" maxlength="45" value="{$info.email}">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">微信号</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="wechat" autocomplete="off" class="layui-input" maxlength="45" value="{$info.wechat}">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">籍贯</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="hometown" autocomplete="off" class="layui-input" maxlength="255" value="{$info.userInfo.hometown}">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">学历</label>
+                            <div class="layui-input-inline">
+                                <select name="qualifications" lay-verify="">
+                                    <option value="">请选择学历</option>
+                                    {foreach $qualifications as $item}
+                                    <option value="{$item.name}" {if condition="$info.userInfo.qualifications eq $item.name"}selected{/if}>{$item.name}</option>
+                                    {/foreach}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">毕业学校</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="school" value="{$info.userInfo.school}" autocomplete="off" class="layui-input" maxlength="45">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">毕业年份</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="graduate" id="year" readonly value="{$info.userInfo.graduate}" autocomplete="off" class="layui-input" maxlength="4">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">民族</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="nation" value="{$info.userInfo.nation}" autocomplete="off" class="layui-input" maxlength="45">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">外语水平</label>
+                            <div class="layui-input-inline">
+                                <select name="pets" lay-verify="">
+                                    <option value="">请选择外语水平</option>
+                                    {foreach $pets as $item}
+                                    <option value="{$item.id}" {if condition="$info.userInfo.pets eq $item.id"}selected{/if}>{$item.name}</option>
+                                    {/foreach}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">政治面貌</label>
+                            <div class="layui-input-inline">
+                                <select name="politics" lay-verify="">
+                                    <option value="">请选择政治面貌</option>
+                                    {foreach $politics as $item}
+                                    <option value="{$item.id}" {if condition="$info.userInfo.politics eq $item.id"}selected{/if}>{$item.name}</option>
+                                    {/foreach}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">接收短信</label>
+                            <div class="layui-input-block">
+                                <input type="radio" name="is_sms" value="1" title="允许接收" {if condition="$info.is_sms eq 1"}checked{/if}>
+                                <input type="radio" name="is_sms" value="0" title="不再接收" {if condition="$info.is_sms eq 0"}checked{/if}>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-input-block">
+                                <button class="layui-btn" lay-submit lay-filter="setInfo">确认修改</button>
+                                <button type="reset" class="layui-btn layui-btn-primary">重新填写</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+{/block}
+
+{block name="script"}
+<script>
+    var userId = "{$userId}";
+    layui.config({
+        base: '{__LAYUI_PATH}' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'form', 'laydate', 'upload'], function () {
+        var $ = layui.$
+            ,form = layui.form
+            ,laydate = layui.laydate
+            ,upload = layui.upload;
+
+        laydate.render({
+            elem: '#year'
+            ,type: 'year'
+            ,max: 0
+        });
+
+        //上传头像
+        upload.render({
+            url: "{:url('authController/baseUpload')}"
+            ,elem: '#avatar-btn'
+            ,data: {mtable: "user", mid: userId, type:"image", from_id:"avatar"}
+            ,done: function(res){
+                layer.msg(res.msg);
+                if(res.code==200){
+                    $('#avatar').val(res.data.src);
+                }
+            }
+        });
+
+        //上传签名
+        upload.render({
+            url: "{:url('authController/baseUpload')}"
+            ,elem: '#signature-btn'
+            ,data: {mtable: "user", mid: userId, "type":"image", from_id:"signature"}
+            ,done: function(res){
+                layer.msg(res.msg);
+                if(res.code==200){
+                    $('#signature').val(res.data.src);
+                }
+            }
+        });
+
+        //自定义验证
+        form.verify({
+            pass: [
+                /^[\S]{6,20}$/
+                ,'密码必须6到20位，且不能出现空格'
+            ]
+            //确认密码
+            ,repass: function(value){
+                if(value !== $('#LAY_password').val()){
+                    return '两次密码输入不一致';
+                }
+            }
+        });
+
+        form.on('submit(setInfo)', function(obj){
+            var data = obj.field;
+            $.ajax({
+                url: "{:url('system.user/profileSave')}",
+                data: data,
+                method: "POST",
+                dataType: 'json',
+                success:function (res) {
+                    if(res.code==200){
+                        layer.msg(res.msg, {time: 2000}, function () {
+                            location.reload();
+                        });
+                    }else{
+                        layer.msg(res.msg);
+                    }
+                }
+            });
+            return false;
+        });
+    });
+</script>
+{/block}

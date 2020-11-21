@@ -1,0 +1,46 @@
+{extend name="public/container"}
+
+{block name="content"}
+<body>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md6">
+            <div class="layui-card">
+                <div class="layui-card-header">清理缓存</div>
+                <div class="layui-card-body">
+                    <div class="layui-btn-container">
+                        <button class="layui-btn layui-btn-normal" id="cache"><i class="fa fa-trash-o"></i> 删除缓存数据</button>
+                        <button class="layui-btn layui-btn-disabled">清空访问日志</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+{/block}
+
+{block name="script"}
+<script>
+    layui.config({
+        base: '{__LAYUI_PATH}' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index'], function () {
+        var $ = layui.$;
+        $('#cache').click(function () {
+            layer.confirm('确定要清除缓存数据吗？', {icon: 3, title:'提示'}, function(index){
+                $.ajax({
+                    url: "{:url('system.config/clearData')}",
+                    method: "POST",
+                    dataType: 'json',
+                    success:function (res) {
+                        layer.msg(res.msg);
+                    }
+                });
+                layer.close(index);
+            });
+        });
+    });
+</script>
+{/block}

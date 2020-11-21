@@ -1,0 +1,58 @@
+{extend name="public/container"}
+
+{block name="content"}
+<body>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-body layui-form">
+
+                    <table class="layui-hide" id="table-toolbar" lay-filter="table-toolbar"></table>
+
+                    <script type="text/html" id="thumb">
+                        <img style="cursor: pointer" lay-event="open_image" src="{{d.thumb}}">
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+{/block}
+
+{block name="script"}
+<script>
+    var userId = "{$Request.param.user_id}" || 0;
+    layui.config({
+        base: '{__LAYUI_PATH}' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'table', 'form'], function(){
+        var $ = layui.$
+            ,form = layui.form
+            ,table = layui.table;
+
+        table.render({
+            elem: '#table-toolbar'
+            ,url: "{:url('user.User/getBidHistoryData')}"
+            ,where: {'user_id': userId}
+            ,title: '数据表'
+            ,cols: [[
+                {field:'thumb', title:'',width:100,templet:"#thumb"}
+                ,{field:'type', title:'类型', width:100, templet:function (d) {
+                    return d.type==2 ? '资产':'普通商品';
+                }}
+                ,{field:'auction_type', title:'拍卖方式', width:100, templet:function (d) {
+                    return d.auction_type==1 ? '同步拍':'限时拍';
+                }}
+                ,{field:'title', title:'拍品名称', minWidth: 300}
+                ,{field:'max_price', title:'最高价', width:150}
+                ,{field:'bid_str', title:'TA的出价', minWidth: 300}
+            ]]
+            ,page: true
+        });
+
+    });
+</script>
+{/block}

@@ -1,0 +1,169 @@
+{extend name="public/container"}
+
+{block name="content"}
+<body>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-body layui-form">
+                    <div class="event-btns" style="margin-bottom: 10px;">
+                        <button class="layui-btn layui-btn-danger" data-type="add"><i class="fa fa-plus-circle"></i> 添加分类</button>
+                    </div>
+
+                    <table class="layui-hide" id="table-toolbar" lay-filter="table-toolbar"></table>
+
+                    <script type="text/html" id="table-toolbar-barDemo">
+                        <a class="layui-btn layui-btn-xs layui-btn-primary" lay-event="son">添加子分类</a>
+                        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+{/block}
+
+{block name="script"}
+<script>
+    layui.config({
+        base: '{__LAYUI_PATH}' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+        ,treetable: 'treetable-lay/treetable'
+    }).use(['index', 'table', 'form', 'treetable'], function(){
+        var $ = layui.$
+            ,form = layui.form
+            ,table = layui.table
+            ,treetable = layui.treetable;
+
+        // 渲染表格
+        var renderTable = function () {
+            layer.load(2);
+            treetable.render({
+                treeColIndex: 2
+                ,treeSpid: 0
+                ,treeIdName: 'id'
+                ,treePidName: 'pid'
+                ,treeDefaultClose: false
+                ,treeLinkage: true
+                ,elem: '#table-toolbar'
+                ,url: "{:url('article.articleCate/getData')}"
+                ,toolbar: '#table-toolbar-toolbarDemo'
+                ,title: '数据表'
+                ,cols: [[
+                    {field:'id', title:'ID', width:80}
+                    ,{field:'icon', title:'缩略图',width:150, templet:function (d) {
+                            return d.icon?"<img src='"+d.icon+"'>":"";
+                        }}
+                    ,{field:'name', title:'分类名'}
+                    // ,{field:'en_name', title:'字段名', width:150}
+                    ,{field:'sort_num', title:'排序值', edit: "sort_num", width: 100}
+                    ,{field:'status', title:'状态', width:150, templet:function (d) {
+                        if(d.status==1){
+                            return '<input type="checkbox" name="status" data-id="'+d.id+'" value="1" lay-filter="isCheck" lay-skin="switch" lay-text="ON|OFF" checked>';
+                        }else{
+                            return '<input type="checkbox" name="status" data-id="'+d.id+'" value="0" lay-filter="isCheck" lay-skin="switch" lay-text="ON|OFF">';
+                        }
+                    }}
+                    ,{title:'操作', toolbar: '#table-toolbar-barDemo', width:250}
+                ]],
+                done: function () {
+                    layer.closeAll('loading');
+                }
+                // ,page: true
+            });
+        };
+
+        renderTable();
+
+        var active = {
+            add: function(){
+                layer.open({
+                    type: 2
+                    ,title: '新增分类'
+                    ,content: "{:url('article.articleCate/create')}"
+                    ,area: ['1000px', '700px']
+                });
+            }
+        };
+
+        $('.event-btns .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //快速编辑
+        table.on('edit(table-toolbar)', function(obj){
+            var value = obj.value //得到修改后的值
+                ,data = obj.data //得到所在行所有键值
+                ,field = obj.field; //得到字段
+            $.ajax({
+                url: "{:url('base/updateStatus')}",
+                data:{'table':'article_cate','status':value, 'id':data.id, 'field':field},
+                method: "POST",
+                dataType: 'json',
+                success:function (res) {
+                    layer.msg(res.msg);
+                    renderTable();
+                }
+            });
+        });
+
+        //监听行工具事件
+        table.on('tool(table-toolbar)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'del'){
+                layer.confirm('删除可能导致系统错误，确定要删除吗？', function(index){
+                    //obj.del();
+                    $.ajax({
+                        url: "{:url('article.articleCate/delete')}",
+                        data:{"id": data.id},
+                        method: "POST",
+                        dataType: 'json',
+                        success:function (res) {
+                            layer.msg(res.msg);
+                            renderTable();
+                        }
+                    });
+                    layer.close(index);
+                });
+            } else if(obj.event === 'edit'){
+                layer.open({
+                    type: 2
+                    ,title: '修改分类'
+                    ,content: "{:url('article.articleCate/create',[], false)}/id/"+data.id
+                    ,area: ['1000px', '700px']
+                });
+            }else if(obj.event === 'son'){
+                layer.open({
+                    type: 2
+                    ,title: '新增分类'
+                    ,content: "{:url('article.articleCate/create', [], false)}/pid/"+data.id
+                    ,area: ['1000px', '700px']
+                });
+            }
+        });
+
+        //更改是否验证
+        form.on('switch(isCheck)', function(data){
+            var is_check = data.elem.checked;
+            is_check = is_check?1:0;
+            var id = data.elem.attributes['data-id'].nodeValue;
+            $.ajax({
+                url: "{:url('base/updateStatus')}",
+                data:{'table':'article_cate','status':is_check, 'id':id},
+                method: "POST",
+                dataType: 'json',
+                success:function (res) {
+                    layer.msg(res.msg);
+                    renderTable();
+                }
+            });
+        });
+
+    });
+</script>
+{/block}

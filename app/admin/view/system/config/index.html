@@ -1,0 +1,74 @@
+{extend name="public/container"}
+
+{block name="content"}
+<body>
+<div class="layui-fluid" id="LAY-app-message">
+    <div class="layui-card">
+        <form class="layui-form layui-tab layui-tab-brief">
+
+            <ul class="layui-tab-title">
+                {foreach $tabs as $key=>$item}
+                <li {if condition="$key eq 0"}class="layui-this"{/if}>{$item.title}</li>
+                {/foreach}
+            </ul>
+            <div class="layui-tab-content layui-card">
+                {foreach $tabs as $key=>$item}
+                <div class="layui-tab-item {if condition='$key eq 0'}layui-show{/if}">
+                    <div class="layui-card-body">
+                        {foreach $item.configs as $config}
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">{$config.info}</label>
+                            <div class="layui-input-block">
+                                {if condition="$config.type eq 'text'"}
+                                <input type="text" name="{$config.menu_name}" value="{$config.value|json_decode}" placeholder="{$config.desc}" class="layui-input">
+                                {elseif condition="$config.type eq 'editor'"/}
+                                <textarea name="{$config.menu_name}" rows="10" class="layui-textarea" placeholder="{$config.desc}">{$config.value|json_decode}</textarea>
+                                {/if}
+                            </div>
+                        </div>
+                        {/foreach}
+                    </div>
+                </div>
+                {/foreach}
+
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit lay-filter="save">确认保存</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+{/block}
+
+{block name="script"}
+<script>
+    layui.config({
+        base: '{__LAYUI_PATH}' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'form'], function(){
+        var $ = layui.$
+            ,form = layui.form;
+
+        form.on('submit(save)', function(data){
+            var data = data.field;
+            //layer.msg(JSON.stringify(data.field));
+            $.ajax({
+                url: "{:url('system.config/save')}",
+                data: data,
+                method: "POST",
+                dataType: 'json',
+                success:function (res) {
+                    layer.msg(res.msg, {time: 2000}, function () {
+                        location.reload();
+                    });
+                }
+            });
+            return false;
+        });
+    });
+</script>
+{/block}

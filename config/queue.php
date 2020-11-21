@@ -8,9 +8,11 @@
 // +----------------------------------------------------------------------
 // | Author: yunwuxin <448901948@qq.com>
 // +----------------------------------------------------------------------
+use think\facade\Env;
 
 return [
-    'default'     => 'sync',
+    'default'     => 'redis',
+    'prefix'      => 'ss_',
     'connections' => [
         'sync'     => [
             'type' => 'sync',
@@ -23,17 +25,17 @@ return [
         ],
         'redis'    => [
             'type'       => 'redis',
-            'queue'      => 'default',
-            'host'       => '127.0.0.1',
-            'port'       => 6379,
-            'password'   => '',
-            'select'     => 0,
+            'queue'      => 'SenSen',
+            'host'       => Env::get('redis.redis_hostname', '127.0.0.1'),
+            'port'       => Env::get('redis.port', 6379),
+            'password'   => Env::get('redis.redis_password', ''),
+            'select'     => Env::get('redis.select', 0),
             'timeout'    => 0,
             'persistent' => false,
         ],
     ],
     'failed'      => [
-        'type'  => 'none',
+        'type'  => 'database',
         'table' => 'failed_jobs',
     ],
 ];

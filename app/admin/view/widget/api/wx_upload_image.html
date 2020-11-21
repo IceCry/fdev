@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>手机图片快捷上传 - 潍律通</title>
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" type="text/css" href="{__PLUG_PATH}webuploader/webuploader.css">
+    <link rel="stylesheet" type="text/css" href="{__STATIC_PATH}api/css/upload.css">
+</head>
+
+<body>
+<div id="wrapper">
+    <div class="page-body">
+        <div id="post-container" class="container">
+            <div class="page-container">
+                <h3 id="title">微信快捷传图 - 潍律通</h3>
+                <p class="tips">选择图片->上传->关闭页面即可</p>
+                <div id="uploader" class="wu-example">
+                    <div class="queueList">
+                        <div id="dndArea" class="placeholder">
+                            <div id="filePicker"></div>
+                            <p>单次最多可选3张</p>
+                        </div>
+                    </div>
+                    <div class="statusBar" style="display:none;">
+                        <div class="progress">
+                            <span class="text">0%</span>
+                            <span class="percentage"></span>
+                        </div><div class="info"></div>
+                        <div class="btns">
+                            <div id="closePage"></div>
+                            <div id="filePicker2"></div><div class="uploadBtn">开始上传</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    // 添加全局站点信息
+    var BASE_URL = '{__PLUG_PATH}/webuploader/';
+    var SYS_URL = "{$siteUrl}";
+    var MID = "{$Request.param.mid}";
+    var MTABLE = "{$Request.param.mtable}";
+    var path = "{$Request.param.path}" || 'seal_apply';
+    var MPATH = './uploads/'+path+'/';
+</script>
+<script type="text/javascript" src="{__STATIC_PATH}api/js/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="{__PLUG_PATH}webuploader/webuploader.min.js"></script>
+<script type="text/javascript" src="{__STATIC_PATH}api/js/upload.js"></script>
+</body>
+</html>

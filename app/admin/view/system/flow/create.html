@@ -1,0 +1,63 @@
+{extend name="public/container"}
+
+{block name="content"}
+<body>
+<div class="layui-form" lay-filter="layuiadmin-form-useradmin" id="layuiadmin-form-useradmin" style="padding: 15px;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">类型</label>
+        <div class="layui-input-inline">
+            <select name="type">
+                <option value="">请选择流程类型</option>
+                {foreach $types as $item}
+                <option {if condition="$info and $info.type eq $item.en_name"}selected{/if} value="{$item.en_name}">{$item.name}</option>
+                {/foreach}
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">流程名称</label>
+        <div class="layui-input-inline">
+            <input type="text" name="name" id="name" class="layui-input" placeholder="名称尽量简洁明了" lay-verify="required" maxlength="45" {if condition="$info"}value="{$info.name}"{/if}>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">流程简介</label>
+        <div class="layui-input-inline">
+            <input type="text" name="intro" id="intro" class="layui-input" placeholder="" maxlength="200" {if condition="$info"}value="{$info.intro}"{/if}>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">编号规则</label>
+        <div class="layui-input-inline">
+            <input type="text" name="prefix_num" placeholder="编号前缀信息" autocomplete="off" class="layui-input" lay-verify="required" {if condition="$info"}value="{$info.prefix_num}"{/if}>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">修改模式</label>
+        <div class="layui-input-inline">
+            <input type="radio" {if condition="$info and $info.restart_mode eq 0"}checked{/if} name="restart_mode" checked value="0" title="重走审批流程"><div class="layui-unselect layui-form-radio"><div>重走审批流程</div></div>
+            <input type="radio" {if condition="$info and $info.restart_mode eq 1"}checked{/if} name="restart_mode" value="1" title="继续进行"><div class="layui-unselect layui-form-radio"><div>继续进行</div></div>
+        </div>
+    </div>
+    <div class="layui-form-item layui-hide">
+        <input type="hidden" name="id" value="{$Request.param.id}">
+        <input type="button" lay-submit lay-filter="layer-submit" id="layer-submit" value="确认">
+    </div>
+</div>
+</body>
+{/block}
+
+{block name="script"}
+<script>
+    layui.config({
+        base: '{__LAYUI_PATH}' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'form'], function(){
+        var $ = layui.$
+            ,form = layui.form;
+
+        form.render();
+    })
+</script>
+{/block}

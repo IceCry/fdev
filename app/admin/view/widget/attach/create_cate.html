@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>hello</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+    <link rel="stylesheet" href="{__STATIC__}/layuiadmin/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="{__STATIC__}/layuiadmin/style/admin.css" media="all">
+    <link rel="stylesheet" href="{__STATIC__}/common/font-awesome-4.7.0/css/font-awesome.min.css" media="all">
+    <link rel="stylesheet" href="{__STATIC__}/common/css/sensen.css" media="all">
+
+    <script src="{__STATIC__}/layuiadmin/layui/layui.js?t=1"></script>
+    <script src="{__PLUG__}/vue/vue.js"></script>
+    <script src="{__PLUG__}/axios.min.js"></script>
+
+    <style>
+        .layui-form-item .layui-input-inline{
+            width: 250px;
+        }
+        .layui-text-danger{
+            color: darkred;
+        }
+        .text-left{text-align:left}.text-right{text-align:right}.text-center{text-align:center}.text-justify{text-align:justify}.text-nowrap{white-space:nowrap}.text-lowercase{text-transform:lowercase}.text-uppercase{text-transform:uppercase}.text-capitalize{text-transform:capitalize}.text-muted{color:#777}.text-primary{color:#337ab7}a.text-primary:focus,a.text-primary:hover{color:#286090}.text-success{color:#3c763d}a.text-success:focus,a.text-success:hover{color:#2b542c}.text-info{color:#31708f}a.text-info:focus,a.text-info:hover{color:#245269}.text-warning{color:#8a6d3b}a.text-warning:focus,a.text-warning:hover{color:#66512c}.text-danger{color:#a94442}a.text-danger:focus,a.text-danger:hover{color:#843534}
+
+        .layui-side-menu .layui-nav .layui-nav-item .fa{
+            position: absolute;
+            top: 50%;
+            left: 20px;
+            margin-top: -19px;
+            line-height: 38px;
+        }
+    </style>
+
+</head>
+<body>
+
+<form class="layui-form" style="padding: 15px;" id="app" v-cloak="">
+    <!--<div class="layui-form-item">
+        <label class="layui-form-label">上级分类</label>
+        <div class="layui-input-inline">
+            <select name="pid" v-model="formData.pid" lay-verify="required">
+                <option value="0">顶级分类</option>
+                {foreach $cates as $item}
+                <option value="{$item.id}">{$item.name}</option>
+                {/foreach}
+            </select>
+        </div>
+    </div>-->
+    <div class="layui-form-item">
+        <label class="layui-form-label">分类名称</label>
+        <div class="layui-input-inline">
+            <input type="text" name="name" lay-verify="required" placeholder="" autocomplete="off" class="layui-input" v-model="formData.name" maxlength="200">
+        </div>
+    </div>
+    <div class="layui-form-item" style="float: right;">
+        <input type="button" lay-submit lay-filter="layer-submit" id="layer-submit" class="layui-btn layui-btn-info" value="确认提交">
+    </div>
+</form>
+
+
+<script>
+    var id = "{$Request.param.id}" || 0;
+    var app = new Vue({
+        el: '#app',
+        data: {
+            formData:{
+                id: id,
+                name: '',
+                pid: 0
+            }
+        },
+        methods: {
+
+        },
+        mounted: function () {
+            var that = this;
+            //如果id>0则获取数据
+            if(id>0){
+                axios.post("{:url('widget.images/cateInfo')}", {id:id}).then(function (res) {
+                    if (res.status == 200 && res.data.code == 200) {
+                        app.formData = res.data.data;
+                    }
+                }).catch(function (err) {
+                    alert(err)
+                });
+            }
+        }
+    });
+
+    layui.config({
+        base: '{__STATIC__}/layuiadmin/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'form'], function(){
+        var $ = layui.$
+            ,form = layui.form;
+
+        form.on('submit(layer-submit)', function(){
+            $.ajax({
+                url: "{:url('widget.images/saveCate')}",
+                data: app.formData,
+                method: "POST",
+                dataType: 'json',
+                success:function (res) {
+                    if(res.code==200){
+                        layer.msg(res.msg, {time: 2000}, function () {
+                            parent.layer.closeAll();
+                            parent.location.reload();
+                        });
+                    }else{
+                        layer.msg(res.msg);
+                    }
+                }
+            });
+            return false;
+        });
+
+    });
+
+</script>
+
+</body>
+</html>

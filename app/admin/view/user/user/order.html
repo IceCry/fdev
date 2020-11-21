@@ -1,0 +1,296 @@
+{extend name="public/container"}
+
+{block name="head"}
+<style>
+    .layui-nav-child2{
+        display: none;
+        padding: 10px;
+        background: #ffffff;
+    }
+</style>
+{/block}
+
+{block name="content"}
+<body>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">订单管理</div>
+                <div class="layui-card-body layui-form">
+                    <div class="event-btns" style="margin-bottom: 10px;">
+                        <div class="layui-inline">
+                            <select name="from_type" id="from_type" lay-search>
+                                <option value="">订单类型</option>
+                                <option value="1">拍卖订单</option>
+                                <option value="2">普通商品</option>
+                            </select>
+                        </div>
+                        <div class="layui-inline">
+                            <select name="order_status" id="order_status" lay-search>
+                                <option value="">订单状态</option>
+                                {foreach $order_status as $item}
+                                <option value="{$item.id}">{$item.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                        <div class="layui-inline">
+                            <input style="width: 250px;" class="layui-input" name="range_time" id="range_time" autocomplete="off" placeholder="按下单时间搜索">
+                        </div>
+                        <div class="layui-inline">
+                            <input class="layui-input" name="keyword" id="keyword" autocomplete="off" placeholder="按购买人、单号等关键词搜索">
+                        </div>
+                        <button class="layui-btn" data-type="search">搜索</button>
+                        <a class="layui-btn layui-btn-primary" href="{:url('user.user/order', [], false)}/user_id/{$Request.param.user_id}">重置</a>
+                    </div>
+
+                    <table class="layui-hide" id="table-toolbar" lay-filter="table-toolbar"></table>
+
+                    <script type="text/html" id="table-toolbar-barDemo">
+                        <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="info">订单详情</a>
+
+                        <!--<button type="button" class="layui-btn layui-btn-xs" onclick="dropDown(this)">操作 <i class="fa fa-caret-down"></i></button>
+                        <ul class="layui-nav-child2">
+                            {{# if(d.order_status > 1){ }}
+                            <li><a href="javascript:void(0);" lay-event='express'><i class="fa fa-send-o"></i> 发货/修改单号</a></li>
+                            {{# } }}
+
+                            {{# if(d.order_status == 1){ }}
+                            <li><a href="javascript:void(0);" lay-event='cancel'><i class="fa fa-history"></i>  取消订单</a></li>
+                            {{# } }}
+                            <li><a href="javascript:void(0);" lay-event='remark'><i class="fa fa-edit"></i> 订单备注</a></li>
+                        </ul>-->
+                    </script>
+
+                    <script type="text/html" id="thumb">
+                        <img style="cursor: pointer;" lay-event="open_image" src="{{d.thumb}}">
+                    </script>
+                    <!--用户信息-->
+                    <script type="text/html" id="user_info">
+                        {{d.user_name==null ? '暂无信息':d.user_name}}/{{d.user_id}}
+                    </script>
+                    <!--商品信息-->
+                    <script type="text/html" id="info">
+                        {{#  layui.each(d.snap.products, function(index, item){ }}
+                        <div class="product">
+                            <span><img style="width: 30px;height: 30px;margin:0;cursor: pointer;" src="{{item.thumb}}"></span>
+                            <span>{{item.title}}</span><span> | ￥{{item.max_price}}×{{item.number}}</span>
+                        </div>
+                        {{#  }); }}
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+{/block}
+
+{block name="script"}
+<script>
+    var user_id = "{$Request.param.user_id}" || 0;
+    layui.config({
+        base: '{__LAYUI_PATH}' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'table', 'form', 'laydate'], function(){
+        var $ = layui.$
+            ,table = layui.table
+            ,laydate = layui.laydate
+            ,form = layui.form;
+
+        laydate.render({
+            elem: '#range_time'
+            ,type: 'datetime'
+            ,range: true
+            ,done:function(val){
+                //app.formData.range_time = val;
+            }
+        });
+
+        table.render({
+            elem: '#table-toolbar'
+            ,url: "{:url('order.order/getData')}"
+            ,where: {"user_id": user_id}
+            ,toolbar: '#table-toolbar-toolbarDemo'
+            ,title: '数据表'
+            ,cols: [[
+                {field:'id', title:'ID', width:80}
+                ,{field:'order_sn', title:'订单号', width:170, align: 'center'}
+                ,{field:'user_info', title:'用户信息',width: 150, templet: '#user_info', align: 'center'}
+                ,{field:'click', title:'商品信息', minWidth:200, templet: "#info"}
+                ,{field: 'order_status_str', title: '订单状态', width: 100, align: 'center'}
+                ,{field: 'total_price', title: '总价', width: 100, align: 'center'}
+                ,{field: 'deduction_price', title: '抵扣金额', width: 100, align: 'center', templet:function (d) {
+                    return d.deduction_price>0?d.deduction_price:'';
+                }}
+                ,{field: 'pay_price', title: '实际支付', width: 100, align: 'center', templet:function (d) {
+                    return d.pay_time>0?d.pay_price:'';
+                }}
+                ,{field:'create_time', title:'创建时间', width:170}
+                ,{title:'操作', toolbar: '#table-toolbar-barDemo', width:120}
+            ]]
+            ,page: true
+            ,limit: 20
+        });
+
+        var active = {
+            search: function(){
+                var from_type = $('select[name=from_type]').val();
+                var order_status = $('select[name=order_status]').val();
+                var keyword = $('input[name=keyword]').val();
+                var range_time = $('input[name=range_time]').val();
+                table.reload('table-toolbar', {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    ,where: {
+                        keyword: keyword,
+                        from_type: from_type,
+                        range_time: range_time,
+                        order_status: order_status
+                    }
+                });
+            }
+        };
+
+        $('.event-btns .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //快速编辑
+        table.on('edit(table-toolbar)', function(obj){
+            var value = obj.value //得到修改后的值
+                ,data = obj.data //得到所在行所有键值
+                ,field = obj.field; //得到字段
+            $.ajax({
+                url: "{:url('base/updateStatus')}",
+                data:{'table':'order','status':value, 'id':data.id, 'field':field},
+                method: "POST",
+                dataType: 'json',
+                success:function (res) {
+                    layer.msg(res.msg);
+                    table.reload('table-toolbar');
+                }
+            });
+        });
+
+        //监听行工具事件
+        table.on('tool(table-toolbar)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'delete'){
+                layer.confirm('确定要删除此订单吗？', function(index){
+                    //obj.del();
+                    $.ajax({
+                        url: "{:url('order.order/delete')}",
+                        data:{"id": data.id},
+                        method: "POST",
+                        dataType: 'json',
+                        success:function (res) {
+                            layer.msg(res.msg);
+                            table.reload('table-toolbar');
+                        }
+                    });
+                    layer.close(index);
+                });
+            } else if(obj.event === 'edit_status'){
+                layer.open({
+                    type: 2
+                    ,title: '修改订单状态'
+                    ,content: "{:url('order.order/editStatus',[], false)}/id/"+data.id
+                    ,area: ['600px', '400px']
+                });
+            }else if(obj.event === 'info'){
+                layer.open({
+                    type: 2
+                    ,title: data.title
+                    ,content: "{:url('order.order/info',[], false)}/id/"+data.id
+                    ,area: ['90%', '90%']
+                });
+            }else if(obj.event === 'express'){
+                layer.open({
+                    type: 2
+                    ,title: data.title
+                    ,content: "{:url('order.order/express',[], false)}/id/"+data.id+'&edit='+data.express_type
+                    ,area: ['500px', '400px']
+                });
+            }else if(obj.event === 'remark'){
+                layer.prompt({
+                    formType: 2,
+                    value: data.remark,
+                    title: '订单备注',
+                }, function(value, index, elem){
+                    $.ajax({
+                        url: "{:url('base/updateStatus')}",
+                        data:{'table':'orders','status':value, 'id':data.id, 'field':'remark'},
+                        method: "POST",
+                        dataType: 'json',
+                        success:function (res) {
+                            layer.msg(res.msg);
+                        }
+                    });
+                    layer.close(index);
+                });
+            }else if(obj.event === 'cancel'){
+                var msg = "确定要取消此订单吗？";
+                if(data.from_type==1){
+                    msg = "取消拍卖订单将扣除用户保证金！确定取消吗？";
+                }
+                layer.confirm(msg, function(index){
+                    //obj.del();
+                    $.ajax({
+                        url: "{:url('order.order/cancel')}",
+                        data:{"id": data.id},
+                        method: "POST",
+                        dataType: 'json',
+                        success:function (res) {
+                            layer.msg(res.msg);
+                            table.reload('table-toolbar');
+                        }
+                    });
+                    layer.close(index);
+                });
+            }
+        });
+
+
+        //更改是否验证
+        form.on('switch(isCheck)', function(data){
+            var is_check = data.elem.checked;
+            is_check = is_check?1:0;
+            var id = data.elem.attributes['data-id'].nodeValue;
+            $.ajax({
+                url: "{:url('base/updateStatus')}",
+                data:{'table':'order','status':is_check, 'id':id},
+                method: "POST",
+                dataType: 'json',
+                success:function (res) {
+                    layer.msg(res.msg);
+                    table.reload('table-toolbar');
+                }
+            });
+        });
+
+        //下拉框
+        /*$(document).click(function (e) {
+            $('.layui-nav-child2').hide();
+        });*/
+        window.dropDown = function(that) {
+            var oEvent = arguments.callee.caller.arguments[0] || event;
+            oEvent.stopPropagation();
+            var index = $(that).parents('tr').data('index');
+            //var ul = $(that).next('ul');
+            //ul.show();
+            $('.layui-nav-child2').each(function (key) {
+                if (key == index) {
+                    $(this).show();
+                }else{
+                    $(this).hide();
+                }
+            })
+        }
+
+    });
+</script>
+{/block}
