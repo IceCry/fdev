@@ -7,7 +7,7 @@
 
 namespace sensen\services\printer;
 
-use crmeb\basic\BaseManager;
+use sensen\basic\BaseManager;
 use think\facade\Config;
 use think\Container;
 
@@ -23,7 +23,7 @@ class Printer extends BaseManager
      * 空间名
      * @var string
      */
-    protected $namespace = '\\crmeb\\services\\printer\\storage\\';
+    protected $namespace = '\\sensen\\services\\printer\\storage\\';
 
     /**
      * @var object

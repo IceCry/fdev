@@ -3,7 +3,7 @@
 namespace sensen\services\template\storage;
 
 use app\services\other\TemplateMessageServices;
-use crmeb\basic\BaseMessage;
+use sensen\basic\BaseMessage;
 use sensen\services\MiniProgramService;
 use think\facade\Log;
 

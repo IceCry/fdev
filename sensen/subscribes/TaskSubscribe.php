@@ -5,7 +5,7 @@ namespace sensen\subscribes;
 /**
  * 定时任务类
  * Class TaskSubscribe
- * @package crmeb\subscribes
+ * @package sensen\subscribes
  */
 class TaskSubscribe
 {

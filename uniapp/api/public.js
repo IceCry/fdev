@@ -1,4 +1,5 @@
 import request from "@/utils/request.js";
+import wechat from "@/libs/wechat.js";
 
 /**
  * 获取微信sdk配置
@@ -7,7 +8,7 @@ import request from "@/utils/request.js";
 export function getWechatConfig() {
   return request.get(
     "wechat/config",
-    { url: document.location.href },
+    { url: wechat.signLink() },
     { noAuth: true }
   );
 }
@@ -30,7 +31,7 @@ export function wechatAuth(code, spread, login_type) {
 */
 export function getLogo()
 {
-  return request.get('routine/get_logo', {}, { noAuth : true});
+  return request.get('wechat/get_logo', {}, { noAuth : true});
 }
 
 /**
@@ -38,7 +39,20 @@ export function getLogo()
  * @param data object 小程序用户登陆信息
  */
 export function login(data) {
-  return request.post("routine/auth", data, { noAuth : true });
+  return request.post("wechat/mp_auth", data, { noAuth : true });
+}
+
+/**
+ * 静默授权
+ * @param {Object} data
+ */
+export function silenceAuth(data) {
+	//#ifdef MP
+  return request.get("v2/wechat/silence_auth", data, { noAuth : true });
+  //#endif
+  //#ifdef H5
+  return request.get("v2/wechat/wx_silence_auth", data, { noAuth : true });
+  //#endif
 }
 
 /**
@@ -70,15 +84,50 @@ export function imageBase64(image, code) {
 }
 
 /**
- * 验证码key
+ * 自动复制口令功能
+ * @returns {*}
  */
-export function getCodeKey() {
-  return request.get("sms_code_key", {}, { login: false });
+export function copyWords() {
+  return request.get("copy_words", {}, { noAuth: true });
 }
 
 /**
- * 验证码key
+ * 获取商城是否强制绑定手机号
  */
-export function getSmsCode(data) {
-  return request.post("sms_code", data, { login: false });
+export function getShopConfig() {
+	return request.get('v2/bind_status' ,{} ,{noAuth : true});
+}
+
+/**
+ * 小程序绑定手机号
+ * @param {Object} data
+ */
+export function getUserPhone(data){
+	console.log(data);
+	return request.post('v2/auth_bindind_phone',data,{noAuth : true});
+}
+
+/**
+ * 小程序用户登录
+ * @param data object 小程序用户登陆信息
+ */
+export function routineLogin(data) {
+	return request.get("v2/wechat/routine_auth", data, {
+		noAuth: true
+	});
+}
+
+/**
+ * 获取微信sdk配置
+ * @returns {*}
+ */
+export function wechatAuthV2(code, spread) {
+	return request.get(
+		"v2/wechat/auth", {
+			code,
+			spread
+		}, {
+			noAuth: true
+		}
+	);
 }

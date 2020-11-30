@@ -7,7 +7,7 @@ use Throwable;
 
 /**
  * Class AuthException
- * @package crmeb\exceptions
+ * @package sensen\exceptions
  */
 class AdminException extends \RuntimeException
 {

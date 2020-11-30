@@ -7,7 +7,7 @@
 
 namespace sensen\services\sms;
 
-use crmeb\basic\BaseManager;
+use sensen\basic\BaseManager;
 use sensen\services\sms\storage\Yunxin;
 use think\facade\Config;
 
@@ -24,7 +24,7 @@ class Sms extends BaseManager
      * 空间名
      * @var string
      */
-    protected $namespace = '\\crmeb\\services\\sms\\storage\\';
+    protected $namespace = '\\sensen\\services\\sms\\storage\\';
 
     /**
      * 默认驱动

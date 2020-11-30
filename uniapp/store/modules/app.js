@@ -11,14 +11,18 @@ import {
 } from '../../config/cache';
 
 const state = {
-	token: Cache.get(LOGIN_STATUS) || null,
+	token: Cache.get(LOGIN_STATUS) || false,
 	backgroundColor: "#fff",
-	userInfo: null,
-	uid: Cache.get(UID) || null,
+	userInfo: {},
+	uid: Cache.get(UID) || 0,
 	homeActive: false,
+	phoneStatus:true
 };
 
 const mutations = {
+	SETPHONESTATUS(state,val){
+		state.phoneStatus = val;
+	},
 	LOGIN(state, opt) {
 		state.token = opt.token;
 		Cache.set(LOGIN_STATUS, opt.token, opt.time);
@@ -42,6 +46,7 @@ const mutations = {
 	},
 	UPDATE_USERINFO(state, userInfo) {
 		state.userInfo = userInfo;
+		Cache.set(USER_INFO, userInfo);
 	},
 	OPEN_HOME(state) {
 		state.homeActive = true;

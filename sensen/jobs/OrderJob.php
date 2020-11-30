@@ -14,15 +14,15 @@ use app\services\user\UserLabelRelationServices;
 use app\services\user\UserLevelServices;
 use app\services\user\UserServices;
 use app\services\wechat\WechatUserServices;
-use crmeb\basic\BaseJob;
-use crmeb\services\WechatService;
-use crmeb\services\workerman\ChannelService;
+use sensen\basic\BaseJob;
+use sensen\services\WechatService;
+use sensen\services\workerman\ChannelService;
 use think\facade\Log;
 
 /**
  * 订单消息队列
  * Class OrderJob
- * @package crmeb\jobs
+ * @package sensen\jobs
  */
 class OrderJob extends BaseJob
 {

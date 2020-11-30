@@ -10,7 +10,7 @@ namespace sensen\services;
 use app\services\message\wechat\MessageServices;
 use app\services\wechat\WechatMessageServices;
 use app\services\wechat\WechatReplyServices;
-use crmeb\exceptions\AdminException;
+use sensen\exceptions\AdminException;
 use app\services\pay\PayNotifyServices;
 use EasyWeChat\Foundation\Application;
 use EasyWeChat\Message\Article;
@@ -24,7 +24,7 @@ use EasyWeChat\Payment\Order;
 use EasyWeChat\Server\Guard;
 use think\exception\ValidateException;
 use think\Response;
-use crmeb\utils\Hook;
+use sensen\utils\Hook;
 
 class WechatService
 {

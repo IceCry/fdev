@@ -4,9 +4,9 @@ namespace sensen\jobs;
 
 use app\services\message\sms\SmsRecordServices;
 use app\services\system\attachment\SystemAttachmentServices;
-use crmeb\basic\BaseJob;
-use crmeb\services\sms\Sms;
-use crmeb\services\UploadService;
+use sensen\basic\BaseJob;
+use sensen\services\sms\Sms;
+use sensen\services\UploadService;
 
 class TaskJob extends BaseJob
 {

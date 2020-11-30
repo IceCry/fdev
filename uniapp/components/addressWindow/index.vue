@@ -1,29 +1,32 @@
 <template>
 	<view>
 		<view class="address-window" :class="address.address==true?'on':''">
-			<view class='title'>选择地址<u-icon class="close" @click="close" name="close" color="#cccccc" size="34"></u-icon></view>
+			<view class='title'>选择地址<text class='iconfont icon-guanbi' @tap='close'></text></view>
 			<view class='list'>
-				<view class='item flex justify-between' :class='active==index?"text-red":""' v-for="(item,index) in addressList" @tap='tapAddress(index,item.id)' :key='index'>
-          <u-icon name="map" :color='active==index?"text-red":""' size="34"></u-icon>
+				<view class='item acea-row row-between-wrapper' :class='active==index?"font-color":""' v-for="(item,index) in addressList"
+				 @tap='tapAddress(index,item.id)' :key='index'>
+					<text class='iconfont icon-ditu' :class='active==index?"font-color":""'></text>
 					<view class='address'>
-						<view class='name' :class='active==index?"text-red":""'>{{item.name}}<text class='phone'>{{item.phone}}</text></view>
+						<view class='name' :class='active==index?"font-color":""'>{{item.real_name}}<text class='phone'>{{item.phone}}</text></view>
 						<view class='line1'>{{item.province}}{{item.city}}{{item.district}}{{item.detail}}</view>
 					</view>
-          <u-icon name="checkmark" :color='active==index?"#fa3534":"#ffffff"' size="34"></u-icon>
+					<text class='iconfont icon-complete' :class='active==index?"font-color":""'></text>
 				</view>
 			</view>
 			<!-- 无地址 -->
 			<view class='pictrue' v-if="!is_loading && !addressList.length">
-				<image src='../../static/noAddress.png'></image>
+				<image src='../../static/images/noAddress.png'></image>
 			</view>
-			<view class='addressBnt bg-red' @tap='goAddressPages'>选择其地址</view>
+			<view class='addressBnt bg-color' @tap='goAddressPages'>选择其它地址</view>
 		</view>
 		<view class='mask' catchtouchmove="true" :hidden='address.address==false' @tap='close'></view>
 	</view>
 </template>
 
 <script>
-	import { getAddress } from '@/api/user.js';
+	import {
+		getAddressList
+	} from '@/api/user.js';
 	export default {
 		props: {
 			pagesUrl: {
@@ -56,7 +59,6 @@
 		methods: {
 			tapAddress: function(e, addressid) {
 				this.active = e;
-        console.log(e)
 				this.$emit('OnChangeAddress', addressid);
 			},
 			close: function() {
@@ -72,11 +74,11 @@
 			},
 			getAddressList: function() {
 				let that = this;
-				getAddress({
+				getAddressList({
 					page: 1,
 					limit: 5
 				}).then(res => {
-					let addressList = res.data.lists;
+					let addressList = res.data;
 					//处理默认选中项
 					for (let i = 0, leng = addressList.length; i < leng; i++) {
 						if (addressList[i].id == that.address.addressId) {
@@ -116,10 +118,9 @@
 		position: relative;
 	}
 
-	.address-window .title .close {
+	.address-window .title .iconfont {
 		position: absolute;
 		right: 30rpx;
-    top: 10rpx;
 		color: #8a8a8a;
 		font-size: 35rpx;
 	}

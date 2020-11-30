@@ -2,7 +2,7 @@
 
 namespace sensen\services\printer\storage;
 
-use crmeb\basic\BasePrinter;
+use sensen\basic\BasePrinter;
 use sensen\services\printer\AccessToken;
 
 /**
@@ -37,7 +37,7 @@ class YiLianYun extends BasePrinter
             'access_token' => $this->accessToken->getAccessToken(),
             'machine_code' => $this->accessToken->machineCode,
             'content' => $this->printerContent,
-            'origin_id' => 'crmeb' . time(),
+            'origin_id' => 'sensen' . time(),
             'sign' => strtolower(md5($this->accessToken->clientId . time() . $this->accessToken->apiKey)),
             'id' => $this->accessToken->createUuid(),
             'timestamp' => time()

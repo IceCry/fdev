@@ -280,7 +280,7 @@ class UtilService
             if (!$siteUrl) return '请前往后台设置->系统设置->网站域名 填写您的域名格式为：http://域名';
             $info = [];
             $outfiles = Config::get('qrcode.cache_dir');
-            $code = new \crmeb\utils\QRcode();
+            $code = new \sensen\utils\QRcode();
             $wapCodePath = $code->setCacheDir($outfiles)->png($url, $outfiles . '/' . $name)->getPath(); //获取二维码生成的地址
             $content = file_get_contents('.' . $wapCodePath);
             if ($uploadType === 1) {

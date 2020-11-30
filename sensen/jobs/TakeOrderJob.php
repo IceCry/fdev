@@ -5,13 +5,13 @@ namespace sensen\jobs;
 use app\services\order\StoreOrderServices;
 use app\services\order\StoreOrderStatusServices;
 use app\services\order\StoreOrderTakeServices;
-use crmeb\basic\BaseJob;
+use sensen\basic\BaseJob;
 use think\facade\Log;
 
 /**
  * 自动收货消息队列
  * Class TakeOrderJob
- * @package crmeb\jobs
+ * @package sensen\jobs
  */
 class TakeOrderJob extends BaseJob
 {

@@ -12,10 +12,10 @@ function baseRequest(url, method, data, {noAuth = false, noVerify = false})
   
   if (!noAuth) {
     //登录过期自动登录
-    if(!store.state.app.token && !checkLogin()){
-      toLogin();
-      return Promise.reject({msg:'未登陆'});
-    }
+	if(!store.state.app.token && !checkLogin()){
+		toLogin();
+		return Promise.reject({msg:'未登陆'});
+	}
   }
   
   if (store.state.app.token) header[TOKENNAME] = 'Bearer ' + store.state.app.token;
@@ -32,7 +32,7 @@ function baseRequest(url, method, data, {noAuth = false, noVerify = false})
         else if (res.data.status == 200)
           reslove(res.data, res);
         else if ([410000, 410001, 410002].indexOf(res.data.status) !== -1) {
-          toLogin();
+		  toLogin();
           reject(res.data);
         } else
           reject(res.data.msg || '系统错误');

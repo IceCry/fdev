@@ -2,7 +2,7 @@
 
 namespace sensen\services\upload;
 
-use crmeb\basic\BaseManager;
+use sensen\basic\BaseManager;
 use think\facade\Config;
 
 /**
@@ -19,7 +19,7 @@ class Upload extends BaseManager
      * 空间名
      * @var string
      */
-    protected $namespace = '\\crmeb\\services\\upload\\storage\\';
+    protected $namespace = '\\sensen\\services\\upload\\storage\\';
 
     /**
      * 设置默认上传类型

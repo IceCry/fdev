@@ -7,30 +7,9 @@ import {
  	pathToBase64
  } from '@/plugin/image-tools/index.js';
  // #ifdef APP-PLUS
- // import permision from "./permission.js"
+ import permision from "./permission.js"
  // #endif
  export default {
-   /**
-    * 页面跳转
-    */
-   goPage(url, type='navigate'){
-     if(!url) return;
-     console.log(url)
-     if(type=='switch'){
-       uni.switchTab({
-         url
-       })
-     }else if(type=='redirect'){
-       uni.redirectTo({
-         url
-       })
-     }else{
-       uni.navigateTo({
-         url
-       })
-     }
-   },
-   
  	/**
  	 * opt  object | string
  	 * to_url object | string
@@ -41,8 +20,8 @@ import {
  	 * tab=1 一定时间后跳转至 table上
  	 * tab=2 一定时间后跳转至非 table上
  	 * tab=3 一定时间后返回上页面
- 	 * tab=4 关闭所有页面跳转至非table上
- 	 * tab=5 关闭当前页面跳转至table上
+ 	 * tab=4 关闭所有页面，打开到应用内的某个页面
+ 	 * tab=5 关闭当前页面，跳转到应用内的某个页面
  	 */
  	Tips: function(opt, to_url) {
  		if (typeof opt == 'string') {
@@ -67,7 +46,7 @@ import {
  					case 1:
  						//一定时间后跳转至 table
  						setTimeout(function() {
- 							uni.switchTab({
+ 							uni.navigateTo({
  								url: url
  							})
  						}, endtime);
@@ -94,7 +73,7 @@ import {
  						}, endtime);
  						break;
  					case 4:
- 						//关闭当前所有页面跳转至非table页面
+ 						//关闭所有页面，打开到应用内的某个页面
  						setTimeout(function() {
  							uni.reLaunch({
  								url: url,
@@ -102,7 +81,7 @@ import {
  						}, endtime);
  						break;
  					case 5:
- 						//关闭当前页面跳转至非table页面
+ 						//关闭当前页面，跳转到应用内的某个页面
  						setTimeout(function() {
  							uni.redirectTo({
  								url: url,
@@ -125,35 +104,6 @@ import {
  			}
  		}
  	},
-  
-  /*
-   * formatMoney(s,type)
-   * 功能：金额按千位逗号分割
-   * 参数：s，需要格式化的金额数值.
-   * 参数：type,判断格式化后的金额是否需要小数位.
-   * 返回：返回格式化后的数值字符串.
-   */
-  formatMoney: function(s, type) {
-  	if (/[^0-9\.]/.test(s))
-  		return "0";
-  	if (s == null || s == "")
-  		return "0";
-  	s = s.toString().replace(/^(\d*)$/, "$1.");
-  	s = (s + "00").replace(/(\d*\.\d\d)\d*/, "$1");
-  	s = s.replace(".", ",");
-  	var re = /(\d)(\d{3},)/;
-  	while (re.test(s))
-  		s = s.replace(re, "$1,$2");
-  	s = s.replace(/,(\d\d)$/, ".$1");
-  	if (type == 0) {// 不带小数位(默认是有小数位)
-  		var a = s.split(".");
-  		if (a[1] == "00") {
-  			s = a[0];
-  		}
-  	}
-  	return s;
-  },
-  
  	/**
  	 * 移除数组中的某个数组并组成新的数组返回
  	 * @param array array 需要移除的数组
@@ -213,11 +163,12 @@ import {
  	 * @param array arr2 海报素材
  	 * @param string store_name 素材文字
  	 * @param string price 价格
+	 * @param string ot_price 原始价格
  	 * @param function successFn 回调函数
  	 * 
  	 * 
  	 */
- 	PosterCanvas: function(arr2, store_name, price, successFn) {
+ 	PosterCanvas: function(arr2, store_name, price,ot_price, successFn) {
  		let that = this;
  		uni.showLoading({
  			title: '海报生成中',
@@ -225,28 +176,31 @@ import {
  		});
  		const ctx = uni.createCanvasContext('myCanvas');
  		ctx.clearRect(0, 0, 0, 0);
+		
+		
  		/**
  		 * 只能获取合法域名下的图片信息,本地调试无法获取
  		 * 
  		 */
+		ctx.fillStyle = '#fff';
+		ctx.fillRect(0, 0, 750, 1150);
  		uni.getImageInfo({
  			src: arr2[0],
  			success: function(res) {
-				console.log(res,'getImageInfo')
  				const WIDTH = res.width;
  				const HEIGHT = res.height;
- 				ctx.drawImage(arr2[0], 0, 0, WIDTH, HEIGHT);
+ 				// ctx.drawImage(arr2[0], 0, 0, WIDTH, 1050);
  				ctx.drawImage(arr2[1], 0, 0, WIDTH, WIDTH);
  				ctx.save();
- 				let r = 90;
+ 				let r = 130;
  				let d = r * 2;
- 				let cx = 40;
- 				let cy = 990;
+ 				let cx = 460;
+ 				let cy = 790;
  				ctx.arc(cx + r, cy + r, r, 0, 2 * Math.PI);
  				// ctx.clip();
  				ctx.drawImage(arr2[2], cx, cy,d,d);
  				ctx.restore();
- 				const CONTENT_ROW_LENGTH = 40;
+ 				const CONTENT_ROW_LENGTH = 20;
  				let [contentLeng, contentArray, contentRows] = that.textByteLength(store_name, CONTENT_ROW_LENGTH);
  				if (contentRows > 2) {
  					contentRows = 2;
@@ -254,16 +208,56 @@ import {
  					textArray[textArray.length - 1] += '……';
  					contentArray = textArray;
  				}
- 				ctx.setTextAlign('center');
- 				ctx.setFontSize(32);
- 				let contentHh = 32 * 1.3;
+ 				ctx.setTextAlign('left');
+ 				ctx.setFontSize(36);
+				ctx.setFillStyle('#000');
+ 				let contentHh = 36 * 1.5;
  				for (let m = 0; m < contentArray.length; m++) {
- 					ctx.fillText(contentArray[m], WIDTH / 2, 820 + contentHh * m);
+ 					ctx.fillText(contentArray[m], 50, 1000 + contentHh * m,750);
  				}
- 				ctx.setTextAlign('center')
- 				ctx.setFontSize(48);
- 				ctx.setFillStyle('red');
- 				ctx.fillText('￥' + price, WIDTH / 2, 880 + contentHh);
+ 				ctx.setTextAlign('left')
+ 				ctx.setFontSize(72);
+ 				ctx.setFillStyle('#DA4F2A');
+ 				ctx.fillText('￥' + price, 40, 820 + contentHh);
+				
+				ctx.setTextAlign('left')
+				ctx.setFontSize(36);
+				ctx.setFillStyle('#999');
+				ctx.fillText('￥' + ot_price, 50, 880 + contentHh);
+				
+				var underline = function(ctx, text, x, y, size, color, thickness ,offset){ 
+					var width = ctx.measureText(text).width; 
+					
+					 switch(ctx.textAlign){ 
+					 case "center": 
+					 x -= (width/2); break; 
+					 case "right": 
+					 x -= width; break; 
+					 } 
+					
+					 y += size+offset; 
+					
+					 ctx.beginPath(); 
+					 ctx.strokeStyle = color; 
+					 ctx.lineWidth = thickness; 
+					 ctx.moveTo(x,y); 
+					 ctx.lineTo(x+width,y); 
+					 ctx.stroke(); 
+				} 
+				underline(ctx,'￥'+ot_price, 55,880,36,'#999',2,0)
+				
+				
+				
+				
+				
+				ctx.setTextAlign('left')
+				ctx.setFontSize(28);
+				ctx.setFillStyle('#999');
+				ctx.fillText('长按或扫描查看', 490, 1030 + contentHh);
+				
+				
+
+					
  				ctx.draw(true, function() {
  					uni.canvasToTempFilePath({
  						canvasId: 'myCanvas',
@@ -303,7 +297,8 @@ import {
  			sourceType = opt.sourceType || ['album', 'camera'],
  			is_load = opt.is_load || true,
  			uploadUrl = opt.url || '',
- 			inputName = opt.name || 'pics';
+ 			inputName = opt.name || 'pics',
+			fileType = opt.fileType || 'image';
  		uni.chooseImage({
  			count: count, //最多可以选择的图片总数  
  			sizeType: sizeType, // 可以指定是原图还是压缩图，默认二者都有  
@@ -317,6 +312,7 @@ import {
 				uni.uploadFile({
 					url: HTTP_REQUEST_URL + '/api/' + uploadUrl,
 					filePath: res.tempFilePaths[0],
+					fileType: fileType,
 					name: inputName,
 					formData: {
 						'filename': inputName
@@ -565,7 +561,7 @@ import {
  				fail: (err) => {}
  			})
  		},
- 		/* async checkPermission() {
+ 		async checkPermission() {
  			let status = permision.isIOS ? await permision.requestIOS('location') :
  				await permision.requestAndroid('android.permission.ACCESS_FINE_LOCATION');
 
@@ -594,7 +590,7 @@ import {
  				})
  			}
  			return status;
- 		}, */
+ 		},
  	}
 
  }

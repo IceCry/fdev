@@ -1,57 +1,92 @@
+<!--
+  trees 递归显示组件
+  github：https://github.com/jin-yufeng/Parser 
+  docs：https://jin-yufeng.github.io/Parser
+  插件市场：https://ext.dcloud.net.cn/plugin?id=805
+  author：JinYufeng
+  update：2020/04/13
+-->
 <template>
-	<view :class="'interlayer '+(c||'')" :style="s">
-		<block v-for="(n, i) in nodes" v-bind:key="i">
+	<view class="interlayer">
+		<block v-for="(n, index) in nodes" v-bind:key="index">
 			<!--图片-->
-			<view v-if="n.name=='img'" :class="'_img '+n.attrs.class" :style="n.attrs.style" :data-attrs="n.attrs" @tap.stop="imgtap">
-				<rich-text v-if="ctrl[i]!=0" :nodes="[{attrs:{src:loading&&(ctrl[i]||0)<2?loading:(lazyLoad&&!ctrl[i]?placeholder:(ctrl[i]==3?errorImg:n.attrs.src||'')),alt:n.attrs.alt||'',width:n.attrs.width||'',style:'-webkit-touch-callout:none;max-width:100%;display:block'+(n.attrs.height?';height:'+n.attrs.height:'')},name:'img'}]" />
-				<image class="_image" :src="lazyLoad&&!ctrl[i]?placeholder:n.attrs.src" :lazy-load="lazyLoad"
-				 :show-menu-by-longpress="!n.attrs.ignore" :data-i="i" :data-index="n.attrs.i" data-source="img" @load="loadImg"
-				 @error="error" />
-			</view>
-			<!--文本-->
-			<text v-else-if="n.type=='text'" decode>{{n.text}}</text>
-			<!--#ifndef MP-BAIDU-->
-			<text v-else-if="n.name=='br'">\n</text>
+			<!--#ifdef MP-WEIXIN || MP-QQ || MP-ALIPAY || APP-PLUS-->
+			<rich-text v-if="n.name=='img'" :id="n.attrs.id" class="_img" :style="''+handler.getStyle(n.attrs.style)" :nodes="handler.getNode(n,!lazyLoad||imgLoad)"
+			 :data-attrs="n.attrs" @tap="imgtap" @longpress="imglongtap" />
 			<!--#endif-->
+			<!--#ifdef MP-BAIDU || MP-TOUTIAO-->
+			<rich-text v-if="n.name=='img'" :id="n.attrs.id" class="_img" :style="n.attrs.contain" :nodes='[n]' :data-attrs="n.attrs"
+			 @tap="imgtap" @longpress="imglongtap" />
+			<!--#endif-->
+			<!--文本-->
+			<!--#ifdef MP-WEIXIN || MP-QQ || APP-PLUS-->
+			<rich-text v-else-if="n.decode" class="_entity" :nodes="[n]"></rich-text>
+			<!--#endif-->
+			<text v-else-if="n.type=='text'" decode>{{n.text}}</text>
+			<text v-else-if="n.name=='br'">\n</text>
 			<!--视频-->
-			<view v-else-if="((n.lazyLoad&&!n.attrs.autoplay)||(n.name=='video'&&!loadVideo))&&ctrl[i]==undefined" :id="n.attrs.id"
-			 :class="'_video '+(n.attrs.class||'')" :style="n.attrs.style" :data-i="i" @tap.stop="_loadVideo" />
-			<video v-else-if="n.name=='video'" :id="n.attrs.id" :class="n.attrs.class" :style="n.attrs.style" :autoplay="n.attrs.autoplay||ctrl[i]==0"
-			 :controls="n.attrs.controls" :loop="n.attrs.loop" :muted="n.attrs.muted" :poster="n.attrs.poster" :src="n.attrs.source[ctrl[i]||0]"
-			 :unit-id="n.attrs['unit-id']" :data-id="n.attrs.id" :data-i="i" data-source="video" @error="error" @play="play" />
-			<!--音频-->
-			<audio v-else-if="n.name=='audio'" :ref="n.attrs.id" :class="n.attrs.class" :style="n.attrs.style" :author="n.attrs.author"
-			 :autoplay="n.attrs.autoplay" :controls="n.attrs.controls" :loop="n.attrs.loop" :name="n.attrs.name" :poster="n.attrs.poster"
-			 :src="n.attrs.source[ctrl[i]||0]" :data-i="i" :data-id="n.attrs.id" data-source="audio" @error.native="error"
-			 @play.native="play" />
-			<!--链接-->
-			<view v-else-if="n.name=='a'" :id="n.attrs.id" :class="'_a '+(n.attrs.class||'')" hover-class="_hover" :style="n.attrs.style"
-			 :data-attrs="n.attrs" @tap.stop="linkpress">
-				<trees class="_span" c="_span" :nodes="n.children" />
+			<view v-else-if="n.name=='video'">
+				<view v-if="(!loadVideo||n.lazyLoad)&&!(controls[n.attrs.id]&&controls[n.attrs.id].play)" :id="n.attrs.id" :class="'_video '+(n.attrs.class||'')"
+				 :style="n.attrs.style" @tap="_loadVideo" />
+				<video v-else :id="n.attrs.id" :class="n.attrs.class" :style="n.attrs.style" :autoplay="n.attrs.autoplay||(controls[n.attrs.id]&&controls[n.attrs.id].play)"
+				 :controls="n.attrs.controls" :loop="n.attrs.loop" :muted="n.attrs.muted" :poster="n.attrs.poster" :src="n.attrs.source[(controls[n.attrs.id]&&controls[n.attrs.id].index)||0]"
+				 :unit-id="n.attrs['unit-id']" :data-id="n.attrs.id" data-from="video" data-source="source" @error="error" @play="play" />
 			</view>
-			<!--广告-->
-			<!--<ad v-else-if="n.name=='ad'" :class="n.attrs.class" :style="n.attrs.style" :unit-id="n.attrs['unit-id']" :appid="n.attrs.appid" :apid="n.attrs.apid" :type="n.attrs.type" :adpid="n.attrs.adpid" data-source="ad" @error="error" />-->
+			<!--音频-->
+			<audio v-else-if="n.name=='audio'" :class="n.attrs.class" :style="n.attrs.style" :author="n.attrs.author" :autoplay="n.attrs.autoplay"
+			 :controls="n.attrs.controls" :loop="n.attrs.loop" :name="n.attrs.name" :poster="n.attrs.poster" :src="n.attrs.source[(controls[n.attrs.id]&&controls[n.attrs.id].index)||0]"
+			 :data-id="n.attrs.id" data-from="audio" data-source="source" @error="error" @play="play" />
+			<!--链接-->
+			<view v-else-if="n.name=='a'" :class="'_a '+(n.attrs.class||'')" hover-class="_hover" :style="n.attrs.style"
+			 :data-attrs="n.attrs" @tap="linkpress">
+				<trees class="_span" :nodes="n.children" />
+			</view>
+			<!--广告（按需打开注释）-->
+			<!--#ifdef MP-WEIXIN || MP-QQ || MP-TOUTIAO-->
+			<!--<ad v-else-if="n.name=='ad'" :class="n.attrs.class" :style="n.attrs.style" :unit-id="n.attrs['unit-id']"
+			 data-from="ad" @error="error" />-->
+			<!--#endif-->
+			<!--#ifdef MP-BAIDU-->
+			<!--<ad v-else-if="n.name=='ad'" :class="n.attrs.class" :style="n.attrs.style" :appid="n.attrs.appid"
+			 :apid="n.attrs.apid" :type="n.attrs.type" data-from="ad" @error="error" />-->
+			<!--#endif-->
+			<!--#ifdef APP-PLUS-->
+			<!--<ad v-else-if="n.name=='ad'" :class="n.attrs.class" :style="n.attrs.style" :adpid="n.attrs.adpid"
+			 data-from="ad" @error="error" />-->
+			<!--#endif-->
 			<!--列表-->
-			<view v-else-if="n.name=='li'" :id="n.attrs.id" :class="n.attrs.class" :style="(n.attrs.style||'')+';display:flex;flex-direction:row'">
+			<view v-else-if="n.name=='li'" :id="n.attrs.id" :class="n.attrs.class" :style="(n.attrs.style||'')+';display:flex'">
 				<view v-if="n.type=='ol'" class="_ol-bef">{{n.num}}</view>
 				<view v-else class="_ul-bef">
 					<view v-if="n.floor%3==0" class="_ul-p1">█</view>
 					<view v-else-if="n.floor%3==2" class="_ul-p2" />
 					<view v-else class="_ul-p1" style="border-radius:50%">█</view>
 				</view>
-				<trees class="_li" c="_li" :nodes="n.children" :lazyLoad="lazyLoad" :loading="loading" />
+				<!--#ifdef MP-ALIPAY-->
+				<view class="_li">
+					<trees :nodes="n.children" />
+				</view>
+				<!--#endif-->
+				<!--#ifndef MP-ALIPAY-->
+				<trees class="_li" :nodes="n.children" :lazyLoad="lazyLoad" :loadVideo="loadVideo" />
+				<!--#endif-->
 			</view>
 			<!--表格-->
-			<view v-else-if="n.name=='table'&&n.c&&n.flag" :id="n.attrs.id" :class="n.attrs.class" :style="(n.attrs.style||'')+';display:grid'">
-				<trees v-for="(cell,n) in n.children" v-bind:key="n" :class="cell.attrs.class" :c="cell.attrs.class" :style="cell.attrs.style"
-				 :s="cell.attrs.style" :nodes="cell.children" />
-			</view>
 			<view v-else-if="n.name=='table'&&n.c" :id="n.attrs.id" :class="n.attrs.class" :style="(n.attrs.style||'')+';display:table'">
-				<view v-for="(tbody, o) in n.children" v-bind:key="o" :class="tbody.attrs.class" :style="(tbody.attrs.style||'')+(tbody.name[0]=='t'?';display:table-'+(tbody.name=='tr'?'row':'row-group'):'')">
-					<view v-for="(tr, p) in tbody.children" v-bind:key="p" :class="tr.attrs.class" :style="(tr.attrs.style||'')+(tr.name[0]=='t'?';display:table-'+(tr.name=='tr'?'row':'cell'):'')">
-						<trees v-if="tr.name=='td'" :nodes="tr.children" />
-						<trees v-else v-for="(td, q) in tr.children" v-bind:key="q" :class="td.attrs.class" :c="td.attrs.class" :style="(td.attrs.style||'')+(td.name[0]=='t'?';display:table-'+(td.name=='tr'?'row':'cell'):'')"
-						 :s="(td.attrs.style||'')+(td.name[0]=='t'?';display:table-'+(td.name=='tr'?'row':'cell'):'')" :nodes="td.children" />
+				<view v-for="(tbody, i) in n.children" v-bind:key="i" :class="tbody.attrs.class" :style="(tbody.attrs.style||'')+(tbody.name[0]=='t'?';display:table-'+(tbody.name=='tr'?'row':'row-group'):'')">
+					<view v-for="(tr, j) in tbody.children" v-bind:key="j" :class="tr.attrs.class" :style="(tr.attrs.style||'')+(tr.name[0]=='t'?';display:table-'+(tr.name=='tr'?'row':'cell'):'')">
+						<trees v-if="tr.name=='td'" :nodes="tr.children" :lazyLoad="lazyLoad" :loadVideo="loadVideo" />
+						<block v-else>
+							<!--#ifdef MP-ALIPAY-->
+							<view v-for="(td, k) in tr.children" v-bind:key="k" :class="td.attrs.class" :style="(td.attrs.style||'')+(td.name[0]=='t'?';display:table-'+(td.name=='tr'?'row':'cell'):'')">
+								<trees :nodes="td.children" />
+							</view>
+							<!--#endif-->
+							<!--#ifndef MP-ALIPAY-->
+							<trees v-for="(td, k) in tr.children" v-bind:key="k" :class="td.attrs.class" :style="(td.attrs.style||'')+(td.name[0]=='t'?';display:table-'+(td.name=='tr'?'row':'cell'):'')"
+							 :nodes="td.children" :lazyLoad="lazyLoad" :loadVideo="loadVideo" />
+							<!--#endif-->
+						</block>
 					</view>
 				</view>
 			</view>
@@ -61,22 +96,29 @@
 			<embed v-else-if="n.name=='embed'" :style="n.attrs.style" :width="n.attrs.width" :height="n.attrs.height" :src="n.attrs.src" />
 			<!--#endif-->
 			<!--富文本-->
-			<!--#ifdef MP-WEIXIN || MP-QQ || APP-PLUS-->
-			<rich-text v-else-if="handler.use(n)" :id="n.attrs.id" :class="'_p __'+n.name" :nodes="[n]" />
+			<!--#ifdef MP-WEIXIN || MP-QQ || MP-ALIPAY || APP-PLUS-->
+			<rich-text v-else-if="handler.useRichText(n)" :id="n.attrs.id" :class="'_p __'+n.name" :nodes="[n]" />
 			<!--#endif-->
-			<!--#ifndef MP-WEIXIN || MP-QQ || APP-PLUS-->
-			<rich-text v-else-if="!n.c" :id="n.attrs.id" :nodes="[n]" style="display:inline" />
+			<!--#ifdef MP-BAIDU || MP-TOUTIAO-->
+			<rich-text v-else-if="!(n.c||n.continue)" :id="n.attrs.id" :class="_p" :style="n.attrs.contain" :nodes="[n]" />
 			<!--#endif-->
-			<trees v-else :class="(n.attrs.id||'')+' _'+n.name+' '+(n.attrs.class||'')" :c="(n.attrs.id||'')+' _'+n.name+' '+(n.attrs.class||'')"
-			 :style="n.attrs.style" :s="n.attrs.style" :nodes="n.children" :lazyLoad="lazyLoad" :loading="loading" />
+			<!--#ifdef MP-ALIPAY-->
+			<view v-else :id="n.attrs.id" :class="'_'+n.name+' '+(n.attrs.class||'')" :style="n.attrs.style">
+				<trees :nodes="n.children" />
+			</view>
+			<!--#endif-->
+			<!--#ifndef MP-ALIPAY-->
+			<trees v-else :class="(n.attrs.id||'')+' _'+n.name+' '+(n.attrs.class||'')" :style="n.attrs.style" :nodes="n.children"
+			 :lazyLoad="lazyLoad" :loadVideo="loadVideo" />
+			<!--#endif-->
 		</block>
 	</view>
 </template>
 <script module="handler" lang="wxs" src="./handler.wxs"></script>
+<script module="handler" lang="sjs" src="./handler.sjs"></script>
 <script>
 	global.Parser = {};
 	import trees from './trees'
-	const errorImg = require('../libs/config.js').errorImg;
 	export default {
 		components: {
 			trees
@@ -84,96 +126,58 @@
 		name: 'trees',
 		data() {
 			return {
-				ctrl: [],
-				placeholder: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="225"/>',
-				errorImg,
-				loadVideo: typeof plus == 'undefined',
-				// #ifndef MP-ALIPAY
-				c: '',
-				s: ''
+				controls: {},
+				// #ifdef MP-WEIXIN || MP-QQ || APP-PLUS
+				imgLoad: false,
+				// #endif
+				// #ifndef APP-PLUS
+				loadVideo: true
 				// #endif
 			}
 		},
 		props: {
 			nodes: Array,
+			// #ifdef MP-WEIXIN || MP-QQ || H5 || APP-PLUS
 			lazyLoad: Boolean,
-			loading: String,
-			// #ifdef MP-ALIPAY
-			c: String,
-			s: String
+			// #endif
+			// #ifdef APP-PLUS
+			loadVideo: Boolean
 			// #endif
 		},
 		mounted() {
-			for (this.top = this.$parent; this.top.$options.name != 'parser'; this.top = this.top.$parent);
-			this.init();
+			// 获取顶层组件
+			this.top = this.$parent;
+			while (this.top.$options.name != 'parser') {
+				if (this.top.top) {
+					this.top = this.top.top;
+					break;
+				}
+				this.top = this.top.$parent;
+			}
 		},
-		// #ifdef APP-PLUS
+		// #ifdef MP-WEIXIN || MP-QQ || APP-PLUS
 		beforeDestroy() {
-			this.observer && this.observer.disconnect();
+			if (this.observer)
+				this.observer.disconnect();
 		},
 		// #endif
 		methods: {
-			init() {
-				for (var i = this.nodes.length, n; n = this.nodes[--i];) {
-					if (n.name == 'img') {
-						this.top.imgList.setItem(n.attrs.i, n.attrs['original-src'] || n.attrs.src);
-						// #ifdef APP-PLUS
-						if (this.lazyLoad && !this.observer) {
-							this.observer = uni.createIntersectionObserver(this).relativeToViewport({
-								top: 500,
-								bottom: 500
-							});
-							setTimeout(() => {
-								this.observer.observe('._img', res => {
-									if (res.intersectionRatio) {
-										for (var j = this.nodes.length; j--;)
-											if (this.nodes[j].name == 'img')
-												this.$set(this.ctrl, j, 1);
-										this.observer.disconnect();
-									}
-								})
-							}, 0)
-						}
-						// #endif
-					} else if (n.name == 'video' || n.name == 'audio') {
-						var ctx;
-						if (n.name == 'video') {
-							ctx = uni.createVideoContext(n.attrs.id
-								// #ifndef MP-BAIDU
-								, this
-								// #endif
-							);
-						} else if (this.$refs[n.attrs.id])
-							ctx = this.$refs[n.attrs.id][0];
-						if (ctx) {
-							ctx.id = n.attrs.id;
-							this.top.videoContexts.push(ctx);
-						}
-					}
-				}
-				// #ifdef APP-PLUS
-				// APP 上避免 video 错位需要延时渲染
-				setTimeout(() => {
-					this.loadVideo = true;
-				}, 1000)
-				// #endif
-			},
+			// #ifndef MP-ALIPAY
 			play(e) {
-				var contexts = this.top.videoContexts;
-				if (contexts.length > 1 && this.top.autopause)
-					for (var i = contexts.length; i--;)
-						if (contexts[i].id != e.currentTarget.dataset.id)
-							contexts[i].pause();
+				if (this.top.videoContexts.length > 1 && this.top.autopause)
+					for (var i = this.top.videoContexts.length; i--;)
+						if (this.top.videoContexts[i].id != e.currentTarget.dataset.id)
+							this.top.videoContexts[i].pause();
 			},
+			// #endif
 			imgtap(e) {
 				var attrs = e.currentTarget.dataset.attrs;
 				if (!attrs.ignore) {
-					var preview = true,
-						data = {
-							id: e.target.id,
-							src: attrs.src,
-							ignore: () => preview = false
-						};
+					var preview = true, data = {
+						id: e.target.id,
+						src: attrs.src,
+						ignore: () => preview = false
+					};
 					global.Parser.onImgtap && global.Parser.onImgtap(data);
 					this.top.$emit('imgtap', data);
 					if (preview) {
@@ -186,29 +190,13 @@
 					}
 				}
 			},
-			loadImg(e) {
-				var i = e.currentTarget.dataset.i;
-				if (this.lazyLoad && !this.ctrl[i]) {
-					// #ifdef QUICKAPP-WEBVIEW
-					this.$set(this.ctrl, i, 0);
-					this.$nextTick(function() {
-						// #endif
-						// #ifndef APP-PLUS
-						this.$set(this.ctrl, i, 1);
-						// #endif
-						// #ifdef QUICKAPP-WEBVIEW
+			imglongtap(e) {
+				var attrs = e.item.dataset.attrs;
+				if (!attrs.ignore)
+					this.top.$emit('imglongtap', {
+						id: e.target.id,
+						src: attrs.src
 					})
-					// #endif
-				} else if (this.loading && this.ctrl[i] != 2) {
-					// #ifdef QUICKAPP-WEBVIEW
-					this.$set(this.ctrl, i, 0);
-					this.$nextTick(function() {
-						// #endif
-						this.$set(this.ctrl, i, 2);
-						// #ifdef QUICKAPP-WEBVIEW
-					})
-					// #endif
-				}
 			},
 			linkpress(e) {
 				var jump = true,
@@ -246,39 +234,34 @@
 							// #endif
 						} else
 							uni.navigateTo({
-								url: attrs.href,
-								fail() {
-									uni.switchTab({
-										url: attrs.href,
-									})
-								}
+								url: attrs.href
 							})
 					}
 				}
 			},
 			error(e) {
-				var target = e.currentTarget,
-					source = target.dataset.source,
-					i = target.dataset.i;
+				var context, target = e.currentTarget,
+					source = target.dataset.from;
 				if (source == 'video' || source == 'audio') {
 					// 加载其他 source
-					var index = this.ctrl[i] ? this.ctrl[i].i + 1 : 1;
-					if (index < this.nodes[i].attrs.source.length)
-						this.$set(this.ctrl, i, index);
-					if (e.detail.__args__)
-						e.detail = e.detail.__args__[0];
-				} else if (errorImg && source == 'img') {
-					this.top.imgList.setItem(target.dataset.index, errorImg);
-					this.$set(this.ctrl, i, 3);
+					var index = this.controls[target.id] ? this.controls[target.id].index + 1 : 1;
+					if (index < target.dataset.source.length)
+						this.$set(this.controls, target.id + '.index', index);
+					if (source == 'video') context = uni.createVideoContext(target.id, this);
 				}
 				this.top && this.top.$emit('error', {
 					source,
 					target,
-					errMsg: e.detail.errMsg
+					errMsg: e.detail.errMsg,
+					errCode: e.detail.errCode,
+					context
 				});
 			},
 			_loadVideo(e) {
-				this.$set(this.ctrl, e.target.dataset.i, 0);
+				this.$set(this.controls, e.currentTarget.id, {
+					play: true,
+					index: 0
+				})
 			}
 		}
 	}
@@ -290,20 +273,19 @@
 	/* 链接和图片效果 */
 	._a {
 		display: inline;
-		padding: 1.5px 0 1.5px 0;
 		color: #366092;
 		word-break: break-all;
+		padding: 1.5px 0 1.5px 0;
 	}
 
 	._hover {
-		text-decoration: underline;
 		opacity: 0.7;
+		text-decoration: underline;
 	}
 
 	._img {
 		display: inline-block;
-		max-width: 100%;
-		overflow: hidden;
+		text-indent: 0;
 	}
 
 	/* #ifdef MP-WEIXIN */
@@ -313,13 +295,13 @@
 
 	/* #endif */
 
-	/* #ifndef MP-ALIPAY || APP-PLUS */
+	/* #ifdef MP */
 	.interlayer {
+		align-content: inherit;
+		align-items: inherit;
 		display: inherit;
 		flex-direction: inherit;
 		flex-wrap: inherit;
-		align-content: inherit;
-		align-items: inherit;
 		justify-content: inherit;
 		width: 100%;
 		white-space: inherit;
@@ -332,7 +314,6 @@
 		font-weight: bold;
 	}
 
-	/* #ifndef MP-ALIPAY */
 	._blockquote,
 	._div,
 	._p,
@@ -341,8 +322,6 @@
 	._li {
 		display: block;
 	}
-
-	/* #endif */
 
 	._code {
 		font-family: monospace;
@@ -387,14 +366,6 @@
 		font-weight: bold;
 	}
 
-	._image {
-		display: block;
-		width: 100%;
-		height: 360px;
-		margin-top: -360px;
-		opacity: 0;
-	}
-
 	._ins {
 		text-decoration: underline;
 	}
@@ -405,37 +376,36 @@
 	}
 
 	._ol-bef {
-		width: 36px;
 		margin-right: 5px;
 		text-align: right;
+		width: 36px;
 	}
 
 	._ul-bef {
-		display: block;
-		margin: 0 12px 0 23px;
 		line-height: normal;
+		margin: 0 12px 0 23px;
 	}
 
 	._ol-bef,
-	._ul-bef {
+	._ul_bef {
 		flex: none;
 		user-select: none;
 	}
 
 	._ul-p1 {
 		display: inline-block;
-		width: 0.3em;
 		height: 0.3em;
-		overflow: hidden;
 		line-height: 0.3em;
+		overflow: hidden;
+		width: 0.3em;
 	}
 
 	._ul-p2 {
-		display: inline-block;
-		width: 0.23em;
-		height: 0.23em;
 		border: 0.05em solid black;
 		border-radius: 50%;
+		display: inline-block;
+		height: 0.23em;
+		width: 0.23em;
 	}
 
 	._q::before {
@@ -456,7 +426,7 @@
 		vertical-align: super;
 	}
 
-	/* #ifdef MP-ALIPAY || APP-PLUS || QUICKAPP-WEBVIEW */
+	/* #ifndef MP-WEIXIN */
 	._abbr,
 	._b,
 	._code,
@@ -475,31 +445,32 @@
 
 	/* #endif */
 
-	/* #ifdef MP-WEIXIN || MP-QQ */
+	/* #ifdef MP-WEIXIN || MP-QQ || MP-ALIPAY */
 	.__bdo,
 	.__bdi,
 	.__ruby,
-	.__rt {
+	.__rt,
+	._entity {
 		display: inline-block;
 	}
 
 	/* #endif */
 	._video {
-		position: relative;
-		display: inline-block;
-		width: 300px;
-		height: 225px;
 		background-color: black;
+		display: inline-block;
+		height: 225px;
+		position: relative;
+		width: 300px;
 	}
 
 	._video::after {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		margin: -15px 0 0 -15px;
-		content: '';
 		border-color: transparent transparent transparent white;
 		border-style: solid;
 		border-width: 15px 0 15px 30px;
+		content: '';
+		left: 50%;
+		margin: -15px 0 0 -15px;
+		position: absolute;
+		top: 50%;
 	}
 </style>

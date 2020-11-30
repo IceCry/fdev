@@ -5,15 +5,15 @@ namespace sensen\jobs;
 
 use app\services\other\QrcodeServices;
 use app\services\system\attachment\SystemAttachmentServices;
-use crmeb\basic\BaseJob;
-use crmeb\services\MiniProgramService;
-use crmeb\services\UploadService;
-use crmeb\services\UtilService;
+use sensen\basic\BaseJob;
+use sensen\services\MiniProgramService;
+use sensen\services\UploadService;
+use sensen\services\UtilService;
 
 /**
  * 海报队列
  * Class PosterJob
- * @package crmeb\jobs
+ * @package sensen\jobs
  */
 class PosterJob extends BaseJob
 {

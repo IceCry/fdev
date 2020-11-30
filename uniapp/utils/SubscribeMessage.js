@@ -10,69 +10,94 @@ export function auth() {
 }
 
 /**
- * 认证审核结果通知
- */
-export function openVerifySubscribe() {
-	let tmplIds = auth();
-	return subscribe([
-		tmplIds.verify
-	]);
-}
-
-/**
- * 出价被超越通知 或中拍通知
- */
-export function openBidSubscribe() {
-	let tmplIds = auth();
-	return subscribe([
-		tmplIds.exceed,
-    tmplIds.shot,
-    tmplIds.auction_order_cancel
-	]);
-}
-
-/**
- * 发货通知
+ * 支付成功后订阅消息id
+ * 订阅  确认收货通知 订单支付成功  新订单管理员提醒 
  */
 export function openPaySubscribe() {
 	let tmplIds = auth();
 	return subscribe([
-		tmplIds.express,
-		tmplIds.pay_success
+		tmplIds.oreder_takever,
+		tmplIds.order_pay_success,
+		tmplIds.order_new,
 	]);
 }
 
 /**
- * 保证金提现通知
+ * 订单相关订阅消息
+ * 送货 发货 取消订单
  */
-export function openWithdrawSubscribe() {
+export function openOrderSubscribe() {
 	let tmplIds = auth();
 	return subscribe([
-		tmplIds.withdraw_success,
-    tmplIds.withdraw_fail
+		tmplIds.order_deliver_success,
+		tmplIds.order_postage_success,
+		tmplIds.order_clone
 	]);
 }
 
 /**
- * 线下保证金充值通知
+ * 提现消息订阅
+ * 成功 和 失败 消息
+ */
+export function openExtrctSubscribe() {
+	let tmplIds = auth();
+	return subscribe([
+		tmplIds.user_extract
+	]);
+}
+
+/**
+ * 拼团成功
+ */
+export function openPinkSubscribe() {
+	let tmplIds = auth();
+	return subscribe([
+		tmplIds.pink_true
+	]);
+}
+
+/**
+ * 砍价成功
+ */
+export function openBargainSubscribe() {
+	let tmplIds = auth();
+	return subscribe([
+		tmplIds.bargain_success
+	]);
+}
+
+/**
+ * 订单退款
+ */
+export function openOrderRefundSubscribe() {
+	let tmplIds = auth();
+	return subscribe([tmplIds.order_refund]);
+}
+
+/**
+ * 充值成功
  */
 export function openRechargeSubscribe() {
 	let tmplIds = auth();
-	return subscribe([
-		tmplIds.recharge_success,
-    tmplIds.recharge_fail
-	]);
+	return subscribe([tmplIds.recharge_success]);
 }
 
+/**
+ * 提现
+ */
+export function openEextractSubscribe() {
+	let tmplIds = auth();
+	return subscribe([tmplIds.user_extract]);
+}
 
 /**
  * 调起订阅界面
  * array tmplIds 模板id
  */
 export function subscribe(tmplIds) {
-	 let wechat = wx;
+	 let wecaht = wx;
 	return new Promise((reslove, reject) => {
-		wechat.requestSubscribeMessage({
+		wecaht.requestSubscribeMessage({
 			tmplIds: tmplIds,
 			success(res) {
 				return reslove(res);

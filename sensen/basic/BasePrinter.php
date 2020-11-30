@@ -1,12 +1,12 @@
 <?php
 
-namespace crmeb\basic;
+namespace sensen\basic;
 
 use sensen\services\printer\AccessToken;
 
 /**
  * Class BasePrinter
- * @package crmeb\basic
+ * @package sensen\basic
  */
 abstract class BasePrinter extends BaseStorage
 {

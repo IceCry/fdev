@@ -7,7 +7,7 @@
 
 namespace sensen\services\template;
 
-use crmeb\basic\BaseManager;
+use sensen\basic\BaseManager;
 use think\facade\Config;
 
 /**
@@ -23,7 +23,7 @@ class Template extends BaseManager
      * 空间名
      * @var string
      */
-    protected $namespace = '\\crmeb\\services\\template\\storage\\';
+    protected $namespace = '\\sensen\\services\\template\\storage\\';
 
     /**
      * 设置默认

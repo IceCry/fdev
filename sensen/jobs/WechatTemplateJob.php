@@ -4,16 +4,16 @@
  * @day: 2020/5/21
  */
 
-namespace crmeb\jobs;
+namespace sensen\jobs;
 
 
-use crmeb\basic\BaseJob;
-use crmeb\services\template\Template;
+use sensen\basic\BaseJob;
+use sensen\services\template\Template;
 use think\facade\Route;
 
 /**
  * Class WechatTemplateJob
- * @package crmeb\jobs
+ * @package sensen\jobs
  */
 class WechatTemplateJob extends BaseJob
 {

@@ -2,8 +2,8 @@
 
 namespace sensen\services\upload\storage;
 
-use crmeb\basic\BaseUpload;
-use crmeb\exceptions\UploadException;
+use sensen\basic\BaseUpload;
+use sensen\exceptions\UploadException;
 use think\exception\ValidateException;
 use think\facade\Config;
 use think\facade\Filesystem;

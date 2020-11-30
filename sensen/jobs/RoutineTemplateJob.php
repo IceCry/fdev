@@ -2,13 +2,13 @@
 
 namespace sensen\jobs;
 
-use crmeb\basic\BaseJob;
-use crmeb\services\template\Template;
+use sensen\basic\BaseJob;
+use sensen\services\template\Template;
 
 /**
  * 小程序模板消息消息队列
  * Class RoutineTemplateJob
- * @package crmeb\jobs
+ * @package sensen\jobs
  */
 class RoutineTemplateJob extends BaseJob
 {

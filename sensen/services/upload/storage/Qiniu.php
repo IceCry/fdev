@@ -2,8 +2,8 @@
 
 namespace sensen\services\upload\storage;
 
-use crmeb\basic\BaseUpload;
-use crmeb\exceptions\UploadException;
+use sensen\basic\BaseUpload;
+use sensen\exceptions\UploadException;
 use Qiniu\Auth;
 use function Qiniu\base64_urlSafeEncode;
 use Qiniu\Storage\BucketManager;

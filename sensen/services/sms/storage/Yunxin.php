@@ -2,7 +2,7 @@
 
 namespace sensen\services\sms\storage;
 
-use crmeb\basic\BaseSms;
+use sensen\basic\BaseSms;
 use sensen\services\HttpService;
 
 /**
@@ -35,7 +35,7 @@ class Yunxin extends BaseSms
      * 短信请求地址
      * @var string
      */
-    protected $smsUrl = 'https://sms.crmeb.net/api/';
+    protected $smsUrl = 'https://sms.sensen.net/api/';
 
     /**
      * 短信支付回调地址

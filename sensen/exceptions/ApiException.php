@@ -6,7 +6,7 @@ namespace sensen\exceptions;
 /**
  * API应用错误信息
  * Class ApiException
- * @package crmeb\exceptions
+ * @package sensen\exceptions
  */
 class ApiException extends \RuntimeException
 {

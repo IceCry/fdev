@@ -6,7 +6,7 @@ use think\facade\Config;
 
 /**
  * Class BaseSms
- * @package crmeb\basic
+ * @package sensen\basic
  */
 abstract class BaseSms extends BaseStorage
 {

@@ -1,240 +1,204 @@
 <script>
-  import { checkLogin } from "./libs/login";
-  import Server from '@/utils/server.js';
-  import { HTTP_REQUEST_URL } from './config/app';
-  
-	export default {
-		onLaunch: function() {
-			
-			// 网路监听（用户目前断网，切换wifi）
-			//this.util.NetWork.On();
-			// #ifdef APP-PLUS
-			// 更新检测
-			//this.util.Update();
-			// #endif
-			
-			/* uni.request({
-				url: 'https://uniapp.dcloud.io/update', //检查更新的服务器地址
-				data: {
-					appid: plus.runtime.appid,
-					version: plus.runtime.version,
-					imei: plus.device.imei
-				},
-				success: (res) => {
-					if (res.statusCode == 200 && res.data.isUpdate) {
-						let openUrl = plus.os.name === 'iOS' ? res.data.iOS : res.data.Android;
-						// 提醒用户更新
-						uni.showModal({
-							title: '更新提示',
-							content: res.data.note ? res.data.note : '是否选择更新',
-							success: (showResult) => {
-								if (showResult.confirm) {
-									plus.runtime.openURL(openUrl);
-								}
-							}
-						})
+import { checkLogin } from './libs/login';
+import { HTTP_REQUEST_URL } from './config/app';
+import { getShopConfig, silenceAuth } from '@/api/public';
+import Auth from './libs/wechat.js';
+import Routine from './libs/routine.js';
+export default {
+	globalData: {
+		spid: 0,
+		code: 0,
+		isLogin: false,
+		userInfo: {},
+		MyMenus: [],
+		globalData: false,
+		isIframe: false,
+		tabbarShow: true
+	},
+	onLaunch: function(option) {
+		let that = this;
+		// #ifdef MP
+		if (HTTP_REQUEST_URL == '') {
+			console.error(
+				"请配置根目录下的config.js文件中的 'HTTP_REQUEST_URL'\n\n请修改开发者工具中【详情】->【AppID】改为自己的Appid\n\n请前往后台【小程序】->【小程序配置】填写自己的 appId and AppSecret"
+			);
+			return false;
+		}
+		if (option.query.hasOwnProperty('scene')) {
+			switch (option.scene) {
+				//扫描小程序码
+				case 1047:
+					let val = that.$util.getUrlParams(decodeURIComponent(option.query.scene));
+					that.globalData.code = val.pid === undefined ? val : val.pid;
+					break;
+				//长按图片识别小程序码
+				case 1048:
+					that.globalData.code = option.query.scene;
+					break;
+				//手机相册选取小程序码
+				case 1049:
+					that.globalData.code = option.query.scene;
+					break;
+				//直接进入小程序
+				case 1001:
+					that.globalData.spid = option.query.scene;
+					break;
+			}
+		}
+		// #endif
+		getShopConfig().then(res => {
+			this.$store.commit('SETPHONESTATUS', res.data.status);
+		});
+		// 获取导航高度；
+		uni.getSystemInfo({
+			success: function(res) {
+				that.globalData.navHeight = res.statusBarHeight * (750 / res.windowWidth) + 91;
+			}
+		});
+
+		// #ifdef H5
+		if (option.query.hasOwnProperty('type')) {
+			this.globalData.isIframe = true;
+		} else {
+			this.globalData.isIframe = false;
+		}
+		// try {
+		// 	// 静默授权code
+		// 	var snsapiCode = uni.getStorageSync('snsapiCode');
+		// } catch (e) {}
+		let snsapiBase = 'snsapi_base';
+		let urlData = location.pathname + location.search;
+		// if (snsapiCode) {
+		// 	return
+		// } else {
+		if (!that.$store.getters.isLogin && Auth.isWeixin()) {
+			const { code, state, scope } = option.query;
+			if (code && location.pathname.indexOf('/pages/users/wechat_login/index') === -1) {
+				// 存储静默授权code
+				uni.setStorageSync('snsapiCode', code);
+				let spread = that.globalData.spid ? that.globalData.spid : '';
+				silenceAuth({
+					code: code,
+					spread: that.$Cache.get('spread'),
+					spid: that.globalData.code
+				})
+					.then(res => {
+						uni.setStorageSync('snRouter', decodeURIComponent(decodeURIComponent(option.query.back_url)));
+						if (res.data.key !== undefined && res.data.key) {
+							this.$Cache.set('snsapiKey', res.data.key);
+						} else {
+							let time = res.data.expires_time - this.$Cache.time();
+							this.$store.commit('LOGIN', {
+								token: res.data.token,
+								time: time
+							});
+							this.$store.commit('SETUID', res.data.userInfo.uid);
+							this.$store.commit('UPDATE_USERINFO', res.data.userInfo);
+							location.href = decodeURIComponent(decodeURIComponent(option.query.back_url));
+						}
+					})
+					.catch(res => {
+						this.$util.Tips({
+							title: error
+						});
+					});
+			} else {
+				if (!this.$Cache.has('snsapiKey')) {
+					if (location.pathname.indexOf('/pages/users/wechat_login/index') === -1) {
+						Auth.oAuth(snsapiBase, urlData);
 					}
 				}
-			}) */
-      
-      //实例化聊天服务
-      //this.$chat = new Server(this);
-		},
-    //$chat:null,
-		onShow: function() {
-			console.log('App Show')
-		},
-		onHide: function() {
-			console.log('App Hide')
-		},
-		globalData: {
-			spid: 0,
-			code:0,
-			isLogin:false,
-			userInfo:{},
-      //默认基础菜单 未登录菜单
-			MyMenus:[]
-		},
-    /**
-     * 聊天事件快捷注册
-    */
-    /* $on: function (name, action){
-      this.$chat.$on(name,action);
-    } */
+			}
+		} else {
+			if(option.query.back_url){
+				// alert(uni.getStorageSync('snsapiCode'))
+				// alert(uni.getStorageSync('snRouter'))
+				location.href = uni.getStorageSync('snRouter')
+			}
+		}
+		// }
+
+		// #endif
+		// #ifdef MP
+		// 小程序静默授权
+		console.log(this.$store.getters.isLogin, 'this.$store');
+		if (!this.$store.getters.isLogin) {
+			Routine.getCode()
+				.then(code => {
+					this.silenceAuth(code);
+				})
+				.catch(res => {
+					uni.hideLoading();
+				});
+		}
+		// #endif
+	},
+	mounted() {},
+	methods: {
+		// 小程序静默授权
+		silenceAuth(code) {
+			let that = this;
+			let spread = that.globalData.spid ? that.globalData.spid : '';
+			silenceAuth({
+				code: code,
+				spread_spid: spread,
+				spread_code: that.globalData.code
+			})
+				.then(res => {
+					if (res.data.token !== undefined && res.data.token) {
+						uni.hideLoading();
+						let time = res.data.expires_time - this.$Cache.time();
+						that.$store.commit('LOGIN', {
+							token: res.data.token,
+							time: time
+						});
+						that.$store.commit('SETUID', res.data.userInfo.uid);
+						that.$store.commit('UPDATE_USERINFO', res.data.userInfo);
+					}
+				})
+				.catch(res => {
+					console.log(res);
+				});
+		}
+	},
+	onHide: function() {
+		//console.log('App Hide')
 	}
+};
 </script>
 
-<style lang="scss">
-	/* #ifndef APP-PLUS-NVUE */
-	/* uni.css - 通用组件、模板样式库，可以当作一套ui库应用 */
-	
-	/* 引入uview-ui */
-	@import "./uview-ui/index.scss";
-	
-	@import './common/app.css';
-  
-  // 引入自定义图标
-  @import "./static/iconfont.css";
+<style>
+@import url("@/plugin/emoji-awesome/css/google.min.css");
+@import url('@/plugin/animate/animate.min.css');
+@import 'static/css/base.css';
+@import 'static/iconfont/iconfont.css';
+@import 'static/css/guildford.css';
+@import 'static/css/style.scss';
 
-	/* 以下样式用于 hello uni-app 演示所需 */
-	page {
-		background-color: #F4F5F6;
-		height: 100%;
-		font-size: 28rpx;
-		line-height: 1.8;
-	}
+view {
+	box-sizing: border-box;
+}
 
-	.uni-header-logo {
-		padding: 30rpx;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		margin-top: 10rpx;
-	}
+.bg-color-red {
+	background-color: #e93323 !important;
+}
 
-	.uni-header-image {
-		width: 100px;
-		height: 100px;
-	}
+.syspadding {
+	padding-top: var(--status-bar-height);
+}
 
-	.uni-hello-text {
-		color: #7A7E83;
-	}
+.flex {
+	display: flex;
+}
 
-	.uni-hello-addfile {
-		text-align: center;
-		line-height: 300rpx;
-		background: #FFF;
-		padding: 50rpx;
-		margin-top: 10px;
-		font-size: 38rpx;
-		color: #808080;
-	}
+.uni-scroll-view::-webkit-scrollbar {
+	/* 隐藏滚动条，但依旧具备可以滚动的功能 */
+	display: none;
+}
 
-	/* #endif*/
-  
-  
-  .noLogin{
-    width: 700rpx;
-    height: 300rpx;
-    margin: 0 auto;
-    margin-top: 200rpx;
-    display: flex;
-    flex-flow: column;
-    justify-content: space-between;
-  }
-  
-  .no-data{
-    color: #ccc;
-    text-align: center;
-    line-height: 40rpx;
-  }
-  
-  .navH{
-    width: 100%;
-    height: 120rpx;
-  }
-  .text-link{
-    color: $u-type-primary-dark;
-  }
-  
-  //专家讲座
-  .lecture{
-  	margin: 30rpx;
-    .items{
-      .item{
-        position: relative;
-        overflow: hidden;
-        margin-bottom: 20rpx;
-        .tag{
-          position: absolute;
-          left: 0;
-          top: 4rpx;
-          z-index: 99;
-        }
-        .info{
-          position: absolute;
-          left: 10rpx;
-          bottom: 10rpx;
-          z-index: 99;
-          .name{
-            font-size: $uni-font-size-base;
-            color: #FFFFFF;
-            line-height: 40rpx;
-            font-weight: 700;
-          }
-          .click{
-            color: #FFFFFF;
-            font-size: $uni-font-size-mini;
-            line-height: 34rpx;
-            margin-left: 15rpx;
-          }
-        }
-      }
-      .one{
-        width: 690rpx;
-        height: 280rpx;
-        border-radius: 14rpx;
-        image{
-          width: 100%;
-        }
-      }
-      .two{
-        width: 340rpx;
-        height: 250rpx;
-        border-radius: 14rpx;
-        image{
-          width: 100%;
-        }
-      }
-    }
-  }
-  
-  .mask {
-  	position: fixed;
-  	top: 0;
-  	left: 0;
-  	right: 0;
-  	bottom: 0;
-  	background-color: #000;
-  	opacity: .5;
-  	z-index: 5
-  }
-  .line-through{
-    text-decoration:line-through;
-  }
-  .ss-block{
-    display: block;
-    clear: both;
-  }
-  .kefu{
-    position: fixed;
-    right: 20rpx;
-    bottom: 120rpx;
-    z-index: 99;
-    image{
-      width: 80rpx;
-      height: 80rpx;
-    }
-  }
-  .status-blue{
-    background: #1E9FFF!important;
-    color: #FFFFFF;
-  }
-  .status-orange{
-    background: #FF5722!important;
-    color: #FFFFFF;
-  }
-  .status-green{
-    background: #009688!important;
-    color: #FFFFFF;
-  }
-  .status-black{
-    background: #393D49!important;
-    color: #FFFFFF;
-  }
-  .status-gray{
-    background: #eeeeee!important;
-    color: #000000;
-  }
+::-webkit-scrollbar {
+	width: 0;
+	height: 0;
+	color: transparent;
+}
 </style>

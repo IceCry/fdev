@@ -4,17 +4,17 @@
  * @day: 2020/7/14
  */
 
-namespace crmeb\jobs;
+namespace sensen\jobs;
 
 
 use app\services\message\sms\SmsSendServices;
 use app\services\order\StoreOrderServices;
-use crmeb\basic\BaseJob;
+use sensen\basic\BaseJob;
 
 /**
  * 未支付10分钟后发送短信
  * Class UnpaidOrderSend
- * @package crmeb\jobs
+ * @package sensen\jobs
  */
 class UnpaidOrderSend extends BaseJob
 {

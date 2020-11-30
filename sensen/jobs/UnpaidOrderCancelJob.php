@@ -4,20 +4,20 @@
  * @day: 2020/7/14
  */
 
-namespace crmeb\jobs;
+namespace sensen\jobs;
 
 
 use app\services\activity\StoreSeckillServices;
 use app\services\order\StoreOrderCartInfoServices;
 use app\services\order\StoreOrderRefundServices;
 use app\services\order\StoreOrderServices;
-use crmeb\basic\BaseJob;
+use sensen\basic\BaseJob;
 use think\facade\Log;
 
 /**
  * 未支付订单到期取消
  * Class UnpaidOrderCancelJob
- * @package crmeb\jobs
+ * @package sensen\jobs
  */
 class UnpaidOrderCancelJob extends BaseJob
 {
