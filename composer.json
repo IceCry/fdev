@@ -37,7 +37,10 @@
         "topthink/think-worker": "^3.0",
         "topthink/think-queue": "^3.0",
         "aliyuncs/oss-sdk-php": "^2.4",
-        "godruoyi/php-snowflake": "^1.0"
+        "godruoyi/php-snowflake": "^1.0",
+        "workerman/gateway-worker": "^3.0",
+        "workerman/gatewayclient": "^3.0",
+        "workerman/channel": "^1.0"
     },
     "require-dev": {
         "symfony/var-dumper": "^4.2",

@@ -20,6 +20,9 @@ a fast development framework based on thinkphp6
 - qcloud/cos-sdk-v5
 - qiniu/php-sdk
 - godruoyi/php-snowflake
+- workerman/gateway-worker
+- workerman/gatewayclient
+- workerman/channel
 
 
 todo
