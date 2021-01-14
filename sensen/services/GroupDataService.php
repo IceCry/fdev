@@ -1,17 +1,14 @@
 <?php
-/**
- *
- * @author: xaboy<365615158@qq.com>
- * @day: 2018/01/15
- */
 
 namespace sensen\services;
+
 
 use app\models\system\SystemGroupData;
 use think\facade\Cache;
 
 class GroupDataService
 {
+
     /**
      * 获取单个组数据
      * @param string $config_name 配置名称

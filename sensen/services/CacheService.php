@@ -5,7 +5,7 @@ namespace sensen\services;
 use think\facade\Cache;
 
 /**
- * 缓存类
+ * sensen 缓存类
  * Class CacheService
  * @package sensen\services
  */
@@ -15,7 +15,7 @@ class CacheService
      * 标签名
      * @var string
      */
-    protected static $globalCacheName = '_cached_19890613';
+    protected static $globalCacheName = '_cached_613666800';
 
     /**
      * 写入缓存
@@ -61,6 +61,7 @@ class CacheService
 
     /**
      * 缓存句柄
+     *
      * @return \think\cache\TagSet|Cache
      */
     public static function handler()

@@ -1,55 +1,30 @@
 <?php
+/**
+ * Desc: 阿里云oss
+ * User: SenSen Wechat:1050575278
+ * Date: 2020/12/24
+ * Time: 13:30
+ */
 
 namespace sensen\services\upload\storage;
 
-use sensen\basic\BaseUpload;
-use sensen\exceptions\UploadException;
-use Guzzle\Http\EntityBody;
 use OSS\Core\OssException;
 use OSS\OssClient;
+use sensen\basic\BaseUpload;
+use sensen\exceptions\UploadException;
 use think\exception\ValidateException;
 
-
-/**
- * 阿里云OSS上传
- * Class OSS
- */
 class Oss extends BaseUpload
 {
-    /**
-     * accessKey
-     * @var mixed
-     */
     protected $accessKey;
-
-    /**
-     * secretKey
-     * @var mixed
-     */
     protected $secretKey;
 
-    /**
-     * 句柄
-     * @var \OSS\OssClient
-     */
     protected $handle;
-
-    /**
-     * 空间域名 Domain
-     * @var mixed
-     */
+    //空间域名 domain
     protected $uploadUrl;
-
-    /**
-     * 存储空间名称  公开空间
-     * @var mixed
-     */
+    //存储空间名
     protected $storageName;
-
-    /**
-     * COS使用  所属地域
-     * @var mixed|null
-     */
+    //所属地域
     protected $storageRegion;
 
     /**
@@ -97,12 +72,7 @@ class Oss extends BaseUpload
         }
         if ($this->validate) {
             try {
-                $error = [
-                    $file . '.filesize' => 'Upload filesize error',
-                    $file . '.fileExt' => 'Upload fileExt error',
-                    $file . '.fileMime' => 'Upload fileMine error'
-                ];
-                validate([$file => $this->validate],$error)->check([$file => $fileHandle]);
+                validate([$file => $this->validate])->check([$file => $fileHandle]);
             } catch (ValidateException $e) {
                 return $this->setError($e->getMessage());
             }
@@ -116,6 +86,14 @@ class Oss extends BaseUpload
             $this->fileInfo->uploadInfo = $uploadInfo;
             $this->fileInfo->filePath = $this->uploadUrl .'/'. $key;
             $this->fileInfo->fileName = $key;
+
+            $this->fileInfo->fileNameOrigin = '';
+            $this->fileInfo->hash = $fileHandle->hash();
+            $this->fileInfo->mime = $fileHandle->getMime();
+            $this->fileInfo->ext = $fileHandle->extension();
+            $this->fileInfo->size = $fileHandle->getSize();
+            $this->fileInfo->filePathZip = '';
+
             return $this->fileInfo;
         } catch (UploadException $e) {
             return $this->setError($e->getMessage());
@@ -130,7 +108,7 @@ class Oss extends BaseUpload
      */
     public function stream(string $fileContent, string $key = null)
     {
-        try {
+        /*try {
             if (!$key) {
                 $key = $this->saveFileName();
             }
@@ -145,7 +123,7 @@ class Oss extends BaseUpload
             return $this->fileInfo;
         } catch (UploadException $e) {
             return $this->setError($e->getMessage());
-        }
+        }*/
     }
 
     /**
@@ -162,51 +140,4 @@ class Oss extends BaseUpload
         }
     }
 
-    /**
-     * 获取OSS上传密钥
-     * @return mixed|void
-     */
-    public function getTempKeys($callbackUrl = '', $dir = '')
-    {
-        // TODO: Implement getTempKeys() method.
-        $base64CallbackBody = base64_encode(json_encode([
-            'callbackUrl' => $callbackUrl,
-            'callbackBody' => 'filename=${object}&size=${size}&mimeType=${mimeType}&height=${imageInfo.height}&width=${imageInfo.width}',
-            'callbackBodyType' => "application/x-www-form-urlencoded"
-        ]));
-
-        $policy = json_encode([
-            'expiration' => $this->gmtIso8601(time() + 30),
-            'conditions' =>
-                [
-                    [0 => 'content-length-range', 1 => 0, 2 => 1048576000],
-                    [0 => 'starts-with', 1 => '$key', 2 => $dir]
-                ]
-        ]);
-        $base64Policy = base64_encode($policy);
-        $signature = base64_encode(hash_hmac('sha1', $base64Policy, $this->secretKey, true));
-        return [
-            'accessid' => $this->accessKey,
-            'host' => $this->uploadUrl,
-            'policy' => $base64Policy,
-            'signature' => $signature,
-            'expire' => time() + 30,
-            'callback' => $base64CallbackBody,
-            'type' => 'OSS'
-        ];
-    }
-    /**
-     * 获取ISO时间格式
-     * @param $time
-     * @return string
-     */
-    protected function gmtIso8601($time)
-    {
-        $dtStr = date("c", $time);
-        $mydatetime = new \DateTime($dtStr);
-        $expiration = $mydatetime->format(\DateTime::ISO8601);
-        $pos = strpos($expiration, '+');
-        $expiration = substr($expiration, 0, $pos);
-        return $expiration . "Z";
-    }
 }

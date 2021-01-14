@@ -2,7 +2,7 @@
 
 namespace sensen\services\template\storage;
 
-use app\services\other\TemplateMessageServices;
+use app\models\system\Wechat as WechatModel;
 use sensen\basic\BaseMessage;
 use sensen\services\WechatService;
 use think\facade\Log;
@@ -25,8 +25,7 @@ class Wechat extends BaseMessage
      */
     public function getTempId(string $templateId)
     {
-        /** @var TemplateMessageServices $services */
-        $services = app()->make(TemplateMessageServices::class);
+        $services = new WechatModel();
         return $services->getTempId($templateId, 1);
     }
 

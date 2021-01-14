@@ -36,3 +36,8 @@ todo
 - thinkphp 6.x
 - layuiadmin 1.4.0
 - 
+
+
+php think worker:gateway
+
+php think queue:listen --queue SENSEN
