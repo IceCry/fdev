@@ -8,7 +8,6 @@
 
 namespace app\admin\controller\article;
 
-
 use app\admin\controller\AuthController;
 use sensen\services\JsonService;
 use app\models\article\ArticleCate as ArticleCateModel;
