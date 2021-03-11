@@ -40,7 +40,6 @@ class AuthController extends Base
         if(!Admin::isOnline()){
             return $this->redirect(Route::buildUrl('login/index')->suffix(false)->build());
         }
-
         //获取用户信息
         //判断当前用户是否被禁用 考虑cookie存储时间 防止session过期无法获取userInfo
         try{

@@ -25,7 +25,7 @@ return [
         ],
         'redis'    => [
             'type'       => 'redis',
-            'queue'      => 'SenSen',
+            'queue'      => Env::get('redis.queue_name', 'SenSen'),
             'host'       => Env::get('redis.redis_hostname', '127.0.0.1'),
             'port'       => Env::get('redis.port', 6379),
             'password'   => Env::get('redis.redis_password', ''),
