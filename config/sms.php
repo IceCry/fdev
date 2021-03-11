@@ -36,9 +36,9 @@ return [
                 'ADMIN_ALERT'=>'',
 
             ],
-            'sign'=>'潍律通',
-            'key'=>'LTAIx8KjgG5g0u6B',
-            'secret'=>'if9zbj7YFPID9LpmgabX6NFK2dYwbC'
+            'sign'=>'短信签名',
+            'key'=>'xxx',
+            'secret'=>'xxx'
         ]
     ]
 ];
