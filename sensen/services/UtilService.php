@@ -12,8 +12,6 @@ use think\facade\Config;
 /**
  * Class UtilService
  * @package sensen\services
- * @method static getMore(array $params, bool $suffix = false) 获取get参数
- * @method static postMore(array $params, bool $suffix = false) 获取Post参数
  */
 class UtilService
 {
