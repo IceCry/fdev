@@ -1,0 +1,86 @@
+{extend name="public/container"}
+
+{block name="content"}
+<!--todo 仅用户单个数据框-->
+<body>
+<form class="layui-form" style="padding: 20px;" id="app" v-cloak="">
+    <div class="layui-form-item" v-for="(item, index) in formData.fields" v-show="item.var != 'status'">
+        <!--<label class="layui-form-label">{{item.name}}</label>-->
+        <div class="layui-input-block" style="margin-left: 0;">
+            <input :type="item.type" :name="item.var" autocomplete="off" class="layui-input" v-model="item.param" maxlength="200">
+        </div>
+    </div>
+    <!--字段添加-->
+
+    <div class="layui-form-item" style="float: right;">
+        <input type="button" lay-submit lay-filter="layer-submit" id="layer-submit" class="layui-btn layui-btn-info" value="保存数据">
+    </div>
+</form>
+</body>
+{/block}
+
+{block name="script"}
+<script>
+    var gid = "{$gid}" || 0;
+    var id = 0;
+    var no_reload = "{$Request.param.no_reload}" || 0;
+    var app = new Vue({
+        el: '#app',
+        data: {
+            formData:{
+                id: 0,
+                gid: gid,
+                fields: []
+            }
+        },
+        watch:{
+
+        },
+        methods: {
+
+        },
+        mounted: function () {
+            var that = this;
+            //如果id>0则获取数据
+            axios.post("{:url('system.dataGroupValue/info')}", {gid:gid, id:id}, {headers:{'Content-Type':'application/json;charset=utf8'}}).then(function (res) {
+                if (res.status == 200 && res.data.code == 200) {
+                    app.formData.fields = res.data.data;
+                }
+            }).catch(function (err) {
+                alert(err)
+            });
+        }
+    });
+
+    layui.config({
+        base: '{__LAYUI_PATH}' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'form'], function(){
+        var $ = layui.$
+            ,form = layui.form;
+
+        form.on('submit(layer-submit)', function(data){
+            $.ajax({
+                url: "{:url('system.dataGroupValue/save')}",
+                data: app.formData,
+                method: "POST",
+                dataType: 'json',
+                success:function (res) {
+                    if(res.code==200){
+                        layer.msg(res.msg, {time: 2000}, function () {
+                            parent.layer.closeAll();
+                            if(no_reload==0){
+                                parent.location.reload();
+                            }
+                        });
+                    }else{
+                        layer.msg(res.msg);
+                    }
+                }
+            });
+            return false;
+        });
+    });
+</script>
+{/block}

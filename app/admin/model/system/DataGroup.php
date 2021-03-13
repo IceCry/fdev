@@ -25,7 +25,7 @@ class DataGroup extends BaseModel
     {
         $model = new self;
         $model = $model->page((int)$where['page'], (int)$where['limit']);
-        $list = $model->select();
+        $list = $model->order('id desc')->select();
         $data = count($list) ? $list->toArray() : [];
 
         $count = self::count();

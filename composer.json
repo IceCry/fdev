@@ -29,7 +29,8 @@
         "firebase/php-jwt": "^5.2",
         "phpoffice/phpspreadsheet": "^1.15",
         "spatie/macroable": "^1.0",
-        "yunwuxin/think-cron": "^3.0"
+        "yunwuxin/think-cron": "^3.0",
+        "xaboy/form-builder": "~2.0"
     },
     "require-dev": {
         "symfony/var-dumper": "^4.2",

@@ -101,6 +101,14 @@
             removeField: function(index){
                 this.formData.fields.splice(index,1);
             },
+            //重新渲染表单
+            render(){
+                this.$nextTick(function () {
+                    layui.use(['form'], function () {
+                        layui.form.render();
+                    });
+                });
+            }
         },
         mounted: function () {
             var that = this;
@@ -114,6 +122,9 @@
                     alert(err)
                 });
             }
+            setTimeout(function () {
+                app.render();
+            }, 500);
         }
     });
 

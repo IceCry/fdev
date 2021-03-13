@@ -28,11 +28,12 @@ class Attachment extends BaseModel
      * @param string $mid
      * @param int $cate_id
      * @param int $user_id
+     * @param string $user_name
      * @param string $hash
      * @param int $upload_type
      * @return Attachment|\think\Model
      */
-    public static function attachmentAdd($type='', $name='', $name_origin='', $path='', $ext='', $mime='', $size=0, $path_zip = '', $mid='', $cate_id=0, $user_id=0, $mtable='', $hash='', $upload_type=1)
+    public static function attachmentAdd($type='', $name='', $name_origin='', $path='', $ext='', $mime='', $size=0, $path_zip = '', $mid='', $cate_id=0, $user_id=0, $user_name='', $mtable='', $hash='', $upload_type=1)
     {
         $data['type'] = $type;
         $data['name'] = $name;
@@ -45,6 +46,7 @@ class Attachment extends BaseModel
         $data['mid'] = $mid;
         $data['cate_id'] = $cate_id;
         $data['user_id'] = $user_id;
+        $data['user_name'] = $user_name;
         $data['upload_type'] = $upload_type;
         $data['uuid'] = create_uuid();
         $data['mtable'] = $mtable;

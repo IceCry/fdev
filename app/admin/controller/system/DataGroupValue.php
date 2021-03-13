@@ -32,7 +32,8 @@ class DataGroupValue extends AuthController
     }
 
     /**
-     * 数据添加 暂定仅text
+     * 数据添加
+     * todo 暂定仅text
      * @param $gid
      * @return string
      * @throws \Exception
@@ -42,7 +43,7 @@ class DataGroupValue extends AuthController
         $fields = DataGroup::getFields($gid);
         $this->assign('fields', $fields['fields']);
 
-        //处理不同类型数据
+        //todo 处理不同类型数据
         /*$f = array();
         foreach ($fields["fields"] as $key => $value) {
 
@@ -59,7 +60,7 @@ class DataGroupValue extends AuthController
             ['fields',[]],
         ],$this->request);
 
-        //暂不做任何判断
+        //todo 暂不做任何判断
         $fields = [];
         foreach ($params['fields'] as $k=>$v){
             $tmp = [];
@@ -71,7 +72,7 @@ class DataGroupValue extends AuthController
         }
         $data = [];
         $data['gid'] = $params['gid'];
-        $data['value'] = htmlspecialchars_decode(json_encode($fields));
+        $data['value'] = htmlspecialchars_decode(json_encode($fields, JSON_UNESCAPED_UNICODE));
         $data['add_time'] = time();
 
         //判断ID是否存在，存在就是编辑，不存在就是添加

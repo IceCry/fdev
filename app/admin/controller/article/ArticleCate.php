@@ -9,9 +9,11 @@
 namespace app\admin\controller\article;
 
 use app\admin\controller\AuthController;
+use FormBuilder\Factory\Elm;
 use sensen\services\JsonService;
 use app\models\article\ArticleCate as ArticleCateModel;
 use sensen\services\UtilService;
+use think\facade\Route;
 
 class ArticleCate extends AuthController
 {
@@ -29,9 +31,34 @@ class ArticleCate extends AuthController
         return JsonService::successlayui(ArticleCateModel::getArticleCateData());
     }
 
-    public function create()
+    public function create($id=0, $pid=0)
     {
-        return $this->fetch();
+        if($id>0){
+            $info = ArticleCateModel::get($id);
+            $name = $info['name'];
+            $icon = $info['icon'];
+            $sort_num = $info['sort_num'];
+            $status = intval($info['status']);
+        }else{
+            $name = $icon = '';
+            $sort_num = 0;
+            $status = 1;
+        }
+        $name = Elm::input('name', '分类名称', $name)->required()->maxlength(45);
+        //$icon = Elm::frameImage('icon', '分类图标', Route::buildUrl('widget.attach/index'), $icon);
+        $icon = Elm::uploadImage('icon', '分类图标', Route::buildUrl('widget.attach/upload'), $icon);
+        $sortNum = Elm::number('sort_num', '排序值', $sort_num);
+        $status = Elm::radio('status', '状态', $status);
+        $status->options(function(){
+            $options = [['value'=>1, 'label'=>'显示'], ['value'=>0, 'label'=>'禁用']];
+            return $options;
+        });
+        $pid = Elm::hidden('pid', $pid);
+        $id = Elm::hidden('id', $id);
+        $form = Elm::createForm(Route::buildUrl('save'))->setMethod('POST');
+        $form->setRule([$name, $icon, $sortNum, $status, $pid, $id]);
+        $this->assign(compact('form'));
+        return $this->fetch('public/form-builder');
     }
 
     public function save()

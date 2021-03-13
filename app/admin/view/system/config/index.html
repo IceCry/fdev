@@ -1,5 +1,6 @@
 {extend name="public/container"}
 
+<!--todo 使用form-create-->
 {block name="content"}
 <body>
 <div class="layui-fluid" id="LAY-app-message">
@@ -20,7 +21,19 @@
                             <label class="layui-form-label">{$config.info}</label>
                             <div class="layui-input-block">
                                 {if condition="$config.type eq 'text'"}
-                                <input type="text" name="{$config.menu_name}" value="{$config.value|json_decode}" placeholder="{$config.desc}" class="layui-input">
+                                <input type="text" name="{$config.menu_name}" value="{$config.value}" placeholder="{$config.desc}" class="layui-input">
+                                {elseif condition="$config.type eq 'textarea'"/}
+                                <textarea name="{$config.menu_name}" class="layui-textarea">{$config.value}</textarea>
+                                {elseif condition="$config.type eq 'radio'"/}
+                                {foreach $config.items as $item}
+                                <input type="radio" name="{$config.menu_name}" value="{$item.value}" class="layui-input" title="{$item.name}" {if condition="$item.value eq $config.value"}checked{/if}>
+                                {/foreach}
+                                {elseif condition="$config.type eq 'date'"/}
+                                <input type="text" name="{$config.menu_name}" value="{$config.value}" readonly id="date-{$config.id}" class="layui-input ss-date" placeholder="{$config.desc}">
+                                {elseif condition="$config.type eq 'area'"/}
+                                <select name="province" name="province" class="layui-select" style="width: 30%;">
+                                    <option value="">省份</option>
+                                </select>
                                 {elseif condition="$config.type eq 'editor'"/}
                                 <textarea name="{$config.menu_name}" rows="10" class="layui-textarea" placeholder="{$config.desc}">{$config.value|json_decode}</textarea>
                                 {/if}
@@ -49,9 +62,18 @@
         base: '{__LAYUI_PATH}' //静态资源所在路径
     }).extend({
         index: 'lib/index' //主入口模块
-    }).use(['index', 'form'], function(){
+    }).use(['index', 'form', 'laydate'], function(){
         var $ = layui.$
+            ,laydate = layui.laydate
             ,form = layui.form;
+
+        lay('.ss-date').each(function(){
+            laydate.render({
+                elem: this
+                ,type: 'datetime'
+                ,trigger: 'click'
+            });
+        });
 
         form.on('submit(save)', function(data){
             var data = data.field;

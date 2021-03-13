@@ -8,7 +8,7 @@
             <div class="layui-card">
                 <div class="layui-card-body layui-form">
                     <div class="event-btns" style="margin-bottom: 10px;">
-                        <button class="layui-btn layui-btn-danger" data-type="add"><i class="fa fa-plus-circle"></i> 添加配置</button>
+                        <button class="layui-btn layui-btn-danger" data-type="add">添加配置</button>
                     </div>
 
                     <table class="layui-hide" id="table-toolbar" lay-filter="table-toolbar"></table>
@@ -39,7 +39,7 @@
 
         table.render({
             elem: '#table-toolbar'
-            ,url: "{:url('system.configTab/getItemsData', [], false)}/id/"+ct_id
+            ,url: "{:url('system.configTab/getItemsData', [], '')}/id/"+ct_id
             ,toolbar: '#table-toolbar-toolbarDemo'
             ,title: '数据表'
             ,cols: [[
@@ -66,7 +66,7 @@
                 layer.open({
                     type: 2
                     ,title: '新增配置'
-                    ,content: "{:url('system.configTab/addItem', [], false)}/id/"+ct_id
+                    ,content: "{:url('system.configTab/addItem', [], '')}/id/"+ct_id
                     ,area: ['500px', '400px']
                     ,btn: ['确定', '取消']
                     ,yes: function(index, layero){
@@ -104,7 +104,7 @@
         table.on('tool(table-toolbar)', function(obj){
             var data = obj.data;
             if(obj.event === 'del'){
-                layer.confirm('删除可能导致系统错误，确定要删除吗？', function(index){
+                layer.confirm('删除可能导致系统错误，确定要删除吗？', {icon: 3}, function(index){
                     //obj.del();
                     $.ajax({
                         url: "{:url('system.configTab/deleteConfig')}",
@@ -122,7 +122,7 @@
                 layer.open({
                     type: 2
                     ,title: '修改配置'
-                    ,content: "{:url('system.configTab/editItem',[], false)}/id/"+data.id
+                    ,content: "{:url('system.configTab/editItem',[],'')}/id/"+data.id
                     ,area: ['500px', '400px']
                     ,btn: ['确定', '取消']
                     ,yes: function(index, layero){
@@ -157,8 +157,8 @@
             is_check = is_check?1:0;
             var id = data.elem.attributes['data-id'].nodeValue;
             $.ajax({
-                url: "{:url('base/updateStatus')}",
-                data:{'table':'config','status':is_check, 'id':id},
+                url: "{:url('base/updateField')}",
+                data:{'table':'config','value':is_check, 'id':id},
                 method: "POST",
                 dataType: 'json',
                 success:function (res) {

@@ -46,7 +46,7 @@ class DataGroupValue extends BaseModel
                 if ($value["type"] == "checkbox") $info[$index]["value"] = implode(",", $value["value"]);
             }*/
             $item->value = $info;
-        });
+        }, [], 100);
     }
 
 }

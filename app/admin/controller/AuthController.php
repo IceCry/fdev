@@ -31,6 +31,9 @@ class AuthController extends Base
     //当前用户最高角色（可能包含多个角色）
     protected $topRole = '';
 
+    //城市信息
+    public $city = '';
+
     /**
      * 构造方法
      */
@@ -53,7 +56,7 @@ class AuthController extends Base
         $this->auth = Admin::getUserAuth($this->userInfo);
         //判断是否授权
         $this->isSuperAdmin() || $this->checkAuth();
-        $this->assign('userInfo', $this->userInfo);
+        $this->assign(['userInfo'=>$this->userInfo, 'city'=>$this->city]);
         //$this->assign('menu', $this->getMenu());
         //dump($this->getMenu());die;
         //记录访问日志

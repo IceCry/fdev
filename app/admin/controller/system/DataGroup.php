@@ -13,6 +13,7 @@ use app\admin\controller\AuthController;
 use sensen\services\JsonService;
 use app\admin\model\system\DataGroup as DataGroupModel;
 use sensen\services\UtilService;
+use think\facade\Db;
 
 class DataGroup extends AuthController
 {
@@ -109,10 +110,54 @@ class DataGroup extends AuthController
             return JsonService::fail(DataGroupModel::getErrorInfo('删除失败！请重试'));
         }else{
             DataGroupValue::del(["gid"=>$id]);
-            insert_log('删除组合数据', 'data_group/delete', 4, $id, $this->userInfo['id'], $this->userInfo['name']);
             return JsonService::successful('删除成功!');
         }
     }
+
+    /**
+     * 获取xm数据
+     * todo data_group数据暂不分页
+     */
+    public function getXmData()
+    {
+        list($type, $keyword, $val) = UtilService::postMore([
+            'type',
+            'keyword',
+            'val'
+        ], null, true);
+        $keyword = trim($keyword);
+        $data = [];
+        if($keyword){
+            $data = $this->getDataValue($type, $keyword);
+        }else{
+            $data = $this->getDataValue($type);
+        }
+        //默认选中
+        $list = [];
+        foreach ($data as $k=>$v){
+            $list[$k] = $v;
+            if($val == $v['value']){
+                $list[$k]['selected'] = true;
+            }
+        }
+        return JsonService::successlayui(0, $list);
+    }
+
+    /**
+     * xmSelect新增数据
+     * @param string $type
+     * @return string
+     * @throws \Exception
+     */
+    public function xmCreate($type='')
+    {
+        $gid = Db::name('data_group')->where(['config_name'=>$type, 'status'=>1])->value('id');
+        $fields = DataGroupModel::getFields($gid);
+        $this->assign(['gid'=>$gid, 'fields'=>$fields['fields']]);
+        return $this->fetch();
+    }
+
+
 
 
 }

@@ -27,6 +27,22 @@ class Config extends AuthController
         //获取tab对应配置
         foreach ($tabs as &$v){
             $configs = ConfigModel::where(['config_tab_id'=>$v['id'], 'status'=>1])->select();
+
+            //判断config类型
+            foreach ($configs as &$x){
+                $x['value'] = json_decode($x['value']);
+                if($x['type']=='radio'){
+                    //radio则获取描述内容为可选值
+                    $tmp = explode(',', $x['desc']);
+                    $item = [];
+                    foreach ($tmp as $t){
+                        $tmp2 = explode('|', $t);
+                        $item[] = ['name'=>$tmp2[0], 'value'=>$tmp2[1]];
+                    }
+                    $x['items'] = $item;
+                }
+            }
+
             $v['configs'] = $configs;
         }
         $this->assign(['tabs'=>$tabs]);
@@ -51,7 +67,6 @@ class Config extends AuthController
     public function clearData()
     {
         FileService::del_dir('../runtime/cache');
-        insert_log('清除缓存', 'config/clearData', 1, '', $this->userInfo['id'], $this->userInfo['name']);
         return JsonService::success('操作成功');
     }
 

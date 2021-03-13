@@ -64,7 +64,7 @@
                             }
                         }}
                     ,{field:'title', title:'权限名', width:300}
-                    ,{field:'name', title:'权限', width:200}
+                    ,{field:'name', title:'权限', minWidth:200}
                     ,{field:'is_check', title:'验证', templet:function (d) {
                             if(d.is_check==1){
                                 return '<input type="checkbox" name="yyy" data-id="'+d.id+'" value="1" lay-filter="isCheck" lay-skin="switch" lay-text="ON|OFF" checked>';
@@ -95,9 +95,9 @@
                 layer.open({
                     type: 2
                     ,title: '新增权限'
-                    ,content: "{:url('system.rule/add')}"
-                    ,area: ['500px', '500px']
-                    ,btn: ['确定', '取消']
+                    ,content: "{:url('system.rule/create')}"
+                    ,area: ['500px', '520px']
+                    /*,btn: ['确定', '取消']
                     ,yes: function(index, layero){
                         var iframeWindow = window['layui-layer-iframe'+ index]
                             ,submitID = 'layer-submit'
@@ -120,7 +120,7 @@
                         });
 
                         submit.trigger('click');
-                    }
+                    }*/
                 });
             }
         };
@@ -153,9 +153,9 @@
                 layer.open({
                     type: 2
                     ,title: '修改权限'
-                    ,content: "{:url('system.rule/edit',[],false)}/id/"+data.id
-                    ,area: ['500px', '400px']
-                    ,btn: ['确定', '取消']
+                    ,content: "{:url('system.rule/create',[],false)}/id/"+data.id
+                    ,area: ['500px', '520px']
+                    /*,btn: ['确定', '取消']
                     ,yes: function(index, layero){
                         var iframeWindow = window['layui-layer-iframe'+ index]
                             ,submitID = 'layer-submit'
@@ -178,15 +178,15 @@
                         });
 
                         submit.trigger('click');
-                    }
+                    }*/
                 });
             }else if(obj.event === 'son'){
                 layer.open({
                     type: 2
                     ,title: '新增权限'
-                    ,content: "{:url('system.rule/add', [], false)}/pid/"+data.id
-                    ,area: ['500px', '400px']
-                    ,btn: ['确定', '取消']
+                    ,content: "{:url('system.rule/create', [], false)}/pid/"+data.id
+                    ,area: ['500px', '520px']
+                    /*,btn: ['确定', '取消']
                     ,yes: function(index, layero){
                         var iframeWindow = window['layui-layer-iframe'+ index]
                             ,submitID = 'layer-submit'
@@ -209,7 +209,7 @@
                         });
 
                         submit.trigger('click');
-                    }
+                    }*/
                 });
             }
         });

@@ -75,7 +75,6 @@ class ConfigTab extends AuthController
         }
         $res = ConfigTabModel::del($id);
         if($res){
-            insert_log('删除配置分类', 'config_tab/delete', 4, $id, $this->userInfo['id'], $this->userInfo['name']);
             return JsonService::successful('操作成功');
         }else{
             return JsonService::fail('操作失败！请重试');
@@ -136,6 +135,7 @@ class ConfigTab extends AuthController
             ['info', ''],
             ['menu_name', ''],
             ['desc', ''],
+            ['type', 'text'],
             ['value', ''],
         ]);
         $id = $data['id'];
@@ -146,8 +146,8 @@ class ConfigTab extends AuthController
         if($id>0){
             $res = ConfigModel::edit($data, $id, 'id');
         }else{
-            //暂定均为text
-            $data['type'] = 'text';
+            //todo 暂定均为text
+            //$data['type'] = 'text';
             $data['input_type'] = 'input';
 
             //判断是否已存在此字段
@@ -165,16 +165,11 @@ class ConfigTab extends AuthController
         }
     }
 
-    /**
-     * 删除
-     * @param string $uuid
-     * @return array
-     */
+
     public function deleteConfig($id=0)
     {
-        $res = ConfigModel::where('id', $id)->delete();
+        $res = ConfigModel::del($id);
         if($res){
-            insert_log('删除配置', 'config_tab/delete_config', 4, $id, $this->userInfo['id'], $this->userInfo['name']);
             return JsonService::successful('操作成功');
         }else{
             return JsonService::fail('操作失败！请重试');

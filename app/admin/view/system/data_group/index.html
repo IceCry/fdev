@@ -9,7 +9,7 @@
                 <div class="layui-card-header">数据组管理</div>
                 <div class="layui-card-body layui-form">
                     <div class="event-btns" style="margin-bottom: 10px;">
-                        <button class="layui-btn layui-btn-danger" data-type="add"><i class="fa fa-plus-circle"></i> 添加数据组</button>
+                        <button class="layui-btn layui-btn-danger" data-type="add">添加数据组</button>
                     </div>
 
                     <table class="layui-hide" id="table-toolbar" lay-filter="table-toolbar"></table>
@@ -83,7 +83,7 @@
             var data = obj.data;
             console.log(data)
             if(obj.event === 'del'){
-                layer.confirm('删除可能导致系统错误，确定要删除吗？', function(index){
+                layer.confirm('删除可能导致系统错误，确定要删除吗？', {icon: 3}, function(index){
                     //obj.del();
                     $.ajax({
                         url: "{:url('system.dataGroup/delete')}",
@@ -102,14 +102,14 @@
                 layer.open({
                     type: 2
                     ,title: '修改数据组'
-                    ,content: "{:url('system.dataGroup/create',[], false)}/id/"+data.id
+                    ,content: "{:url('system.dataGroup/create',[],'')}/id/"+data.id
                     ,area: ['90%', '90%']
                 });
             } else if(obj.event === 'values'){
                 layer.open({
                     type: 2
                     ,title: '数据管理'
-                    ,content: "{:url('system.dataGroupValue/index',[], false)}/gid/"+data.id
+                    ,content: "{:url('system.dataGroupValue/index',[],'')}/gid/"+data.id
                     ,area: ['90%', '90%']
                 });
             }
@@ -121,8 +121,8 @@
             is_check = is_check?1:0;
             var id = data.elem.attributes['data-id'].nodeValue;
             $.ajax({
-                url: "{:url('base/updateStatus')}",
-                data:{'table':'data_group','status':is_check, 'id':id},
+                url: "{:url('base/updateField')}",
+                data:{'table':'data_group','value':is_check, 'id':id},
                 method: "POST",
                 dataType: "Json",
                 success:function (res) {

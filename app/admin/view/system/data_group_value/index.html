@@ -100,7 +100,7 @@
 
         $('.del-btn').click(function () {
             var id = $(this).attr('data-id');
-            layer.confirm('删除可能导致系统错误，确定要删除吗？', function(index){
+            layer.confirm('删除可能导致系统错误，确定要删除吗？', {icon: 3}, function(index){
                 $.ajax({
                     url: "{:url('system.dataGroupValue/delete')}",
                     data:{"id": id},
