@@ -58,6 +58,10 @@ if (vconsole !== undefined && vconsole === md5Sensen) {
 //全局路由前置守卫
 // #endif
 
+//引入uviewui
+import uView from "uview-ui";
+Vue.use(uView);
+
 App.mpType = 'app'
 
 

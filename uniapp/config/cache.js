@@ -3,27 +3,27 @@ module.exports = {
 	LOGIN_STATUS: 'LOGIN_STATUS_TOKEN',
 	// uid
 	UID:'UID',
-	//�û�
+	//用户信息
 	USER_INFO: 'USER_INFO',
-	//token�����¼�
+	//token过期时间
 	EXPIRES_TIME: 'EXPIRES_TIME',
-	//�Ƿ���Ȩ
+	//微信标识
 	WX_AUTH: 'WX_AUTH',
-	//���ں���Ȩcode
+	//状态
 	STATE_KEY: 'wx_authorize_state',
-	//�û�����
+	//登录类型
 	LOGINTYPE: 'loginType',
-	//���ں���ת����
+	//登录回调
 	BACK_URL: 'login_back_url',
-	// С����code
-	STATE_R_KEY: 'roution_authorize_state',
-	//��ȨlogoС����
+	//授权状态
+	STATE_R_KEY: 'routine_authorize_state',
+	//LOGO
 	LOGO_URL: 'LOGO_URL',
 	//模板缓存
 	SUBSCRIBE_MESSAGE: 'SUBSCRIBE_MESSAGE',
 
 	TIPS_KEY: 'TIPS_KEY',
-
+	//推广人字段
 	SPREAD: 'spread',
 	//缓存经度
 	CACHE_LONGITUDE: 'LONGITUDE',

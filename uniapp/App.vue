@@ -167,12 +167,12 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
+@import "uview-ui/index.scss";
 @import url("@/plugin/emoji-awesome/css/google.min.css");
 @import url('@/plugin/animate/animate.min.css');
 @import 'static/css/base.css';
 @import 'static/iconfont/iconfont.css';
-@import 'static/css/guildford.css';
 @import 'static/css/style.scss';
 
 view {

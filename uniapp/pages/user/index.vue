@@ -236,7 +236,6 @@
 				}
 			}
 		},
-		computed: mapGetters(['isLogin']),
 		onLoad(options) {
 			let that = this;
 			that.$set(that, 'MyMenus', app.globalData.MyMenus);
