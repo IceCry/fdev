@@ -32,6 +32,16 @@
                         <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
                         <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
                     </script>
+                    <script id="table2toolMenu" type="text/plain">
+                    [
+                      [{layIcon: 'layui-icon-read', txt: '查看详情', event:'detail'}]
+
+                      {{# if(true || d.user_id == 0) { }}
+                        [{layIcon: 'layui-icon-edit', txt: '编辑', event:'edit'}]
+                        [{layIcon: 'layui-icon-delete', txt: '删除', event:'delete'}]
+                      {{# } }}
+                    ]
+                    </script>
 
                     <script type="text/html" id="thumb">
                         <img style="cursor: pointer" lay-event="open_image" src="{{d.thumb}}">
@@ -50,7 +60,7 @@
         base: '{__LAYUI_PATH}' //静态资源所在路径
     }).extend({
         index: 'lib/index' //主入口模块
-    }).use(['index', 'table', 'form'], function(){
+    }).use(['index', 'table', 'form', 'dropdown'], function(){
         var $ = layui.$
             ,table = layui.table
             ,form = layui.form;
@@ -67,10 +77,10 @@
                 }}
                 ,{field:'type_str', title:'类型', width:150}
                 ,{field:'title', title:'标题'}
-                ,{field:'click', title:'查看次数', width:100, edit: 'click'}
-                ,{field:'create_time', title:'创建时间', width:170}
+                ,{field:'click', title:'查看次数', width:100, sort: true, edit: 'click'}
+                ,{field:'create_time', title:'创建时间', width:170, sort: true}
                 ,{field:'user_name', title:'录入人', width:100}
-                ,{field:'sort_num', title:'排序值', edit: "sort_num", width: 80}
+                ,{field:'sort_num', title:'排序值', edit: "sort_num", width: 80, sort: true}
                 ,{field:'status', title:'状态', width:100, templet:function (d) {
                     if(d.status==1){
                         return '<input type="checkbox" name="status" data-id="'+d.id+'" value="1" lay-filter="isCheck" lay-skin="switch" lay-text="ON|OFF" checked>';
@@ -78,10 +88,18 @@
                         return '<input type="checkbox" name="status" data-id="'+d.id+'" value="0" lay-filter="isCheck" lay-skin="switch" lay-text="ON|OFF">';
                     }
                 }}
-                ,{title:'操作', toolbar: '#table-toolbar-barDemo', width:200}
+                ,{title:'操作', toolbar: '#table-toolbar-barDemo', width:90}
             ]]
             ,page: true
             ,limit: 20
+            ,autoSort: false
+            ,done:function (res) {
+                for (var i = 0; i < res.data.length; i++) {
+                    dropdown.suite("#layuidropdown_" + res.data[i].id, {
+                        data: res.data[i]
+                    });
+                }
+            }
         });
 
         var active = {
@@ -126,6 +144,17 @@
                 success:function (res) {
                     layer.msg(res.msg);
                     table.reload('table-toolbar');
+                }
+            });
+        });
+
+        //监听排序
+        table.on('sort(table-toolbar)', function(obj){
+            table.reload('table-toolbar', {
+                initSort: obj
+                ,where: {
+                    order_by: obj.field
+                    ,order: obj.type
                 }
             });
         });
