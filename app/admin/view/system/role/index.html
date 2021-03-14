@@ -6,10 +6,9 @@
     <div class="layui-row layui-col-space15">
         <div class="layui-col-md12">
             <div class="layui-card">
-                <div class="layui-card-header">角色管理</div>
                 <div class="layui-card-body layui-form">
                     <div class="event-btns" style="margin-bottom: 10px;">
-                        <button class="layui-btn layui-btn-danger" data-type="add"><i class="fa fa-plus-circle"></i> 添加角色</button>
+                        <button class="layui-btn layui-btn-sm layui-btn-danger" data-type="add"><i class="fa fa-plus-circle"></i> 添加角色</button>
                     </div>
 
                     <table class="layui-hide" id="table-toolbar" lay-filter="table-toolbar"></table>
@@ -41,7 +40,7 @@
         table.render({
             elem: '#table-toolbar'
             ,url: "{:url('system.role/getData')}"
-            ,toolbar: '#table-toolbar-toolbarDemo'
+            ,toolbar: false
             ,title: '数据表'
             ,cols: [[
                 {type:'numbers', title:'序号', width:80}
@@ -54,7 +53,7 @@
                         return '<input type="checkbox" name="status" data-id="'+d.id+'" value="0" lay-filter="isCheck" lay-skin="switch" lay-text="ON|OFF" >';
                     }
                 }}
-                ,{title:'操作', toolbar: '#table-toolbar-barDemo', width:250}
+                ,{title:'操作', toolbar: '#table-toolbar-barDemo', width:190}
             ]]
             // ,page: true
         });

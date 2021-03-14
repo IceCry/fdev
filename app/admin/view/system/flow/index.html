@@ -6,10 +6,9 @@
     <div class="layui-row layui-col-space15">
         <div class="layui-col-md12">
             <div class="layui-card">
-                <div class="layui-card-header">流程管理</div>
                 <div class="layui-card-body layui-form">
                     <div class="event-btns" style="margin-bottom: 10px;">
-                        <button class="layui-btn layui-btn-danger" data-type="add">添加流程</button>
+                        <button class="layui-btn layui-btn-sm layui-btn-danger" data-type="add"><i class="fa fa-plus-circle"></i> 添加流程</button>
                     </div>
 
                     <table class="layui-hide" id="table-toolbar" lay-filter="table-toolbar"></table>
@@ -56,7 +55,7 @@
                         return '<input type="checkbox" name="status" data-id="'+d.id+'" value="0" lay-filter="isCheck" lay-skin="switch" lay-text="ON|OFF" >';
                     }
                 }}
-                ,{title:'操作', toolbar: '#table-toolbar-barDemo', width:250}
+                ,{title:'操作', toolbar: '#table-toolbar-barDemo', width:210}
             ]]
             // ,page: true
         });
@@ -67,30 +66,7 @@
                     type: 2
                     ,title: '新增流程'
                     ,content: "{:url('system.flow/create')}"
-                    ,area: ['450px', '450px']
-                    ,btn: ['确定', '取消']
-                    ,yes: function(index, layero){
-                        var iframeWindow = window['layui-layer-iframe'+ index]
-                            ,submitID = 'layer-submit'
-                            ,submit = layero.find('iframe').contents().find('#'+ submitID);
-                        //监听提交
-                        iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
-                            var field = data.field;
-                            $.ajax({
-                                url: "{:url('system.flow/save')}",
-                                data:field,
-                                method: "POST",
-                                dataType: "json",
-                                success:function (res) {
-                                    layer.msg(res.msg);
-                                    table.reload('table-toolbar');
-                                }
-                            });
-                            layer.close(index);
-                        });
-
-                        submit.trigger('click');
-                    }
+                    ,area: ['450px', '500px']
                 });
             }
         };
@@ -123,30 +99,7 @@
                     type: 2
                     ,title: '修改流程'
                     ,content: "{:url('system.flow/create', [], false)}/id/"+data.id
-                    ,area: ['450px', '450px']
-                    ,btn: ['确定', '取消']
-                    ,yes: function(index, layero){
-                        var iframeWindow = window['layui-layer-iframe'+ index]
-                            ,submitID = 'layer-submit'
-                            ,submit = layero.find('iframe').contents().find('#'+ submitID);
-                        //监听提交
-                        iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
-                            var field = data.field;
-                            $.ajax({
-                                url: "{:url('system.flow/save')}",
-                                data:field,
-                                method: "POST",
-                                dataType: "json",
-                                success:function (res) {
-                                    layer.msg(res.msg);
-                                    table.reload('table-toolbar');
-                                }
-                            });
-                            layer.close(index);
-                        });
-
-                        submit.trigger('click');
-                    }
+                    ,area: ['450px', '500px']
                 });
             }else if(obj.event==='step'){
                 layer.open({
@@ -154,29 +107,6 @@
                     ,title: '步骤管理'
                     ,content: "{:url('system.flow/step',[], false)}/flow_id/"+data.id
                     ,area: ['90%', '90%']
-                    // ,btn: ['确定', '取消']
-                    ,yes: function(index, layero){
-                        var iframeWindow = window['layui-layer-iframe'+ index]
-                            ,submitID = 'layer-submit'
-                            ,submit = layero.find('iframe').contents().find('#'+ submitID);
-                        //监听提交
-                        iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
-                            var field = data.field;
-                            $.ajax({
-                                url: "{:url('system.flow/stepSave')}",
-                                data:field,
-                                method: "POST",
-                                dataType: 'json',
-                                success:function (res) {
-                                    layer.msg(res.msg);
-                                    table.reload('table-toolbar');
-                                }
-                            });
-                            layer.close(index);
-                        });
-
-                        submit.trigger('click');
-                    }
                 });
             }
         });

@@ -6,7 +6,7 @@
     <div class="layui-row layui-col-space15">
         <div class="layui-col-md12">
             <div class="layui-card">
-                <div class="layui-card-header">文章管理</div>
+                <!--<div class="layui-card-header">文章管理</div>-->
                 <div class="layui-card-body layui-form">
                     <div class="event-btns" style="margin-bottom: 10px;">
                         <button class="layui-btn layui-btn-danger" data-type="add"><i class="fa fa-plus-circle"></i> 添加文章</button>
@@ -27,11 +27,6 @@
 
                     <table class="layui-hide" id="table-toolbar" lay-filter="table-toolbar"></table>
 
-                    <script type="text/html" id="table-toolbar-barDemo">
-                        <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="view">查看详情</a>
-                        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
-                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
-                    </script>
                     <script id="table2toolMenu" type="text/plain">
                     [
                       [{layIcon: 'layui-icon-read', txt: '查看详情', event:'detail'}]
@@ -68,7 +63,7 @@
         table.render({
             elem: '#table-toolbar'
             ,url: "{:url('article.article/getData')}"
-            ,toolbar: '#table-toolbar-toolbarDemo'
+            ,toolbar: false
             ,title: '数据表'
             ,cols: [[
                 {field:'id', title:'ID', width:80}

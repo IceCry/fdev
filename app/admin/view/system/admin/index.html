@@ -6,10 +6,9 @@
     <div class="layui-row layui-col-space15">
         <div class="layui-col-md12">
             <div class="layui-card">
-                <div class="layui-card-header">管理员管理</div>
                 <div class="layui-card-body layui-form">
                     <div class="event-btns" style="margin-bottom: 10px;">
-                        <button class="layui-btn layui-btn-danger" data-type="add"><i class="fa fa-plus-circle"></i> 添加管理员</button>
+                        <button class="layui-btn layui-btn-sm layui-btn-danger" data-type="add"><i class="fa fa-plus-circle"></i> 添加管理员</button>
                         <!--<div class="layui-inline">
                             <input class="layui-input" name="keyword" id="keyword" autocomplete="off" v-model="where.keyword" placeholder="按关键词搜索">
                         </div>
@@ -49,16 +48,16 @@
         table.render({
             elem: '#table-toolbar'
             ,url: "{:url('system.admin/getData')}"
-            ,toolbar: '#table-toolbar-toolbarDemo'
+            ,toolbar: false
             ,title: '数据表'
             ,cols: [[
-                {field:'id', title:'ID', width:80}
-                ,{field:'account', title:'登录帐号', width:200}
-                ,{field:'name', title:'姓名', width:180}
-                ,{field:'phone', title:'手机号', width:200}
-                ,{field:'role_str', title:'角色', minWidth:200}
-                ,{field:'last_ip', title:'上次登录IP', width: 180}
-                ,{field:'last_time', title:'上次登录时间', width: 180}
+                {field:'id', title:'ID', width:60}
+                ,{field:'account', title:'登录帐号', width:150}
+                ,{field:'name', title:'姓名', width:120}
+                ,{field:'phone', title:'手机号', width:120}
+                ,{field:'role_str', title:'角色', minWidth:140}
+                ,{field:'last_ip', title:'上次登录IP', width: 140}
+                ,{field:'last_time', title:'上次登录时间', width: 170}
                 ,{field:'status', title:'状态', width:100, templet:function (d) {
                     if(d.status==1){
                         return '<input type="checkbox" name="status" data-id="'+d.id+'" value="1" lay-filter="isCheck" lay-skin="switch" lay-text="ON|OFF" checked>';
@@ -66,7 +65,7 @@
                         return '<input type="checkbox" name="status" data-id="'+d.id+'" value="0" lay-filter="isCheck" lay-skin="switch" lay-text="ON|OFF">';
                     }
                 }}
-                ,{title:'操作', toolbar: '#table-toolbar-barDemo', width:200}
+                ,{title:'操作', toolbar: '#table-toolbar-barDemo', width:120}
             ]]
             ,page: true
             ,limit: 20

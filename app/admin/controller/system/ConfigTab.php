@@ -9,11 +9,13 @@
 namespace app\admin\controller\system;
 
 use app\admin\controller\AuthController;
+use FormBuilder\Factory\Elm;
 use sensen\services\JsonService;
 use app\models\system\{
     Config as ConfigModel, ConfigTab as ConfigTabModel
 };
 use sensen\services\UtilService;
+use think\facade\Route;
 
 class ConfigTab extends AuthController
 {
@@ -27,18 +29,32 @@ class ConfigTab extends AuthController
         return JsonService::successlayui(ConfigTabModel::getConfigTabData());
     }
 
-    public function add()
-    {
-        return $this->fetch();
-    }
 
-    public function edit($id=0)
+    public function create($id=0)
     {
-        $info = ConfigTabModel::get($id);
-        $this->assign([
-            'info'=>$info
-        ]);
-        return $this->fetch();
+        if($id>0){
+            $info = ConfigTabModel::get($id);
+            $title = $info['title'];
+            $enTitle = $info['en_title'];
+            $intro = $info['info'];
+            $status = $info['status'];
+        }else{
+            $title = $enTitle = $intro = '';
+            $status = 1;
+        }
+        $title = Elm::input('title', '分类名称', $title)->required()->maxlength(45);
+        $enTitle = Elm::input('en_title', '英文名称', $enTitle)->maxlength(45);
+        $info = Elm::input('info', '描述', $intro)->maxlength(255);
+        $status = Elm::radio('status', '状态', $status);
+        $status->options(function(){
+            $options = [['value'=>1, 'label'=>'显示'], ['value'=>0, 'label'=>'禁用']];
+            return $options;
+        });
+        $id = Elm::hidden('id', $id);
+        $form = Elm::createForm(Route::buildUrl('save'))->setMethod('POST');
+        $form->setRule([$title, $enTitle, $info, $status, $id]);
+        $this->assign(compact('form'));
+        return $this->fetch('public/form-builder');
     }
 
     public function save()
@@ -49,6 +65,7 @@ class ConfigTab extends AuthController
             ['title', ''],
             ['en_title', ''],
             ['info', ''],
+            ['status', 1],
             ['icon', '']
         ]);
         $id = $data['id'];
@@ -106,22 +123,50 @@ class ConfigTab extends AuthController
     }
 
     /**
-     * 新增配置字段
+     * 新增配置项
+     * @param int $id
+     * @param int $config_tab_id
      * @return string
+     * @throws \FormBuilder\Exception\FormBuilderException
      */
-    public function addItem()
+    public function createItem($id=0, $config_tab_id=0)
     {
-        return $this->fetch();
-    }
+        if($id>0){
+            $info = ConfigModel::get($id);
+            $name = $info['info'];
+            $menuName = $info['menu_name'];
+            $type = $info['type'];
+            $desc = $info['desc'];
+            $value = json_decode($info['value']);
+        }else{
+            $name = $menuName = $desc = $value = '';
+            $type = 'text';
+        }
+        $name = Elm::input('info', '配置名称', $name)->required()->maxlength(45);
+        $menuName = Elm::input('menu_name', '字段变量', $menuName)->required()->maxlength(45);
+        $type = Elm::select('type', '数据类型', $type)->required();
+        $type->options(function(){
+            $options = [
+                ['value'=>'text', 'label'=>'文本框'],
+                ['value'=>'textarea', 'label'=>'多行文本框'],
+                ['value'=>'radio', 'label'=>'单选'],
+                ['value'=>'checkbox', 'label'=>'多选'],
+                ['value'=>'select', 'label'=>'下拉'],
+                ['value'=>'image', 'label'=>'图片'],
+                ['value'=>'date', 'label'=>'日期'],
+                ['value'=>'area', 'label'=>'地域'],
+            ];
+            return $options;
+        });
 
-    public function editItem($id=0)
-    {
-        $info = ConfigModel::get($id);
-        $info['value'] = json_decode($info['value']);
-        $this->assign([
-            'info'=>$info
-        ]);
-        return $this->fetch();
+        $desc = Elm::input('desc', '描述', $desc)->maxlength(255);
+        $value = Elm::input('value', '默认值', $value);
+        $id = Elm::hidden('id', $id);
+        $configTabId = Elm::hidden('config_tab_id', $config_tab_id);
+        $form = Elm::createForm(Route::buildUrl('saveItem'))->setMethod('POST');
+        $form->setRule([$name, $menuName, $type, $desc, $value, $id, $configTabId]);
+        $this->assign(compact('form'));
+        return $this->fetch('public/form-builder');
     }
 
     /**

@@ -8,7 +8,7 @@
             <div class="layui-card">
                 <div class="layui-card-body layui-form">
                     <div class="event-btns" style="margin-bottom: 10px;">
-                        <button class="layui-btn layui-btn-danger" data-type="add"><i class="fa fa-plus-circle"></i> 添加分类</button>
+                        <button class="layui-btn layui-btn-sm layui-btn-danger" data-type="add"><i class="fa fa-plus-circle"></i> 添加分类</button>
                     </div>
 
                     <table class="layui-hide" id="table-toolbar" lay-filter="table-toolbar"></table>
@@ -51,7 +51,7 @@
                 ,treeLinkage: true
                 ,elem: '#table-toolbar'
                 ,url: "{:url('article.articleCate/getData')}"
-                ,toolbar: '#table-toolbar-toolbarDemo'
+                ,toolbar: false
                 ,title: '数据表'
                 ,cols: [[
                     {field:'id', title:'ID', width:80}
@@ -85,7 +85,7 @@
                     type: 2
                     ,title: '新增分类'
                     ,content: "{:url('article.articleCate/create')}"
-                    ,area: ['600px', '450px']
+                    ,area: ['500px', '400px']
                 });
             }
         };
@@ -135,14 +135,14 @@
                     type: 2
                     ,title: '修改分类'
                     ,content: "{:url('article.articleCate/create',[], false)}/id/"+data.id
-                    ,area: ['1000px', '700px']
+                    ,area: ['500px', '400px']
                 });
             }else if(obj.event === 'son'){
                 layer.open({
                     type: 2
                     ,title: '新增分类'
                     ,content: "{:url('article.articleCate/create', [], false)}/pid/"+data.id
-                    ,area: ['1000px', '700px']
+                    ,area: ['500px', '400px']
                 });
             }
         });

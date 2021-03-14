@@ -10,10 +10,12 @@ namespace app\admin\controller\system;
 
 use app\admin\controller\AuthController;
 use app\admin\model\system\FlowStep;
+use FormBuilder\Factory\Elm;
 use sensen\services\JsonService;
 use app\admin\model\system\Flow as FlowModel;
 use sensen\services\UtilService;
 use think\facade\Db;
+use think\facade\Route;
 
 class Flow extends AuthController
 {
@@ -29,15 +31,39 @@ class Flow extends AuthController
 
     public function create($id=0)
     {
-        $types = $this->getDataValue('flow_type');
-
-        $info = [];
-        if($id){
-            $info = FlowModel::where('id', $id)->find()->toArray();
+        if($id>0){
+            $info = FlowModel::get($id);
+            $name = $info['name'];
+            $type = $info['type'];
+            $intro = $info['intro'];
+            $number = $info['prefix_num'];
+            $restartMode = intval($info['restart_mode']);
+            $status = intval($info['status']);
+        }else{
+            $name = $type = $intro = $number = '';
+            $restartMode = 0;
+            $status = 1;
         }
+        $name = Elm::input('name', '流程名称', $name)->required()->maxlength(45);
+        $type = Elm::input('type', '唯一标识', $type)->required()->maxlength(15);
+        $intro = Elm::input('intro', '流程简介', $intro);
+        $number = Elm::input('prefix_num', '编号规则', $number);
+        $restartMode = Elm::radio('restart_mode', '修改模式', $restartMode);
+        $restartMode->options(function(){
+            $options = [['value'=>0, 'label'=>'重走流程'], ['value'=>1, 'label'=>'继续向下']];
+            return $options;
+        });
+        $status = Elm::radio('status', '状态', $status);
+        $status->options(function(){
+            $options = [['value'=>1, 'label'=>'显示'], ['value'=>0, 'label'=>'禁用']];
+            return $options;
+        });
+        $id = Elm::hidden('id', $id);
+        $form = Elm::createForm(Route::buildUrl('save'))->setMethod('POST');
+        $form->setRule([$name, $type, $intro, $number, $restartMode, $status, $id]);
+        $this->assign(compact('form'));
+        return $this->fetch('public/form-builder');
 
-        $this->assign(['types'=>$types, 'info'=>$info]);
-        return $this->fetch();
     }
 
     public function save()
@@ -171,6 +197,7 @@ class Flow extends AuthController
         $checker = $this->getDataValue('flow_checker');
         //获取部门及id
         $dept = Db::name('lawfirm_dept')->where(['type'=>1, 'delete_time'=>0, 'status'=>1])->field('id, name')->select();
+        $dept = [];
 
         //获取角色及id
         $role = Db::name('auth_group')->where(['delete_time'=>0, 'status'=>1])->field('id, title')->select();

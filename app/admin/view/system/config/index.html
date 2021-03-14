@@ -5,11 +5,11 @@
 <body>
 <div class="layui-fluid" id="LAY-app-message">
     <div class="layui-card">
-        <form class="layui-form layui-tab layui-tab-brief">
+        <form class="layui-form layui-tab layui-tab-brief" lay-filter="hash">
 
             <ul class="layui-tab-title">
                 {foreach $tabs as $key=>$item}
-                <li {if condition="$key eq 0"}class="layui-this"{/if}>{$item.title}</li>
+                <li {if condition="$key eq 0"}class="layui-this"{/if} lay-id="{$key}">{$item.title}</li>
                 {/foreach}
             </ul>
             <div class="layui-tab-content layui-card">
@@ -62,9 +62,10 @@
         base: '{__LAYUI_PATH}' //静态资源所在路径
     }).extend({
         index: 'lib/index' //主入口模块
-    }).use(['index', 'form', 'laydate'], function(){
+    }).use(['index', 'form', 'laydate', 'element'], function(){
         var $ = layui.$
             ,laydate = layui.laydate
+            ,element = layui.element
             ,form = layui.form;
 
         lay('.ss-date').each(function(){
@@ -90,6 +91,14 @@
                 }
             });
             return false;
+        });
+
+        //Hash地址的定位
+        var layid = location.hash.replace(/^#hash=/, '');
+        element.tabChange('hash', layid);
+
+        element.on('tab(hash)', function(elem){
+            location.hash = 'hash='+ $(this).attr('lay-id');
         });
     });
 </script>

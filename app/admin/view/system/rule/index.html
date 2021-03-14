@@ -6,10 +6,9 @@
     <div class="layui-row layui-col-space15">
         <div class="layui-col-md12">
             <div class="layui-card">
-                <div class="layui-card-header">权限管理</div>
                 <div class="layui-card-body layui-form">
                     <div class="event-btns" style="margin-bottom: 10px;">
-                        <button class="layui-btn layui-btn-danger" data-type="add"><i class="fa fa-plus-circle"></i> 添加权限</button>
+                        <button class="layui-btn layui-btn-sm layui-btn-danger" data-type="add"><i class="fa fa-plus-circle"></i> 添加权限</button>
                     </div>
 
                     <table class="layui-hide" id="table-toolbar" lay-filter="table-toolbar"></table>
@@ -55,31 +54,31 @@
                 ,toolbar: '#table-toolbar-toolbarDemo'
                 ,title: '权限数据表'
                 ,cols: [[
-                    {type:'numbers', title:'序号', width:100, unresize: true}
-                    ,{field:'is_menu', title:'菜单', width:80, templet:function (d) {
-                            if(d.is_menu==1){
-                                return "<i class='fa fa-"+d.ico+"'>";
-                            }else{
-                                return '';
-                            }
-                        }}
-                    ,{field:'title', title:'权限名', width:300}
+                    {type:'numbers', title:'序号', width:80, unresize: true}
+                    ,{field:'is_menu', title:'菜单', width:70, templet:function (d) {
+                        if(d.is_menu==1){
+                            return "<i class='fa fa-"+d.ico+"'>";
+                        }else{
+                            return '';
+                        }
+                    }}
+                    ,{field:'title', title:'权限名', width:200}
                     ,{field:'name', title:'权限', minWidth:200}
-                    ,{field:'is_check', title:'验证', templet:function (d) {
-                            if(d.is_check==1){
-                                return '<input type="checkbox" name="yyy" data-id="'+d.id+'" value="1" lay-filter="isCheck" lay-skin="switch" lay-text="ON|OFF" checked>';
-                            }else{
-                                return '<input type="checkbox" name="yyy" data-id="'+d.id+'" value="0" lay-filter="isCheck" lay-skin="switch" lay-text="ON|OFF">';
-                            }
-                        }}
-                    ,{field:'status', title:'是否开启', templet:function (d) {
-                            if(d.status==1){
-                                return '<input type="checkbox" name="status" data-id="'+d.id+'" value="1" lay-filter="isStatus" lay-skin="switch" lay-text="ON|OFF" checked>';
-                            }else{
-                                return '<input type="checkbox" name="status" data-id="'+d.id+'" value="0" lay-filter="isStatus" lay-skin="switch" lay-text="ON|OFF">';
-                            }
-                        }}
-                    ,{title:'操作', toolbar: '#table-toolbar-barDemo', width:250}
+                    ,{field:'is_check', title:'验证', width:120, templet:function (d) {
+                        if(d.is_check==1){
+                            return '<input type="checkbox" name="yyy" data-id="'+d.id+'" value="1" lay-filter="isCheck" lay-skin="switch" lay-text="ON|OFF" checked>';
+                        }else{
+                            return '<input type="checkbox" name="yyy" data-id="'+d.id+'" value="0" lay-filter="isCheck" lay-skin="switch" lay-text="ON|OFF">';
+                        }
+                    }}
+                    ,{field:'status', title:'是否开启', width:120, templet:function (d) {
+                        if(d.status==1){
+                            return '<input type="checkbox" name="status" data-id="'+d.id+'" value="1" lay-filter="isStatus" lay-skin="switch" lay-text="ON|OFF" checked>';
+                        }else{
+                            return '<input type="checkbox" name="status" data-id="'+d.id+'" value="0" lay-filter="isStatus" lay-skin="switch" lay-text="ON|OFF">';
+                        }
+                    }}
+                    ,{title:'操作', toolbar: '#table-toolbar-barDemo', width:200}
                 ]],
                 done: function () {
                     layer.closeAll('loading');

@@ -6,10 +6,9 @@
     <div class="layui-row layui-col-space15">
         <div class="layui-col-md12">
             <div class="layui-card">
-                <div class="layui-card-header">数据组管理</div>
                 <div class="layui-card-body layui-form">
                     <div class="event-btns" style="margin-bottom: 10px;">
-                        <button class="layui-btn layui-btn-danger" data-type="add">添加数据组</button>
+                        <button class="layui-btn layui-btn-sm layui-btn-danger" data-type="add"><i class="fa fa-plus-circle"></i> 添加数据组</button>
                     </div>
 
                     <table class="layui-hide" id="table-toolbar" lay-filter="table-toolbar"></table>
@@ -41,7 +40,7 @@
         table.render({
             elem: '#table-toolbar'
             ,url: "{:url('system.dataGroup/getData')}"
-            ,toolbar: '#table-toolbar-toolbarDemo'
+            ,toolbar: false
             ,title: '数据表'
             ,cols: [[
                 {field:'id', title:'ID', width:80, unresize: true, sort: true}

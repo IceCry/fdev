@@ -6,7 +6,6 @@
     <div class="layui-row layui-col-space15">
         <div class="layui-col-md12">
             <div class="layui-card">
-                <div class="layui-card-header">用户管理</div>
                 <div class="layui-card-body layui-form">
                     <div class="event-btns" style="margin-bottom: 10px;">
                         <div class="layui-inline">
@@ -40,12 +39,14 @@
                         <img style="cursor: pointer" lay-event="open_image" src="{{d.avatar}}">
                     </script>
 
-                    <script type="text/html" id="table-toolbar-barDemo">
-                        <a class="layui-btn layui-btn-xs" lay-event="bid">出价记录</a>
-                        <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="deposit">保证金明细</a>
-                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="order">订单列表</a>
-                        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="info">个人信息</a>
+                    <script id="table2toolMenu" type="text/plain">
+                    [
+                      [{layIcon: 'layui-icon-read', txt: '查看详情', event:'detail'}]
+                      [{layIcon: 'layui-icon-form', txt: '订单列表', event:'order'}]
+                      [{layIcon: 'layui-icon-edit', txt: '编辑', event:'edit'}]
+                    ]
                     </script>
+
                 </div>
             </div>
         </div>
@@ -68,7 +69,7 @@
         table.render({
             elem: '#table-toolbar'
             ,url: "{:url('user.user/getData')}"
-            ,toolbar: '#table-toolbar-toolbarDemo'
+            ,toolbar: false
             ,title: '数据表'
             ,cols: [[
                 {field:'id', title:'ID', width:80, unresize: true, sort: true}
@@ -94,9 +95,16 @@
                 }}
                 ,{title:'操作', toolbar: '#table-toolbar-barDemo', width:320}
             ]]
-            ,autoSort: false
             ,page: true
             ,limit: 20
+            ,autoSort: false
+            ,done:function (res) {
+                for (var i = 0; i < res.data.length; i++) {
+                    dropdown.suite("#layuidropdown_" + res.data[i].id, {
+                        data: res.data[i]
+                    });
+                }
+            }
         });
 
         var active = {

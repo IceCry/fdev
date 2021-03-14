@@ -8,7 +8,7 @@
             <div class="layui-card">
                 <div class="layui-card-body layui-form">
                     <div class="event-btns" style="margin-bottom: 10px;">
-                        <button class="layui-btn layui-btn-danger" data-type="add">添加配置</button>
+                        <button class="layui-btn layui-btn-sm layui-btn-danger" data-type="add"><i class="fa fa-plus-circle"></i> 添加配置</button>
                     </div>
 
                     <table class="layui-hide" id="table-toolbar" lay-filter="table-toolbar"></table>
@@ -40,23 +40,23 @@
         table.render({
             elem: '#table-toolbar'
             ,url: "{:url('system.configTab/getItemsData', [], '')}/id/"+ct_id
-            ,toolbar: '#table-toolbar-toolbarDemo'
+            ,toolbar: false
             ,title: '数据表'
             ,cols: [[
-                {field:'id', title:'ID', width:80}
-                ,{field:'info', title:'配置名称', width:150}
-                ,{field:'menu_name', title:'字段变量', width:150}
-                ,{field:'type', title:'字段类型', width: 150}
-                ,{field:'desc', title:'描述', width: 180}
+                {field:'id', title:'ID', width:60}
+                ,{field:'info', title:'配置名称', width:120}
+                ,{field:'menu_name', title:'字段变量', width:120}
+                ,{field:'type', title:'字段类型', width: 90}
+                ,{field:'desc', title:'描述', width: 160}
                 ,{field:'value', title:'值', minWidth: 200}
-                ,{field:'status', title:'状态', width:120, templet:function (d) {
+                ,{field:'status', title:'状态', width:100, templet:function (d) {
                     if(d.status==1){
                         return '<input type="checkbox" name="status" data-id="'+d.id+'" value="1" lay-filter="isCheck" lay-skin="switch" lay-text="ON|OFF" checked>';
                     }else{
                         return '<input type="checkbox" name="status" data-id="'+d.id+'" value="0" lay-filter="isCheck" lay-skin="switch" lay-text="ON|OFF">';
                     }
                 }}
-                ,{title:'操作', toolbar: '#table-toolbar-barDemo', width:150}
+                ,{title:'操作', toolbar: '#table-toolbar-barDemo', width:120}
             ]]
             // ,page: true
         });
@@ -66,31 +66,8 @@
                 layer.open({
                     type: 2
                     ,title: '新增配置'
-                    ,content: "{:url('system.configTab/addItem', [], '')}/id/"+ct_id
-                    ,area: ['500px', '400px']
-                    ,btn: ['确定', '取消']
-                    ,yes: function(index, layero){
-                        var iframeWindow = window['layui-layer-iframe'+ index]
-                            ,submitID = 'layer-submit'
-                            ,submit = layero.find('iframe').contents().find('#'+ submitID);
-                        //监听提交
-                        iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
-                            var field = data.field;
-                            $.ajax({
-                                url: "{:url('system.configTab/saveItem')}",
-                                data:field,
-                                method: "POST",
-                                dataType: 'json',
-                                success:function (res) {
-                                    layer.msg(res.msg);
-                                    table.reload('table-toolbar');
-                                }
-                            });
-                            layer.close(index);
-                        });
-
-                        submit.trigger('click');
-                    }
+                    ,content: "{:url('system.configTab/createItem', [], '')}/config_tab_id/"+ct_id
+                    ,area: ['500px', '450px']
                 });
             }
         };
@@ -122,31 +99,8 @@
                 layer.open({
                     type: 2
                     ,title: '修改配置'
-                    ,content: "{:url('system.configTab/editItem',[],'')}/id/"+data.id
-                    ,area: ['500px', '400px']
-                    ,btn: ['确定', '取消']
-                    ,yes: function(index, layero){
-                        var iframeWindow = window['layui-layer-iframe'+ index]
-                            ,submitID = 'layer-submit'
-                            ,submit = layero.find('iframe').contents().find('#'+ submitID);
-                        //监听提交
-                        iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
-                            var field = data.field;
-                            $.ajax({
-                                url: "{:url('system.configTab/saveItem')}",
-                                data:field,
-                                method: "POST",
-                                dataType: 'json',
-                                success:function (res) {
-                                    layer.msg(res.msg);
-                                    table.reload('table-toolbar');
-                                }
-                            });
-                            layer.close(index);
-                        });
-
-                        submit.trigger('click');
-                    }
+                    ,content: "{:url('system.configTab/createItem',[],'')}/id/"+data.id+'/config_tab_id/'+ct_id
+                    ,area: ['500px', '450px']
                 });
             }
         });
