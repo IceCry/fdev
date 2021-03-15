@@ -196,7 +196,6 @@ class Flow extends AuthController
         //审核人员类型
         $checker = $this->getDataValue('flow_checker');
         //获取部门及id
-        $dept = Db::name('lawfirm_dept')->where(['type'=>1, 'delete_time'=>0, 'status'=>1])->field('id, name')->select();
         $dept = [];
 
         //获取角色及id
@@ -415,7 +414,7 @@ class Flow extends AuthController
         $data = [];
         if($type=='user'){
             //获取所有部门 分类展示用户
-            $depts = Db::name('lawfirm_dept')->where(['type'=>1, 'delete_time'=>0, 'status'=>1])->field('id, name')->select();
+            $depts = [];
             foreach ($depts as $k=>$v){
                 $tmpArr = [];
                 $tmpUser = Db::name('user')->where(['dept_id'=>$v['id'],'delete_time'=>0, 'status'=>1])->field('id as value, name')->select()->toArray();

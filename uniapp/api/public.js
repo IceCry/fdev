@@ -92,13 +92,6 @@ export function copyWords() {
 }
 
 /**
- * 获取商城是否强制绑定手机号
- */
-export function getShopConfig() {
-	return request.get('v2/bind_status' ,{} ,{noAuth : true});
-}
-
-/**
  * 小程序绑定手机号
  * @param {Object} data
  */

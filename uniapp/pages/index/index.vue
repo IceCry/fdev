@@ -1,25 +1,25 @@
 <template>
 	<view>
-		<!-- #ifdef H5 -->
-
-		<!-- #endif -->
-		<!-- #ifdef MP -->
-
-		<!-- #endif -->
+		<view class="u-flex u-row-center u-margin-60">
+			<image src="/static/images/support.png" mode="widthFix"></image>
+		</view>
+		
+		<view class="u-text-center">
+			<text>仅供演示，请删除pages自行创建文件。完整项目地址：https://github.com/IceCry/fdev</text>
+		</view>
 	</view>
 </template>
 
 <script>
-import couponWindow from '@/components/couponWindow/index';
 import { SUBSCRIBE_MESSAGE } from '@/config/cache';
 import authorize from '@/components/Authorize.vue';
 import { getTemlIds } from '@/api/api.js';
+import { getShare } from '@/api/public.js';
 import { mapGetters } from 'vuex';
 let app = getApp();
 export default {
 	computed: mapGetters(['isLogin', 'uid']),
 	components: {
-		couponWindow,
 		authorize,
 	},
 	data() {
@@ -35,7 +35,7 @@ export default {
 		};
 	},
 	onLoad(options) {
-		uni.getLocation({
+		/* uni.getLocation({
 			type: 'wgs84',
 			success: function(res) {
 				try {
@@ -43,20 +43,11 @@ export default {
 					uni.setStorageSync('user_longitude', res.longitude);
 				} catch {}
 			}
-		});
-		this.getIndexData();
-		this.setOpenShare();
-		// #ifdef H5
-		window.addEventListener('message', this.handleMessageFromParent, false);
-		if (app.globalData.isIframe) {
-			uni.hideTabBar();
-		}
-		// #endif
-		// #ifdef MP
-		this.getTemlIds();
-		// #endif
+		}); */
+		//this.getIndexData();
+		//this.setOpenShare();
+		//this.getTemlIds();
 	},
-	// #ifdef MP
 	//发送给朋友
 	onShareAppMessage: function() {
 		// 此处的distSource为分享者的部分信息，需要传递给其他人
@@ -74,21 +65,14 @@ export default {
 			imageUrl: this.storeInfo.img
 		};
 	},
-	// #endif
 	onShow() {
-		if (!app.globalData.isIframe) {
-			uni.showTabBar();
-			if (this.isLogin) {
-				this.getCoupon();
-			}
-		}
+		
 	},
 	methods: {
 		// 授权关闭
 		authColse: function(e) {
 			this.isShowAuth = e;
 		},
-		// #ifdef MP
 		getTemlIds() {
 			let messageTmplIds = wx.getStorageSync(SUBSCRIBE_MESSAGE);
 			if (!messageTmplIds) {
@@ -97,30 +81,7 @@ export default {
 				});
 			}
 		},
-		// #endif
 		onLoadFun() {},
-		// #ifdef H5
-		handleMessageFromParent(event) {
-			var data = event.data;
-			// console.log(event.data,'handleMessageFromParent')
-		},
-		// #endif
-		// 对象转数组
-		objToArr(data) {
-			for (let name in data) {
-				if (name === "z_tabBar") {
-					app.globalData.tabbarShow = data[name].isShow.val;
-					break;
-				}
-			}
-			let obj = Object.keys(data);
-
-			let m = obj.map(function(key) {
-				data[key].name = key;
-				return data[key];
-			});
-			return m;
-		},
 		getIndexData() {
 			let self = this;
 			getIndexData().then(res => {

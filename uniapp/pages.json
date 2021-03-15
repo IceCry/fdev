@@ -6,11 +6,8 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "首页",
-				"navigationStyle": "custom",
-				"app-plus": {
-					"scrollIndicator": false //禁用原生导航栏
-				}
+				"navigationBarTitleText": "首页"
+				// ,"navigationStyle": "custom"
 			}
 		},
 		{
@@ -62,6 +59,32 @@
 		"navigationBarBackgroundColor": "#fff",
 		"backgroundColor": "#F8F8F8",
 		"titleNView": false
+	},
+	"tabBar": {
+		"backgroundColor": "#ffffff",
+		"color": "#282828",
+		"selectedColor": "#e93323",
+		"borderStyle": "white",
+		"list": [
+			{
+				"pagePath": "pages/index/index",
+				"iconPath": "static/images/1-001.png",
+				"selectedIconPath": "static/images/1-002.png",
+				"text": "首页"
+			},
+			{
+				"pagePath": "pages/category/category",
+				"iconPath": "static/images/2-001.png",
+				"selectedIconPath": "static/images/2-002.png",
+				"text": "分类"
+			},
+			{
+				"pagePath": "pages/user/index",
+				"iconPath": "static/images/4-001.png",
+				"selectedIconPath": "static/images/4-002.png",
+				"text": "我的"
+			}
+		]
 	},
 	"condition": { //模式配置，仅开发期间生效
 		"current": 0, //当前激活的模式(list 的索引项)

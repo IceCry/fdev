@@ -45,7 +45,7 @@ export default {
 	},
 	data() {
 		return {
-			logoUrl: '',
+			logoUrl: '/static/images/avatar.jpg',
 			authKey: ''
 		};
 	},

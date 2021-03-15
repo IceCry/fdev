@@ -62,3 +62,11 @@ export function getTemlIds()
 {
   return request.get('wechat/teml_ids', {}, { noAuth:true});
 }
+
+/**
+ * 获取分类信息
+ */
+export function getCategoryList()
+{
+	return request.get('category_list', {}, { noAuth:true});
+}

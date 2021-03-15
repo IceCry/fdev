@@ -5,7 +5,6 @@ import WechatJSSDK from "@/plugin/jweixin-module/index.js";
 import {
 	getWechatConfig,
 	wechatAuth,
-	getShopConfig,
 	wechatAuthV2
 } from "@/api/public";
 import {

@@ -1,7 +1,7 @@
 <script>
 import { checkLogin } from './libs/login';
 import { HTTP_REQUEST_URL } from './config/app';
-import { getShopConfig, silenceAuth } from '@/api/public';
+import { silenceAuth } from '@/api/public';
 import Auth from './libs/wechat.js';
 import Routine from './libs/routine.js';
 export default {
@@ -46,9 +46,6 @@ export default {
 			}
 		}
 		// #endif
-		getShopConfig().then(res => {
-			this.$store.commit('SETPHONESTATUS', res.data.status);
-		});
 		// 获取导航高度；
 		uni.getSystemInfo({
 			success: function(res) {
@@ -123,13 +120,13 @@ export default {
 		// 小程序静默授权
 		console.log(this.$store.getters.isLogin, 'this.$store');
 		if (!this.$store.getters.isLogin) {
-			Routine.getCode()
+			/* Routine.getCode()
 				.then(code => {
 					this.silenceAuth(code);
 				})
 				.catch(res => {
 					uni.hideLoading();
-				});
+				}); */
 		}
 		// #endif
 	},

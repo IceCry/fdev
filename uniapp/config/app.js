@@ -1,6 +1,6 @@
 module.exports = {
 	// #ifdef MP
-	HTTP_REQUEST_URL: '',// 请求域名 格式： https://您的域名
+	HTTP_REQUEST_URL: 'https://blog.r1989.com',// 请求域名 格式： https://您的域名
 	VUE_APP_WS_URL: ``,// 客服域名 格式： ws://您的域名：20003
 	// #endif
 

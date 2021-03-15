@@ -38,20 +38,14 @@
 			</scroll-view>
 		</view>
 		<view class="uni-p-b-98"></view>
-		<z_tabBar :pagePath="'/pages/goods_cate/goods_cate'" @tabbar-h="tabbarH = $event"></z_tabBar>
 	</view>
 </template>
 
 <script>
-	import z_tabBar from "@/pages/index/components/z_tabBar.vue";
 	import {
 		getCategoryList
-	} from '@/api/store.js';
-	// import z_tabBar from './components/z_tabBar';
+	} from '@/api/api.js';
 	export default {
-		components:{
-			z_tabBar
-		},
 		data() {
 			return {
 				navlist: [],

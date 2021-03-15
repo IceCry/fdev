@@ -7,22 +7,13 @@
 				<view class="user-info">
 					<view :class="{headwear: userInfo.is_money_level}">
 						<!-- 注释这个是加的bnt -->
-						<!-- #ifdef H5 -->
-						<button class="bntImg" v-if="userInfo.is_complete == 0 && isWeixin" @click="getWechatuserinfo">
-							<!-- <button class="bntImg" @click="getWechatuserinfo"> -->
-							<image class="avatar" src='/static/images/f.png'></image>
-							<view class="avatarName">获取头像</view>
-						</button>
-						<!-- #endif -->
-						<!-- #ifdef MP -->
 						<button class="bntImg" v-if="userInfo.is_complete == 0" open-type='getUserInfo' @getuserinfo="getRoutineUserInfo">
-							<image class="avatar" src='/static/images/f.png'></image>
+							<image class="avatar" src='/static/images/avatar.jpg'></image>
 							<view class="avatarName">获取头像</view>
 						</button>
-						<!-- #endif -->
 						<view v-else>
 							<image class="avatar" :src='userInfo.avatar' v-if="userInfo.avatar" @click="goEdit()"></image>
-							<image v-else class="avatar" src="/static/images/f.png" mode="" @click="goEdit()"></image>
+							<image v-else class="avatar" src="/static/images/avatar.jpg" mode="" @click="goEdit()"></image>
 						</view>
 					</view>
 
@@ -50,110 +41,38 @@
 						<view class="phone" v-if="!userInfo.phone && isLogin" @tap="bindPhone">绑定手机号</view>
 					</view>
 				</view>
-				<!-- <view class="sign" @click="goSignIn">签到</view> -->
 			</view>
 			<view class="iconfont icon-shezhi" @click="goEdit()"></view>
 		</view>
 		<view class="main">
-			<navigator v-if="userInfo.is_open_member" url="/pages/annex/vip_paid/index" hover-class="none">
-				<view class="member-wrapper">
-					<view class="text">
-						<view>会员可享多项权益</view>
-						<template v-if="userInfo.is_money_level">
-							<view v-if="userInfo.pay_vip_status">
-								<view v-if="userInfo.is_ever_level" class="small">永久</view>
-								<view v-else class="small">会员到期 {{ userInfo.overdue_time | dateFormat }}</view>
-							</view>
-							<view v-else class="small">已过期</view>
-						</template>
-						<view v-else class="small">未开通会员</view>
-					</view>
-					<view class="link">{{ userInfo.overdue_time ? '立即续费' : '立即激活' }}</view>
-				</view>
-			</navigator>
 			<view class="num-wrapper">
-				<!-- <view class="num-item" v-if="userInfo.balance_func_status" @click="goMenuPage('/pages/users/user_money/index')">
-					<view class="txt">余额</view>
-					<text class="num">{{userInfo.now_money || 0}}</text>
-				</view> -->
-				<view class="num-item" @click="goMenuPage('/pages/users/user_goods_collection/index')">
+				<view class="num-item">
 					<view class="txt">收藏</view>
-					<text class="num">{{userInfo.collectCount || 0}}</text>
+					<text class="num">12</text>
 				</view>
-				<view class="num-item" @click="goMenuPage('/pages/users/user_integral/index')">
+				<view class="num-item">
 					<view class="txt">积分</view>
-					<text class="num">{{userInfo.integral || 0}}</text>
+					<text class="num">34</text>
 				</view>
-				<view class="num-item" @click="goMenuPage('/pages/users/user_coupon/index')">
+				<view class="num-item">
 					<view class="txt">优惠券</view>
-					<text class="num">{{userInfo.couponCount || 0}}</text>
+					<text class="num">56</text>
 				</view>
 			</view>
-			<view class="order-wrapper">
-				<view class="order-hd flex">
-					<view class="left">订单中心</view>
-					<navigator class="right flex" hover-class="none" url="/pages/users/order_list/index" open-type="navigate">
-						查看全部
-						<text class="iconfont icon-xiangyou"></text>
-					</navigator>
-				</view>
-				<view class="order-bd">
-					<block v-for="(item,index) in orderMenu" :key="index">
-						<navigator class="order-item" hover-class="none" :url="item.url">
-							<view class="pic">
-								<image :src="item.img" mode=""></image>
-								<text class="order-status-num" v-if="item.num > 0">{{ item.num }}</text>
-							</view>
-							<view class="txt">{{item.title}}</view>
-						</navigator>
-					</block>
-				</view>
-			</view>
-			<!-- 会员菜单 -->
-			<div style="margin-top: 20rpx; border-radius: 6rpx; overflow: hidden;">
-				<view class="title-box">我的服务</view>
-				<view class="user-menus">
-					<template v-for="(item, index) in MyMenus">
-						<view v-if="item.url !== '#' && item.url !== '/pages/service/index'" class="item" :key="index" @click="goMenuPage(item.url, item.name)">
-							<image :src="item.pic"></image>
-							<text>{{ item.name }}</text>
-						</view>
-					</template>
-					<!-- #ifdef H5 -->
-					<!-- <navigator class="item" url="/pages/customer_list/chat" hover-class="none">
-						<image src="/static/images/customer.png"></image>
-						<text>联系客服</text>
-					</navigator> -->
-					<!-- #endif -->
-					<!-- #ifdef MP -->
-					<!-- <button class="item" open-type='contact' hover-class='none'>
-						<image src="/static/images/customer.png"></image>
-						<text>联系客服</text>
-					</button> -->
-					<!-- #endif -->
-				</view>
-			</div>
 		</view>
-		<img src="/static/images/support.png" alt="" class='support'>
+		<img src="/static/images/support.png" class='support'>
 		<view style="height: 50rpx;"></view>
 		<!-- #ifdef MP -->
-		<!-- <authorize @onLoadFun="onLoadFun" :isAuto="isAuto" :isShowAuth="isShowAuth" @authColse="authColse"></authorize> -->
+		<authorize @onLoadFun="onLoadFun" :isAuto="isAuto" :isShowAuth="isShowAuth" @authColse="authColse"></authorize>
 		<!-- #endif -->
 		<view class="uni-p-b-98"></view>
-		<z_tabBar :pagePath="'/pages/user/index'"></z_tabBar>
 	</view>
 </template>
 <script>
-	import z_tabBar from "@/pages/index/components/z_tabBar.vue";
 	import {
-		getMenuList,
 		getUserInfo,
-		setVisit,
 		updateUserInfo
 	} from '@/api/user.js';
-	import {
-		wechatAuthV2
-	} from '@/api/public.js'
 	import {
 		toLogin
 	} from '@/libs/login.js';
@@ -161,52 +80,17 @@
 	import {
 		mapGetters
 	} from "vuex";
-	// #ifdef MP
 	import authorize from '@/components/Authorize';
-	// #endif
-	// #ifdef H5
-	import Auth from '@/libs/wechat';
-	// #endif
 	const app = getApp();
 	export default {
 		components: {
-			z_tabBar,
-			// #ifdef MP
 			authorize
-			// #endif
 		},
 		computed: {
 			...mapGetters(['isLogin'])
 		},
 		data() {
 			return {
-				orderMenu: [{
-						img: '/static/images/order1.png',
-						title: '待付款',
-						url: '/pages/users/order_list/index?status=0'
-					},
-					{
-						img: '/static/images/order2.png',
-						title: '待发货',
-						url: '/pages/users/order_list/index?status=1'
-					},
-					{
-						img: '/static/images/order3.png',
-						title: '待收货',
-						url: '/pages/users/order_list/index?status=2'
-					},
-					{
-						img: '/static/images/order4.png',
-						title: '待评价',
-						url: '/pages/users/order_list/index?status=3'
-					},
-					{
-						img: '/static/images/order5.png',
-						title: '售后/退款',
-						url: '/pages/users/user_return_list/index'
-					},
-				],
-				imgUrls: [],
 				autoplay: true,
 				circular: true,
 				interval: 3000,
@@ -215,10 +99,6 @@
 				isShowAuth: false, //是否隐藏授权
 				orderStatusNum: {},
 				userInfo: {},
-				MyMenus: [],
-				// #ifdef H5
-				isWeixin: Auth.isWeixin()
-				//#endif
 			}
 		},
 		filters: {
@@ -227,51 +107,17 @@
 			}
 		},
 		watch: {
-			MyMenus(newValue, oldValue) {
-				for (let key in newValue) {
-					if (newValue[key].url === '/pages/users/user_spread_user/index') {
-						uni.setStorageSync('user_spread_user', newValue[key].url);
-						break;
-					}
-				}
-			}
 		},
 		onLoad(options) {
 			let that = this;
-			that.$set(that, 'MyMenus', app.globalData.MyMenus);
-			if (that.isLogin == false) {
-				// #ifdef H5 || APP-PLUS
-				toLogin()
-				// #endif
-			}
-			// #ifdef H5
-			if (options.code) {
-				let spread = app.globalData.spid ? app.globalData.spid : '';
-				wechatAuthV2(options.code, spread).then(res => {
-					location.href = decodeURIComponent(
-						decodeURIComponent(options.back_url)
-					)
-				})
-			}
-			// #endif
 		},
 		onShow: function() {
 			let that = this;
 			if (that.isLogin) {
 				this.getUserInfo();
-				this.setVisit();
 			};
-			this.getMyMenus();
-			if (!app.globalData.isIframe) {
-				uni.showTabBar();
-			}
 		},
 		methods: {
-			getWechatuserinfo() {
-				//#ifdef H5
-				Auth.isWeixin() && Auth.oAuth('snsapi_userinfo');
-				//#endif
-			},
 			getRoutineUserInfo(e) {
 				updateUserInfo({
 					userInfo: e.detail.userInfo
@@ -282,21 +128,14 @@
 
 				})
 			},
-			// 记录会员访问
-			setVisit() {
-				setVisit({
-					url: '/pages/user/index'
-				}).then(res => {})
-			},
 			// 打开授权
 			openAuto() {
-				toLogin();
+				this.isShowAuth = true;
+				//toLogin();
 			},
 			// 授权回调
 			onLoadFun() {
 				this.getUserInfo();
-				this.getMyMenus();
-				this.setVisit();
 			},
 			Setting: function() {
 				uni.openSetting({
@@ -307,12 +146,6 @@
 			authColse: function(e) {
 				this.isShowAuth = e
 			},
-			// 绑定手机
-			bindPhone() {
-				uni.navigateTo({
-					url: '/pages/users/user_phone/index'
-				})
-			},
 			/**
 			 * 获取个人用户信息
 			 */
@@ -321,37 +154,6 @@
 				getUserInfo().then(res => {
 					that.userInfo = res.data
 					that.$store.commit("SETUID", res.data.uid);
-					that.orderMenu.forEach((item, index) => {
-						switch (item.title) {
-							case '待付款':
-								item.num = res.data.orderStatusNum.unpaid_count
-								break
-							case '待发货':
-								item.num = res.data.orderStatusNum.unshipped_count
-								break
-							case '待收货':
-								item.num = res.data.orderStatusNum.received_count
-								break
-							case '待评价':
-								item.num = res.data.orderStatusNum.evaluated_count
-								break
-							case '售后/退款':
-								item.num = res.data.orderStatusNum.refund_count
-								break
-						}
-					})
-				});
-			},
-			/**
-			 * 
-			 * 获取个人中心图标
-			 */
-			getMyMenus: function() {
-				let that = this;
-				if (this.MyMenus.length) return;
-				getMenuList().then(res => {
-					that.$set(that, 'MyMenus', res.data.routine_my_menus);
-					this.imgUrls = res.data.routine_my_banner
 				});
 			},
 			// 编辑页面
@@ -360,40 +162,6 @@
 					url: '/pages/users/user_info/index'
 				})
 			},
-			// 签到
-			goSignIn() {
-				uni.navigateTo({
-					url: '/pages/users/user_sgin/index'
-				})
-			},
-			// goMenuPage
-			goMenuPage(url, name) {
-				if (this.isLogin) {
-					if (url.indexOf('http') === -1) {
-						// #ifdef H5
-						if (name && name === '客服接待') {
-							return uni.navigateTo({
-								url: `/pages/annex/web_view/index?url=${location.origin}${url}`
-							});
-						}
-						// #endif
-						uni.navigateTo({
-							url: url
-						})
-					} else {
-						uni.navigateTo({
-							url: `/pages/annex/web_view/index?url=${url}`
-						});
-					}
-				} else {
-					// #ifdef H5
-					toLogin();
-					// #endif
-					// #ifdef MP
-					this.openAuto()
-					// #endif
-				}
-			}
 		}
 	}
 </script>
