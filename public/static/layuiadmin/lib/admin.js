@@ -209,7 +209,7 @@ layui.define('view', function(exports){
         
         //logo
         ,'.layui-layout-admin .layui-logo{background-color:{{d.color.logo || d.color.main}} !important;}'
-        
+
         //头部色
         ,'{{# if(d.color.header){ }}'
           ,'.layui-layout-admin .layui-header{background-color:{{ d.color.header }};}'
@@ -221,6 +221,37 @@ layui.define('view', function(exports){
           ,'.layui-layout-admin .layui-header .layui-nav .layui-this:after, .layui-layout-admin .layui-header .layui-nav-bar{background-color: #fff; background-color: rgba(255,255,255,.5);}'
           ,'.layadmin-pagetabs .layui-tab-title li:after{display: none;}'
         ,'{{# } }}'
+
+          //sensen 定制白色主题
+          ,'{{# if(d.color.sensen){ }}'
+            ,'.layui-nav-tree .layui-nav-bar{ background: {{ d.color.sensen }} !important; }'
+            ,'.layui-layout-admin .layui-logo,'
+            ,'.layui-layout-admin .layui-logo a,'
+            ,'.layui-nav-tree .layui-this,'
+            ,'.layui-nav-tree .layui-this>a,'
+            ,'.layui-nav-tree .layui-nav-child dd.layui-this,'
+            ,'.layui-nav-tree .layui-nav-child dd.layui-this a,'
+            ,'.layui-nav-itemed>a,'
+            ,'.layui-nav-tree .layui-nav-title a,'
+            ,'.layui-nav-tree .layui-nav-title a:hover,'
+            ,'.layui-nav .layui-nav-itemed>a{ color: #1890ff !important;}'
+            ,'.layui-nav-itemed>.layui-nav-child,'
+            ,'.layui-layout-admin .layui-logo{ background: {{ d.color.main }} !important;}'
+            ,'.layui-nav-itemed>.layui-nav-child{ background: {{ d.color.main }} !important;}'
+            ,'.layui-nav .layui-nav-item a,'
+            ,'.layui-layout-admin .layui-header a,'
+            ,'.layui-layout-admin .layui-header .layui-nav .layui-nav-more,'
+            ,'.layui-layout-admin .layui-header a cite{ color: #333333 !important; }'
+            ,'.layui-nav .layui-nav-more,'
+            ,'.layui-layout-admin .layui-header .layui-nav .layui-nav-more{ border-color: #333333 transparent transparent; }'
+            ,'.layui-nav .layui-nav-mored,'
+            ,'.layui-nav-itemed>a .layui-nav-more{ border-color: transparent transparent #1890ff !important; }'
+            ,'.layui-nav, .layui-side-menu,'
+            ,'.layadmin-setTheme-side{ background-color: {{ d.color.main }}; }'
+            ,'.layadmin-pagetabs .layui-tab-title li:hover,'
+            ,'.layadmin-pagetabs .layui-tab-title li.layui-this{ border-top: 2px solid #666666; }'
+          ,'{{# } }}'
+
       ].join('')).render(options = $.extend({}, local.theme, options))
       ,styleElem = document.getElementById(id);
       

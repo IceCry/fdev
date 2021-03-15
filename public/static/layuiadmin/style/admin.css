@@ -240,14 +240,14 @@ html{background-color: #f2f2f2; color: #666;}
 .layui-layout-admin .layui-header .layui-nav .layui-nav-mored{border-color: transparent; border-bottom-color: #666;}
 .layui-layout-admin .layui-header .layui-nav .layui-this:after, 
 .layui-layout-admin .layui-header .layui-nav-bar{height: 2px; background-color: #20222A}
-.layui-layout-admin .layui-logo{background-color: #20222A; box-shadow: 0 1px 2px 0 rgba(0,0,0,.15);}
+.layui-layout-admin .layui-logo{background-color: #ffffff; box-shadow: 0 1px 2px 0 rgba(0,0,0,.15);}
 .layui-layout-admin .layui-logo,
-.layui-layout-admin .layui-logo a{color: #fff; color: rgba(255,255,255,.8)}
+.layui-layout-admin .layui-logo a{color: #333333; color: rgba(255,255,255,.8)}
 .layui-side-menu{box-shadow: 1px 0 2px 0 rgba(0,0,0,.05);}
 .layui-layout-admin .layui-footer{box-shadow: 0 -1px 2px 0 rgba(0,0,0,.05);}
 
 .layui-side-menu,
-.layadmin-setTheme-side{background-color: #20222A; color: #fff;}
+.layadmin-setTheme-side{background-color: #ffffff; color: #333333;}
 .layadmin-setTheme-header{background-color: #fff;}
 
 .layui-layout-admin .layui-footer{background-color: #fff;}

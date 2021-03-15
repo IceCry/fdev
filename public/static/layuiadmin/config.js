@@ -46,11 +46,13 @@ layui.define(['laytpl', 'layer', 'element', 'util'], function(exports){
     
     //主题配置
     ,theme: {
-      //内置主题配色方案
+      //自定义白色主题
       color: [{
           main: '#ffffff'
           ,logo: '#ffffff'
           ,selected: '#e6f7ff'
+          ,header: '#ffffff'
+          ,sensen: '#1890ff' //文字默认颜色
           ,alias: 'white' //白色
       },{
         main: '#20222A' //主题色
@@ -94,7 +96,8 @@ layui.define(['laytpl', 'layer', 'element', 'util'], function(exports){
         ,selected: '#009688'
         ,alias: 'classic-black' //经典黑
       },{
-        logo: '#226A62'
+        main: '#000000'
+        ,logo: '#226A62'
         ,header: '#2F9688'
         ,alias: 'green-header' //墨绿头
       },{
@@ -104,7 +107,8 @@ layui.define(['laytpl', 'layer', 'element', 'util'], function(exports){
         ,header: '#1E9FFF'
         ,alias: 'ocean-header' //海洋头
       },{
-        header: '#393D49'
+        main: '#000000'
+        ,header: '#393D49'
         ,alias: 'classic-black-header' //经典黑头
       },{
         main: '#50314F'
